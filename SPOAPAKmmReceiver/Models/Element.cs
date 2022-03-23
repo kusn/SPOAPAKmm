@@ -3,7 +3,7 @@ using SPOAPAKmmReceiver.Models.Base;
 
 namespace SPOAPAKmmReceiver.Models
 {
-    public class Room : Entity
+    public class Element : Entity
     {
         [NotNull]
         public string Name { get; set; }
@@ -11,8 +11,8 @@ namespace SPOAPAKmmReceiver.Models
         public string? Description { get; set; }
 
         [NotNull]
-        public Organization Organization { get; set; }
+        public Room Room { get; set; }
 
-        public ICollection<Element> Elements { get; set; }
+        public ICollection<MeasPoint> Points { get; set; }
     }
 }
