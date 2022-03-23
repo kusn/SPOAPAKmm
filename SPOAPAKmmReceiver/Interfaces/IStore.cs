@@ -1,9 +1,5 @@
-﻿using System;
+﻿using SPOAPAKmmReceiver.Models.Base;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SPOAPAKmmReceiver.Models.Base;
 
 namespace SPOAPAKmmReceiver.Interfaces
 {
@@ -15,8 +11,8 @@ namespace SPOAPAKmmReceiver.Interfaces
 
         T Add(T item);
 
-        T Update(T item);
+        void Update(T item);
 
-        void Delete(T item);
+        void Delete(int id);
     }
 }
