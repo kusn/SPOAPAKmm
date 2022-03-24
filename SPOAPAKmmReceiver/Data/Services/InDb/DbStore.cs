@@ -11,10 +11,10 @@ namespace SPOAPAKmmReceiver.Data.Stores.InDb
 {
     internal class DbStore<T> : IStore<T> where T : Entity
     {
-        private readonly SPOAPAKmmReceiverDB _db;
+        private readonly SPOAPAKmmDB _db;
         private DbSet<T> Set { get; }
 
-        public DbStore(SPOAPAKmmReceiverDB db)
+        public DbStore(SPOAPAKmmDB db)
         {
             _db = db;
             Set = db.Set<T>();

@@ -10,9 +10,10 @@ namespace SPOAPAKmmReceiver.Models
 
         public string? Description { get; set; }
 
-        [NotNull]
-        public Organization Organization { get; set; }
-
         public ICollection<Element> Elements { get; set; }
+
+        public ICollection<Device> Devices { get; set; }
+
+        public Organization Organization { get; set; }
     }
 }

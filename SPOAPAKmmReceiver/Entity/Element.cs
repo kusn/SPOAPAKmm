@@ -10,9 +10,8 @@ namespace SPOAPAKmmReceiver.Models
 
         public string? Description { get; set; }
 
-        [NotNull]
-        public Room Room { get; set; }
-
         public ICollection<MeasPoint> Points { get; set; }
+
+        public Room Room { get; set; }
     }
 }

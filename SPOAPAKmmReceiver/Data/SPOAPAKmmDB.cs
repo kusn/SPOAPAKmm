@@ -3,7 +3,7 @@ using SPOAPAKmmReceiver.Models;
 
 namespace SPOAPAKmmReceiver.Data
 {
-    public class SPOAPAKmmReceiverDB : DbContext
+    class SPOAPAKmmDB : DbContext
     {
         public DbSet<Organization> Organizations { get; set; }
 
@@ -15,9 +15,13 @@ namespace SPOAPAKmmReceiver.Data
 
         public DbSet<Measuring> Measurings { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<Device> Devices { get; set; }
+
+        public SPOAPAKmmDB(DbContextOptions<SPOAPAKmmDB> opt) : base(opt) { }
+
+        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-        }
+        }*/
     }
 }
