@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPOAPAKmmReceiver"
         mc:Ignorable="d"
+        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
         Title="MainWindow" Height="450" Width="800">
     <StackPanel Orientation="Vertical">
-        <Menu HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+        <Menu>
             <MenuItem Header="Настройки" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Menu>
@@ -16,12 +17,21 @@
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Width="400">
-                <TreeView.ItemTemplate>
-                    <DataTemplate></DataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-            <DataGrid Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"></DataGrid>
+            <DockPanel Grid.Column="0">
+                <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Add"/>
+                    <Button Content="Remove"/>
+                    <Button Content="Copy"/>
+                </WrapPanel>
+                <TreeView>
+                    <TreeView.ItemTemplate>
+                        <DataTemplate></DataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
+            <DockPanel Grid.Column="1">
+                <ContentControl Content="{Binding UserPage}"></ContentControl>
+            </DockPanel>
         </Grid>
         <StatusBar >
             <StatusBarItem Content="Статус:"></StatusBarItem>
