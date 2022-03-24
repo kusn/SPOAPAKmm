@@ -6,7 +6,25 @@
         xmlns:local="clr-namespace:SPOAPAKmmReceiver"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+    <StackPanel Orientation="Vertical">
+        <Menu HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <MenuItem Header="Настройки" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+        </Menu>
+        <Grid Height="375">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TreeView Grid.Column="0" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Width="400">
+                <TreeView.ItemTemplate>
+                    <DataTemplate></DataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <DataGrid Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"></DataGrid>
+        </Grid>
+        <StatusBar >
+            <StatusBarItem Content="Статус:"></StatusBarItem>
+        </StatusBar>
+    </StackPanel>
 </Window>
