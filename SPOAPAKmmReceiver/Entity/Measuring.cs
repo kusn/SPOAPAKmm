@@ -10,6 +10,6 @@ namespace SPOAPAKmmReceiver.Models
 
         public double P2 { get; set; }
 
-        public MeasPoint MeasPoint { get; set; }
+        public MeasPoint MeasPoint { get; set; } = null!;
     }
 }

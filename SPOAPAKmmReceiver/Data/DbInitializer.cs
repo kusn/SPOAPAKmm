@@ -15,7 +15,7 @@ namespace SPOAPAKmmReceiver.Data
         public async Task InitializeAsync()
         {
             await _db.Database.MigrateAsync().ConfigureAwait(false);
-
+#if DEBUG
             if (!await _db.Organizations.AnyAsync())
             {
                 await _db.Organizations.AddRangeAsync();
@@ -51,6 +51,8 @@ namespace SPOAPAKmmReceiver.Data
                 await _db.Measurings.AddRangeAsync();
                 await _db.SaveChangesAsync();
             }
+#endif
+
         }
     }
 }

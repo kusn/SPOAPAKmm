@@ -5,8 +5,7 @@ namespace SPOAPAKmmReceiver.Models
 {
     public class Room : Entity
     {
-        [NotNull]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public string? Description { get; set; }
 
@@ -14,6 +13,6 @@ namespace SPOAPAKmmReceiver.Models
 
         public ICollection<Device> Devices { get; set; }
 
-        public Organization Organization { get; set; }
+        public Organization Organization { get; set; } = null!;
     }
 }

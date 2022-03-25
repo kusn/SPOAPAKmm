@@ -5,10 +5,9 @@ namespace SPOAPAKmmReceiver.Models
 {
     public class Organization : Entity
     {
-        [NotNull]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
-        public string? Address { get; set; }
+        public string Address { get; set; }
 
         public string? Description { get; set; }
 
