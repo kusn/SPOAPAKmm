@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using SPOAPAKmmReceiver.Models.Base;
+using SPOAPAKmmReceiver.Entities.Base;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmmReceiver.Entities
 {
-    public class MeasPoint : Entity
+    public class MeasPoint : Base.Entity
     {
         public string Name { get; set; } = null!;
 

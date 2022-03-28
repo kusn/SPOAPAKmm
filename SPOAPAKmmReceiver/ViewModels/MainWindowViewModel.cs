@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Interfaces;
-using SPOAPAKmmReceiver.Models;
+using SPOAPAKmmReceiver.Entities;
 using SPOAPAKmmReceiver.ViewModels.Base;
 
 namespace SPOAPAKmmReceiver.ViewModels
@@ -29,7 +29,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         public ObservableCollection<Device> Devices { get; set; }
 
-        public ObservableCollection<MeasPoint> MeasPoints { get; set; }
+        public ObservableCollection<MeasPoint> Points { get; set; }
 
         public ObservableCollection<Measuring> Measurings { get; set; }
 
@@ -44,7 +44,26 @@ namespace SPOAPAKmmReceiver.ViewModels
             _dBMeasPoint = dBMeasPoint;
             _dBMeasuring = dBMeasuring;
 
-            _dBOrganization.Add(TestData.TestDataOrganizations.First());
+            IEnumerable<Organization> organizationsInDb = new List<Organization>();
+
+
+            organizationsInDb = _dBOrganization.GetAll();
+            var c = organizationsInDb.Count();
+
+
+            foreach (var org in TestData.TestDataOrganizations)
+            {
+                if(c == 0 || (organizationsInDb.First(o => o.Name == org.Name) == null))
+                    _dBOrganization.Add(org);
+            }
+            
+            Organizations = new ObservableCollection<Organization>(_dBOrganization.GetAll());
+            Rooms = new ObservableCollection<Room>(_dBRoom.GetAll());
+            Elements = new ObservableCollection<Element>(_dBElement.GetAll());
+            Devices = new ObservableCollection<Device>(_dBDevice.GetAll());
+            Points = new ObservableCollection<MeasPoint>(_dBMeasPoint.GetAll());
+            Measurings = new ObservableCollection<Measuring>(_dBMeasuring.GetAll());
+
         }
 
     }

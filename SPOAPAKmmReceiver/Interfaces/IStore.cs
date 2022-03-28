@@ -1,9 +1,9 @@
-﻿using SPOAPAKmmReceiver.Models.Base;
+﻿using SPOAPAKmmReceiver.Entities.Base;
 using System.Collections.Generic;
 
 namespace SPOAPAKmmReceiver.Interfaces
 {
-    public interface IStore<T> where T : Entity
+    public interface IStore<T> where T : Entities.Base.Entity
     {
         IEnumerable<T> GetAll();
         

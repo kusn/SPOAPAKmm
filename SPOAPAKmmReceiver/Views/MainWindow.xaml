@@ -4,9 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPOAPAKmmReceiver"
+        xmlns:src="clr-namespace:SPOAPAKmmReceiver"
+        xmlns:entities="clr-namespace:SPOAPAKmmReceiver.Entities"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
         Title="MainWindow" Height="450" Width="800">
+    
     <StackPanel Orientation="Vertical">
         <Menu>
             <MenuItem Header="Настройки" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
@@ -17,16 +20,27 @@
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0">
+            <DockPanel Grid.Column="0" Margin="5,0,0,0">
                 <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="Add"/>
                     <Button Content="Remove"/>
                     <Button Content="Copy"/>
                 </WrapPanel>
-                <TreeView>
-                    <TreeView.ItemTemplate>
-                        <DataTemplate></DataTemplate>
-                    </TreeView.ItemTemplate>
+                <TreeView ItemsSource="{Binding Organizations}"  Margin="5,0,0,0">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Organization}" ItemsSource="{Binding Rooms}">
+                            <TreeViewItem Header="{Binding Name}"/>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Room}" ItemsSource="{Binding Elements}">
+                            <TreeViewItem Header="{Binding Name }"/>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Element}" ItemsSource="{Binding Points}">
+                            <TreeViewItem Header="{Binding Name }"/>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type entities:MeasPoint}">
+                            <TextBlock Text="{Binding Name }"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
                 </TreeView>
             </DockPanel>
             <DockPanel Grid.Column="1">

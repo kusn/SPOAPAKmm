@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SPOAPAKmmReceiver.Interfaces;
-using SPOAPAKmmReceiver.Models.Base;
+using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Data.Stores.InDb
 {

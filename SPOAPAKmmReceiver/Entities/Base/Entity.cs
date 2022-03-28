@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace SPOAPAKmmReceiver.Models.Base
+namespace SPOAPAKmmReceiver.Entities.Base
 {
     public abstract class Entity
     {

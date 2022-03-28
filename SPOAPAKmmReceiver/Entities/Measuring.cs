@@ -1,8 +1,8 @@
-﻿using SPOAPAKmmReceiver.Models.Base;
+﻿using SPOAPAKmmReceiver.Entities.Base;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmmReceiver.Entities
 {
-    public class Measuring : Entity
+    public class Measuring : Base.Entity
     {
         public double Freq { get; set; }
 

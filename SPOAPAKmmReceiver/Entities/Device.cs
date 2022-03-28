@@ -1,8 +1,8 @@
-﻿using SPOAPAKmmReceiver.Models.Base;
+﻿using SPOAPAKmmReceiver.Entities.Base;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmmReceiver.Entities
 {
-    public class Device : Entity
+    public class Device : Base.Entity
     {
         public string Type { get; set; }
         

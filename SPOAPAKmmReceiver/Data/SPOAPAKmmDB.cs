@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SPOAPAKmmReceiver.Models;
+using SPOAPAKmmReceiver.Entities;
 
 namespace SPOAPAKmmReceiver.Data
 {

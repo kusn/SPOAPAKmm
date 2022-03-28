@@ -1,9 +1,9 @@
-﻿using SPOAPAKmmReceiver.Models.Base;
+﻿using SPOAPAKmmReceiver.Entities.Base;
 using System.Collections.Generic;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmmReceiver.Entities
 {
-    public class Organization : Entity
+    public class Organization : Base.Entity
     {
         public string Name { get; set; } = null!;
 
