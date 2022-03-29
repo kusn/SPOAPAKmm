@@ -26,7 +26,19 @@
                     <Button Content="Remove"/>
                     <Button Content="Copy"/>
                 </WrapPanel>
-                <TreeView ItemsSource="{Binding Organizations}"  Margin="5,0,0,0">
+                <TreeView ItemsSource="{Binding Organizations}">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="False"/>
+                            <Setter Property="IsSelected" Value="False"/>
+                            <Setter Property="FontWeight" Value="Normal"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type entities:Organization}" ItemsSource="{Binding Rooms}">
                             <TreeViewItem Header="{Binding Name}"/>
