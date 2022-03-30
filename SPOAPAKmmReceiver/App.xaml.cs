@@ -38,7 +38,8 @@ namespace SPOAPAKmmReceiver
             services.AddDbContext<SPOAPAKmmDB>(opt => opt.UseSqlite(host.Configuration.GetConnectionString("Default")));
             services.AddTransient<DbInitializer>();
 
-            services.AddSingleton<MainWindowViewModel>();
+            services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<TreeViewItemViewModel>();
 
             services.AddScoped(typeof(IStore<>), typeof(DbStore<>));
         }
