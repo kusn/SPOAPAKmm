@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using SPOAPAKmmReceiver.Controls;
 using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.Entities;
@@ -23,6 +24,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         
         private bool _isSelected;
         private object _selectedValue;
+        private Page _userPage;
 
         public ObservableCollection<Organization> Organizations { get; set; }
 
@@ -45,10 +47,35 @@ namespace SPOAPAKmmReceiver.ViewModels
         public object SelectedValue
         {
             get => _selectedValue;
-            set => Set(ref _selectedValue, value);
-        }
+            set
+            {
+                Set(ref _selectedValue, value);
 
-        public Page UserPage { get; set; }
+                if (value != null)
+                {
+                    if (value is Organization)
+                        UserPage = new OrganizationPage();
+                    else if (value is Room)
+                    {
+                        UserPage = new RoomPage();
+                    }
+                    else if (value is Element)
+                    {
+                        UserPage = new ElementPage();
+                    }
+                    else if (value is MeasPoint)
+                    {
+                        UserPage = new MeasPointPage();
+                    }
+                }
+            }
+}
+
+        public Page UserPage
+        {
+            get => _userPage;
+            set => Set(ref _userPage, value);
+        }
 
         public MainWindowViewModel(IStore<Organization> dBOrganization, IStore<Room> dBRoom, IStore<Element> dBElement, IStore<Device> dBDevice, IStore<MeasPoint> dBMeasPoint, IStore<Measuring> dBMeasuring)
         {

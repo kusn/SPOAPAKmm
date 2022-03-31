@@ -9,6 +9,22 @@
       Title="OrganizationPage">
 
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
+            <TextBox DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        </DockPanel>
+        <DockPanel Grid.Row="1">
+            <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
+            <TextBox DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        </DockPanel>
+        <DockPanel Grid.Row="2">
+            <Label DockPanel.Dock="Top" Content="Описание организации" HorizontalAlignment="Center"/>
+            <TextBox DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        </DockPanel>
     </Grid>
 </Page>
