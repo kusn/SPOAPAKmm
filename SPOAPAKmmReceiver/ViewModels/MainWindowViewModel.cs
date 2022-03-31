@@ -20,6 +20,9 @@ namespace SPOAPAKmmReceiver.ViewModels
         private IStore<Device> _dBDevice;
         private IStore<MeasPoint> _dBMeasPoint;
         private IStore<Measuring> _dBMeasuring;
+        
+        private bool _isSelected;
+        private object _selectedValue;
 
         public ObservableCollection<Organization> Organizations { get; set; }
 
@@ -32,6 +35,18 @@ namespace SPOAPAKmmReceiver.ViewModels
         public ObservableCollection<MeasPoint> Points { get; set; }
 
         public ObservableCollection<Measuring> Measurings { get; set; }
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => Set(ref _isSelected, value);
+        }
+
+        public object SelectedValue
+        {
+            get => _selectedValue;
+            set => Set(ref _selectedValue, value);
+        }
 
         public Page UserPage { get; set; }
 
@@ -63,6 +78,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             Devices = new ObservableCollection<Device>(_dBDevice.GetAll());
             Points = new ObservableCollection<MeasPoint>(_dBMeasPoint.GetAll());
             Measurings = new ObservableCollection<Measuring>(_dBMeasuring.GetAll());
+
+            var v = SelectedValue;
 
         }
 

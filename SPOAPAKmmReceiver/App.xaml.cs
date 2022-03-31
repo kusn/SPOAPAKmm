@@ -39,7 +39,6 @@ namespace SPOAPAKmmReceiver
             services.AddTransient<DbInitializer>();
 
             services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<TreeViewItemViewModel>();
 
             services.AddScoped(typeof(IStore<>), typeof(DbStore<>));
         }
