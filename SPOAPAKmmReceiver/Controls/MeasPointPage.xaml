@@ -16,15 +16,15 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom"/>
+            <TextBox Text="{Binding Name_, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:MeasPointPage}}" DockPanel.Dock="Bottom"/>
         </DockPanel>
         <DockPanel Grid.Row="1">
             <Label DockPanel.Dock="Top" Content="Описание точки" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom"/>
+            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:MeasPointPage}}" DockPanel.Dock="Bottom"/>
         </DockPanel>
         <DockPanel Grid.Row="2">
             <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
-            <DataGrid/>
+            <DataGrid ItemsSource="{Binding  Measurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:MeasPointPage}}"/>
         </DockPanel>
     </Grid>
 </Page>

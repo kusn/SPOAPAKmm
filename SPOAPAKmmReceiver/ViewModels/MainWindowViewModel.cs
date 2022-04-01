@@ -25,6 +25,10 @@ namespace SPOAPAKmmReceiver.ViewModels
         private bool _isSelected;
         private object _selectedValue;
         private Page _userPage;
+        private Organization _selectedOrganization;
+        private Room _selectedRoom;
+        private Element _selectedElement;
+        private MeasPoint _selectedPoint;
 
         public ObservableCollection<Organization> Organizations { get; set; }
 
@@ -37,6 +41,30 @@ namespace SPOAPAKmmReceiver.ViewModels
         public ObservableCollection<MeasPoint> Points { get; set; }
 
         public ObservableCollection<Measuring> Measurings { get; set; }
+
+        public Organization SelectedOrganization
+        {
+            get => _selectedOrganization;
+            set => Set(ref _selectedOrganization, value);
+        }
+
+        public Room SelectedRoom
+        {
+            get => _selectedRoom;
+            set => Set(ref _selectedRoom, value);
+        }
+
+        public Element SelectedElement
+        {
+            get => _selectedElement;
+            set => Set(ref _selectedElement, value);
+        }
+
+        public MeasPoint SelectedPoint
+        {
+            get => _selectedPoint;
+            set => Set(ref _selectedPoint, value);
+        }
 
         public bool IsSelected
         {
@@ -54,18 +82,25 @@ namespace SPOAPAKmmReceiver.ViewModels
                 if (value != null)
                 {
                     if (value is Organization)
-                        UserPage = new OrganizationPage();
+                    {
+                        SelectedOrganization = (Organization)value;
+                        UserPage = new OrganizationPage(this);
+                        //SelectedOrganization = (Organization)value;
+                    }
                     else if (value is Room)
                     {
-                        UserPage = new RoomPage();
+                        SelectedRoom = (Room)value;
+                        UserPage = new RoomPage(this);
                     }
                     else if (value is Element)
                     {
-                        UserPage = new ElementPage();
+                        SelectedElement = (Element)value;
+                        UserPage = new ElementPage(this);
                     }
                     else if (value is MeasPoint)
                     {
-                        UserPage = new MeasPointPage();
+                        SelectedPoint = (MeasPoint)value;
+                        UserPage = new MeasPointPage(this);
                     }
                 }
             }
@@ -77,7 +112,12 @@ namespace SPOAPAKmmReceiver.ViewModels
             set => Set(ref _userPage, value);
         }
 
-        public MainWindowViewModel(IStore<Organization> dBOrganization, IStore<Room> dBRoom, IStore<Element> dBElement, IStore<Device> dBDevice, IStore<MeasPoint> dBMeasPoint, IStore<Measuring> dBMeasuring)
+        public MainWindowViewModel(IStore<Organization> dBOrganization,
+            IStore<Room> dBRoom,
+            IStore<Element> dBElement,
+            IStore<Device> dBDevice,
+            IStore<MeasPoint> dBMeasPoint,
+            IStore<Measuring> dBMeasuring)
         {
             _dBOrganization = dBOrganization;
             _dBRoom = dBRoom;

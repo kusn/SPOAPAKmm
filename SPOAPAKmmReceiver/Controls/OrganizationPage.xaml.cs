@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SPOAPAKmmReceiver.ViewModels;
 
 namespace SPOAPAKmmReceiver.Controls
 {
@@ -20,9 +21,18 @@ namespace SPOAPAKmmReceiver.Controls
     /// </summary>
     public partial class OrganizationPage : Page
     {
-        public OrganizationPage()
+        public string Name_ { get; set; }
+        public string Address { get; set; }
+        public string? Description { get; set; }
+
+        public OrganizationPage(MainWindowViewModel vm)
         {
             InitializeComponent();
+
+            Name_ = vm.SelectedOrganization.Name;
+            Address = vm.SelectedOrganization.Address;
+            Description = vm.SelectedOrganization.Description;
+
         }
     }
 }

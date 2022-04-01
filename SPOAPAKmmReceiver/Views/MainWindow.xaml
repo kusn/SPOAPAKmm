@@ -57,7 +57,7 @@
                 </local:ExtendedTreeView>
             </DockPanel>
             <DockPanel Grid.Column="1">
-                <Frame NavigationUIVisibility="Hidden" Content="{Binding UserPage, Mode=TwoWay}"></Frame>
+                <Frame NavigationUIVisibility="Hidden" Content="{Binding UserPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Frame>
             </DockPanel>
         </Grid>
         <StatusBar >

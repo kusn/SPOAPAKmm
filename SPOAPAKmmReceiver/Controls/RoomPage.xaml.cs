@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SPOAPAKmmReceiver.ViewModels;
 
 namespace SPOAPAKmmReceiver.Controls
 {
@@ -20,9 +21,15 @@ namespace SPOAPAKmmReceiver.Controls
     /// </summary>
     public partial class RoomPage : Page
     {
-        public RoomPage()
+        public string Name_ { get; set; }
+        public string? Description { get; set; }
+
+        public RoomPage(MainWindowViewModel vm)
         {
             InitializeComponent();
+
+            Name_ = vm.SelectedRoom.Name;
+            Description = vm.SelectedRoom.Description;
         }
     }
 }

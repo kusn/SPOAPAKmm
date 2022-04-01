@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:SPOAPAKmmReceiver.Controls"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+      DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
       Title="OrganizationPage">
 
     <Grid>
@@ -16,15 +17,15 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <TextBox Text="{Binding Name_, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:OrganizationPage}}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </DockPanel>
         <DockPanel Grid.Row="1">
             <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <TextBox Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:OrganizationPage}}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </DockPanel>
         <DockPanel Grid.Row="2">
             <Label DockPanel.Dock="Top" Content="Описание организации" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:OrganizationPage}}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </DockPanel>
     </Grid>
 </Page>

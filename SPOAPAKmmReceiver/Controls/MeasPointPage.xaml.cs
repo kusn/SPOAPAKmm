@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SPOAPAKmmReceiver.Entities;
+using SPOAPAKmmReceiver.ViewModels;
 
 namespace SPOAPAKmmReceiver.Controls
 {
@@ -20,9 +22,28 @@ namespace SPOAPAKmmReceiver.Controls
     /// </summary>
     public partial class MeasPointPage : Page
     {
-        public MeasPointPage()
+        public string Name_ { get; set; }
+
+        public string? Description { get; set; }
+
+        public double AverageE { get; set; }
+
+        public double DX { get; set; }
+
+        public double E { get; set; }
+
+        public ICollection<Measuring> Measurings { get; set; }
+
+        public MeasPointPage(MainWindowViewModel vm)
         {
             InitializeComponent();
+
+            Name_ = vm.SelectedPoint.Name;
+            Description = vm.SelectedPoint.Description;
+            AverageE = vm.SelectedPoint.AverageE;
+            DX = vm.SelectedPoint.DX;
+            E = vm.SelectedPoint.E;
+            Measurings = vm.SelectedPoint.Measurings;
         }
     }
 }

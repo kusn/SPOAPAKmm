@@ -15,11 +15,11 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <Label DockPanel.Dock="Top" Content="Название элемента" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom"/>
+            <TextBox Text="{Binding Name_, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:ElementPage}}" DockPanel.Dock="Bottom"/>
         </DockPanel>
         <DockPanel Grid.Row="1">
             <Label DockPanel.Dock="Top" Content="Описание элемента" HorizontalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Bottom"/>
+            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:ElementPage}}" DockPanel.Dock="Bottom"/>
         </DockPanel>
     </Grid>
 </Page>

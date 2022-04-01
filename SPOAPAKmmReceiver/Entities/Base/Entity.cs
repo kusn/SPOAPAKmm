@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace SPOAPAKmmReceiver.Entities.Base
 {
-    public abstract class Entity
+    public abstract class Entity : INotifyPropertyChanged
     {
         public int Id { get; set; }
 
