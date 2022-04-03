@@ -84,8 +84,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                     if (value is Organization)
                     {
                         SelectedOrganization = (Organization)value;
-                        UserPage = new OrganizationPage(this);
-                        //SelectedOrganization = (Organization)value;
+                        UserPage = new OrganizationPage();
+                        UserPage.DataContext = SelectedOrganization;
                     }
                     else if (value is Room)
                     {

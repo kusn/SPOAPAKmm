@@ -21,17 +21,17 @@ namespace SPOAPAKmmReceiver.Controls
     /// </summary>
     public partial class OrganizationPage : Page
     {
-        public string Name_ { get; set; }
+        /*public string Name_ { get; set; }
         public string Address { get; set; }
-        public string? Description { get; set; }
+        public string? Description { get; set; }*/
 
-        public OrganizationPage(MainWindowViewModel vm)
+        public OrganizationPage()
         {
             InitializeComponent();
 
-            Name_ = vm.SelectedOrganization.Name;
+            /*Name_ = vm.SelectedOrganization.Name;
             Address = vm.SelectedOrganization.Address;
-            Description = vm.SelectedOrganization.Description;
+            Description = vm.SelectedOrganization.Description;*/
 
         }
     }

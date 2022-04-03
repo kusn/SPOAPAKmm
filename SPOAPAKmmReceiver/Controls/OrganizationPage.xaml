@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
-            <TextBox Text="{Binding Name_, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:OrganizationPage}}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource AncestorType=local:OrganizationPage}}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
         </DockPanel>
         <DockPanel Grid.Row="1">
             <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
