@@ -20,6 +20,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private IStore<Measuring> _dBMeasuring;
         
         private bool _isSelected;
+        private bool _isChanged;
         private object _selectedValue;
         private Page _userPage;
         private Organization _selectedOrganization;
@@ -33,17 +34,21 @@ namespace SPOAPAKmmReceiver.ViewModels
         private Visibility _isVisibilityPoint = Visibility.Collapsed;
         private Visibility _isVisibilityTabControl = Visibility.Hidden;
         private int _selectedTab = 0;
+        private string _selectedOrganizationName;
+        private string _selectedOrganizationDescription;
+        private string _selectedOrganizationAddress;
+        private string _selectedRoomName;
+        private string _selectedRoomDescription;
+        private string _selectedElementName;
+        private string _selectedElementDescription;
+        private string _selectedPointName;
+        private string _selectedPointDescription;
 
         public ObservableCollection<Organization> Organizations { get; set; }
-
         public ObservableCollection<Room> Rooms { get; set; }
-
         public ObservableCollection<Element> Elements { get; set; }
-
         public ObservableCollection<Device> Devices { get; set; }
-
         public ObservableCollection<MeasPoint> Points { get; set; }
-
         public ObservableCollection<Measuring> Measurings { get; set; }
 
         public Organization SelectedOrganization
@@ -51,67 +56,61 @@ namespace SPOAPAKmmReceiver.ViewModels
             get => _selectedOrganization;
             set => Set(ref _selectedOrganization, value);
         }
-
         public Room SelectedRoom
         {
             get => _selectedRoom;
             set => Set(ref _selectedRoom, value);
         }
-
         public Element SelectedElement
         {
             get => _selectedElement;
             set => Set(ref _selectedElement, value);
         }
-
         public MeasPoint SelectedPoint
         {
             get => _selectedPoint;
             set => Set(ref _selectedPoint, value);
         }
-
         public Visibility IsVisibilityOrganization
         {
             get => _isVisibilityOrganization;
             set => Set(ref _isVisibilityOrganization, value);
         }
-
         public Visibility IsVisibilityRoom
         {
             get => _isVisibilityRoom;
             set => Set(ref _isVisibilityRoom, value);
         }
-
         public Visibility IsVisibilityElement
         {
             get => _isVisibilityElement;
             set => Set(ref _isVisibilityElement, value);
         }
-
         public Visibility IsVisibilityPoint
         {
             get => _isVisibilityPoint;
             set => Set(ref _isVisibilityPoint, value);
         }
-
         public Visibility IsVisibilityTabControl
         {
             get => _isVisibilityTabControl;
             set => Set(ref _isVisibilityTabControl, value);
         }
-
         public int SelectedTab
         {
             get => _selectedTab;
             set => Set(ref _selectedTab, value);
         }
-
         public bool IsSelected
         {
             get => _isSelected;
             set => Set(ref _isSelected, value);
         }
-
+        public bool IsChanged
+        {
+            get => _isChanged;
+            set => Set(ref _isChanged, value);
+        }
         public object SelectedValue
         {
             get => _selectedValue;
@@ -119,15 +118,80 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Set(ref _selectedValue, value);
                 OpenValue(value);
+                IsChanged = false;
             }
         }
 
+        public string SelectedOrganizationName
+        {
+            get => _selectedOrganizationName;
+            set
+            {
+                IsChanged = IsChangeText(_selectedOrganizationName, value);
+                Set(ref _selectedOrganizationName, value);
+            } 
+        }
+
+        public string SelectedOrganizationAddress
+        {
+            get => _selectedOrganizationAddress;
+            set
+            {
+                IsChanged = IsChangeText(_selectedOrganizationAddress, value);
+                Set(ref _selectedOrganizationAddress, value);
+            }
+        }
+
+        public string SelectedOrganizationDescription
+        {
+            get => _selectedOrganizationDescription;
+            set
+            {
+                IsChanged = !IsChangeText(_selectedOrganizationDescription, value);
+                Set(ref _selectedOrganizationDescription, value);
+            }
+        }
+
+        public string SelectedRoomName
+        {
+            get => _selectedRoomName;
+            set => Set(ref _selectedRoomName, value);
+        }
+
+        public string SelectedRoomDescription
+        {
+            get => _selectedRoomDescription;
+            set => Set(ref _selectedRoomDescription, value);
+        }
+
+        public string SelectedElementName
+        {
+            get => _selectedElementName;
+            set => Set(ref _selectedElementName, value);
+        }
+
+        public string SelectedElementDescription
+        {
+            get => _selectedElementDescription;
+            set => Set(ref _selectedElementDescription, value);
+        }
+
+        public string SelectedPointName
+        {
+            get => _selectedPointName;
+            set => Set(ref _selectedPointName, value);
+        }
+
+        public string SelectedPointDescription
+        {
+            get => _selectedPointDescription;
+            set => Set(ref _selectedPointDescription, value);
+        }
         public ViewModel SelectedViewModel
         {
             get => _selectedViewModel;
             set => Set(ref _selectedViewModel, value);
         }
-
         public Page UserPage
         {
             get => _userPage;
@@ -179,6 +243,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 if (obj is Organization)
                 {
                     SelectedOrganization = (Organization)obj;
+                    SelectedOrganizationName = SelectedOrganization.Name;
+                    SelectedOrganizationDescription = SelectedOrganization.Description;
+                    SelectedOrganizationAddress = SelectedOrganization.Address;
                     IsVisibilityOrganization = Visibility.Visible;
                     IsVisibilityRoom = Visibility.Hidden;
                     IsVisibilityElement = Visibility.Hidden;
@@ -188,6 +255,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                 else if (obj is Room)
                 {
                     SelectedRoom = (Room)obj;
+                    SelectedRoomName = SelectedRoom.Name;
+                    SelectedRoomDescription = SelectedRoom.Description;
                     IsVisibilityOrganization = Visibility.Hidden;
                     IsVisibilityRoom = Visibility.Visible;
                     IsVisibilityElement = Visibility.Hidden;
@@ -197,6 +266,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                 else if (obj is Element)
                 {
                     SelectedElement = (Element)obj;
+                    SelectedElementName = SelectedElement.Name;
+                    SelectedElementDescription = SelectedElement.Description;
                     IsVisibilityOrganization = Visibility.Hidden;
                     IsVisibilityRoom = Visibility.Hidden;
                     IsVisibilityElement = Visibility.Visible;
@@ -206,6 +277,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                 else if (obj is MeasPoint)
                 {
                     SelectedPoint = (MeasPoint)obj;
+                    SelectedPointName = SelectedPoint.Name;
+                    SelectedPointDescription = SelectedPoint.Description;
                     IsVisibilityOrganization = Visibility.Hidden;
                     IsVisibilityRoom = Visibility.Hidden;
                     IsVisibilityElement = Visibility.Hidden;
@@ -213,6 +286,14 @@ namespace SPOAPAKmmReceiver.ViewModels
                     SelectedTab = 3;
                 }
             }
+        }
+
+        private bool IsChangeText(string oldText, string newText)
+        {
+            bool isChange = false;
+            if (oldText != newText && (oldText != null && newText != null))
+                isChange = true;
+            return isChange;
         }
     }
 }

@@ -72,15 +72,17 @@
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
                             <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedOrganization.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                            <TextBox Name="txtBoxOrgName" Text="{Binding SelectedOrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                                
+                            </TextBox>
                         </DockPanel>
                         <DockPanel Grid.Row="1">
                             <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedOrganization.Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                            <TextBox Text="{Binding SelectedOrganizationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
                         </DockPanel>
                         <DockPanel Grid.Row="2">
                             <Label DockPanel.Dock="Top" Content="Описание организации" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedOrganization.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                            <TextBox Text="{Binding SelectedOrganizationDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
                         </DockPanel>
                     </Grid>
                 </TabItem>
@@ -92,11 +94,11 @@
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
                             <Label DockPanel.Dock="Top" Content="Название помещения" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedRoom.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                            <TextBox Text="{Binding SelectedRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                         </DockPanel>
                         <DockPanel Grid.Row="1">
                             <Label DockPanel.Dock="Top" Content="Описание помещения" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedRoom.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                            <TextBox Text="{Binding SelectedRoomDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                         </DockPanel>
                     </Grid>
                 </TabItem>
@@ -108,11 +110,11 @@
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
                             <Label DockPanel.Dock="Top" Content="Название элемента" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedElement.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                            <TextBox Text="{Binding SelectedElementName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                         </DockPanel>
                         <DockPanel Grid.Row="1">
                             <Label DockPanel.Dock="Top" Content="Описание элемента" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedElement.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                            <TextBox Text="{Binding SelectedElementDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                         </DockPanel>
                     </Grid>
                 </TabItem>
@@ -125,11 +127,11 @@
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
                             <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedPoint.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                            <TextBox Text="{Binding SelectedPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                         </DockPanel>
                         <DockPanel Grid.Row="1">
                             <Label DockPanel.Dock="Top" Content="Описание точки" HorizontalAlignment="Center"/>
-                            <TextBox Text="{Binding SelectedPoint.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                            <TextBox Text="{Binding SelectedPointDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                         </DockPanel>
                         <DockPanel Grid.Row="2">
                             <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
