@@ -1,15 +1,12 @@
-﻿using System;
+﻿using SPOAPAKmmReceiver.Data;
+using SPOAPAKmmReceiver.Entities;
+using SPOAPAKmmReceiver.Interfaces;
+using SPOAPAKmmReceiver.ViewModels.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
-using SPOAPAKmmReceiver.Controls;
-using SPOAPAKmmReceiver.Data;
-using SPOAPAKmmReceiver.Interfaces;
-using SPOAPAKmmReceiver.Entities;
-using SPOAPAKmmReceiver.ViewModels.Base;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -29,6 +26,13 @@ namespace SPOAPAKmmReceiver.ViewModels
         private Room _selectedRoom;
         private Element _selectedElement;
         private MeasPoint _selectedPoint;
+        private ViewModel _selectedViewModel;
+        private Visibility _isVisibilityOrganization = Visibility.Collapsed;
+        private Visibility _isVisibilityRoom = Visibility.Collapsed;
+        private Visibility _isVisibilityElement = Visibility.Collapsed;
+        private Visibility _isVisibilityPoint = Visibility.Collapsed;
+        private Visibility _isVisibilityTabControl = Visibility.Hidden;
+        private int _selectedTab = 0;
 
         public ObservableCollection<Organization> Organizations { get; set; }
 
@@ -66,6 +70,42 @@ namespace SPOAPAKmmReceiver.ViewModels
             set => Set(ref _selectedPoint, value);
         }
 
+        public Visibility IsVisibilityOrganization
+        {
+            get => _isVisibilityOrganization;
+            set => Set(ref _isVisibilityOrganization, value);
+        }
+
+        public Visibility IsVisibilityRoom
+        {
+            get => _isVisibilityRoom;
+            set => Set(ref _isVisibilityRoom, value);
+        }
+
+        public Visibility IsVisibilityElement
+        {
+            get => _isVisibilityElement;
+            set => Set(ref _isVisibilityElement, value);
+        }
+
+        public Visibility IsVisibilityPoint
+        {
+            get => _isVisibilityPoint;
+            set => Set(ref _isVisibilityPoint, value);
+        }
+
+        public Visibility IsVisibilityTabControl
+        {
+            get => _isVisibilityTabControl;
+            set => Set(ref _isVisibilityTabControl, value);
+        }
+
+        public int SelectedTab
+        {
+            get => _selectedTab;
+            set => Set(ref _selectedTab, value);
+        }
+
         public bool IsSelected
         {
             get => _isSelected;
@@ -78,33 +118,15 @@ namespace SPOAPAKmmReceiver.ViewModels
             set
             {
                 Set(ref _selectedValue, value);
-
-                if (value != null)
-                {
-                    if (value is Organization)
-                    {
-                        SelectedOrganization = (Organization)value;
-                        UserPage = new OrganizationPage();
-                        UserPage.DataContext = SelectedOrganization;
-                    }
-                    else if (value is Room)
-                    {
-                        SelectedRoom = (Room)value;
-                        UserPage = new RoomPage(this);
-                    }
-                    else if (value is Element)
-                    {
-                        SelectedElement = (Element)value;
-                        UserPage = new ElementPage(this);
-                    }
-                    else if (value is MeasPoint)
-                    {
-                        SelectedPoint = (MeasPoint)value;
-                        UserPage = new MeasPointPage(this);
-                    }
-                }
+                OpenValue(value);
             }
-}
+        }
+
+        public ViewModel SelectedViewModel
+        {
+            get => _selectedViewModel;
+            set => Set(ref _selectedViewModel, value);
+        }
 
         public Page UserPage
         {
@@ -145,10 +167,52 @@ namespace SPOAPAKmmReceiver.ViewModels
             Devices = new ObservableCollection<Device>(_dBDevice.GetAll());
             Points = new ObservableCollection<MeasPoint>(_dBMeasPoint.GetAll());
             Measurings = new ObservableCollection<Measuring>(_dBMeasuring.GetAll());
-
-            var v = SelectedValue;
-
         }
 
+        private void OpenValue(object obj)
+        {
+            IsVisibilityTabControl = Visibility.Hidden;
+            if (obj != null)
+            {
+                IsVisibilityTabControl = Visibility.Visible;
+
+                if (obj is Organization)
+                {
+                    SelectedOrganization = (Organization)obj;
+                    IsVisibilityOrganization = Visibility.Visible;
+                    IsVisibilityRoom = Visibility.Hidden;
+                    IsVisibilityElement = Visibility.Hidden;
+                    IsVisibilityPoint = Visibility.Hidden;
+                    SelectedTab = 0;
+                }
+                else if (obj is Room)
+                {
+                    SelectedRoom = (Room)obj;
+                    IsVisibilityOrganization = Visibility.Hidden;
+                    IsVisibilityRoom = Visibility.Visible;
+                    IsVisibilityElement = Visibility.Hidden;
+                    IsVisibilityPoint = Visibility.Hidden;
+                    SelectedTab = 1;
+                }
+                else if (obj is Element)
+                {
+                    SelectedElement = (Element)obj;
+                    IsVisibilityOrganization = Visibility.Hidden;
+                    IsVisibilityRoom = Visibility.Hidden;
+                    IsVisibilityElement = Visibility.Visible;
+                    IsVisibilityPoint = Visibility.Hidden;
+                    SelectedTab = 2;
+                }
+                else if (obj is MeasPoint)
+                {
+                    SelectedPoint = (MeasPoint)obj;
+                    IsVisibilityOrganization = Visibility.Hidden;
+                    IsVisibilityRoom = Visibility.Hidden;
+                    IsVisibilityElement = Visibility.Hidden;
+                    IsVisibilityPoint = Visibility.Visible;
+                    SelectedTab = 3;
+                }
+            }
+        }
     }
 }

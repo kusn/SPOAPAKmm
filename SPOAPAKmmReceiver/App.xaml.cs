@@ -37,10 +37,15 @@ namespace SPOAPAKmmReceiver
         {
             services.AddDbContext<SPOAPAKmmDB>(opt => opt.UseSqlite(host.Configuration.GetConnectionString("Default")));
             services.AddTransient<DbInitializer>();
-
-            services.AddTransient<MainWindowViewModel>();
-
             services.AddScoped(typeof(IStore<>), typeof(DbStore<>));
+
+            services.AddScoped<MainWindowViewModel>();
+            services.AddScoped<OrganizationPageViewModel>(_ => new OrganizationPageViewModel(obj: _));
+            services.AddScoped<RoomPageViewModel>();
+            services.AddScoped<ElementPageViewModel>();
+            services.AddScoped<MeasPointPageViewModel>();
+
+            
         }
 
         protected override void OnStartup(StartupEventArgs e)
