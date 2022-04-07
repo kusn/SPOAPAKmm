@@ -7,7 +7,7 @@ namespace SPOAPAKmmReceiver.Entities
     {
         public string Name { get; set; } = null!;
 
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         public string? Description { get; set; }
 
