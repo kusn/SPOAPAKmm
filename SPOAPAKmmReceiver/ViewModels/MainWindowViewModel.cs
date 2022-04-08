@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
+using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -132,8 +133,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = false;
             }
         }
-
-        public string? SelectedOrganizationName
+        public string SelectedOrganizationName
         {
             get => _selectedOrganizationName;
             set
@@ -142,7 +142,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedOrganizationName, value);
             } 
         }
-
         public string? SelectedOrganizationAddress
         {
             get => _selectedOrganizationAddress;
@@ -152,7 +151,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedOrganizationAddress, value);
             }
         }
-
         public string? SelectedOrganizationDescription
         {
             get => _selectedOrganizationDescription;
@@ -162,7 +160,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedOrganizationDescription, value);
             }
         }
-
         public string SelectedRoomName
         {
             get => _selectedRoomName;
@@ -172,7 +169,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedRoomName, value);
             }
         }
-
         public string? SelectedRoomDescription
         {
             get => _selectedRoomDescription;
@@ -182,7 +178,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedRoomDescription, value);
             }
         }
-
         public string SelectedElementName
         {
             get => _selectedElementName;
@@ -192,7 +187,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedElementName, value);
             }
         }
-
         public string? SelectedElementDescription
         {
             get => _selectedElementDescription;
@@ -202,7 +196,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedElementDescription, value);
             }
         }
-
         public string SelectedPointName
         {
             get => _selectedPointName;
@@ -212,7 +205,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedPointName, value);
             }
         }
-
         public string? SelectedPointDescription
         {
             get => _selectedPointDescription;
@@ -222,6 +214,13 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedPointDescription, value);
             }
         }
+        public IStore<Organization> DbOrganizationStore { get; set; }
+        public IStore<Room> DbRoomStore { get; set; }
+        public IStore<Element> DbElementStore { get; set; }
+        public IStore<MeasPoint> DbPointStore { get; set; }
+        public IStore<Device> DbDeviceStore { get; set; }
+        public IStore<Measuring> DbMeasuringStore { get; set; }
+
         public ViewModel SelectedViewModel
         {
             get => _selectedViewModel;
@@ -240,32 +239,33 @@ namespace SPOAPAKmmReceiver.ViewModels
             IStore<MeasPoint> dBMeasPoint,
             IStore<Measuring> dBMeasuring)
         {
-            _dBOrganization = dBOrganization;
-            _dBRoom = dBRoom;
-            _dBElement = dBElement;
-            _dBDevice = dBDevice;
-            _dBMeasPoint = dBMeasPoint;
-            _dBMeasuring = dBMeasuring;
+            DbOrganizationStore = dBOrganization;
+            DbRoomStore = dBRoom;
+            DbElementStore = dBElement;
+            DbDeviceStore = dBDevice;
+            DbPointStore = dBMeasPoint;
+            DbMeasuringStore = dBMeasuring;
 
             IEnumerable<Organization> organizationsInDb = new List<Organization>();
 
 
-            organizationsInDb = _dBOrganization.GetAll();
+            organizationsInDb = DbOrganizationStore.GetAll();
+#if DEBUG
             var c = organizationsInDb.Count();
-
 
             foreach (var org in TestData.TestDataOrganizations)
             {
-                if(c == 0 || (organizationsInDb.First(o => o.Name == org.Name) == null))
-                    _dBOrganization.Add(org);
+                if(c == 0 || (organizationsInDb.FirstOrDefault(o => o.Name == org.Name) == null))
+                    DbOrganizationStore.Add(org);
             }
-            
-            Organizations = new ObservableCollection<Organization>(_dBOrganization.GetAll());
-            Rooms = new ObservableCollection<Room>(_dBRoom.GetAll());
-            Elements = new ObservableCollection<Element>(_dBElement.GetAll());
-            Devices = new ObservableCollection<Device>(_dBDevice.GetAll());
-            Points = new ObservableCollection<MeasPoint>(_dBMeasPoint.GetAll());
-            Measurings = new ObservableCollection<Measuring>(_dBMeasuring.GetAll());
+#endif
+
+            Organizations = new ObservableCollection<Organization>(DbOrganizationStore.GetAll());
+            Rooms = new ObservableCollection<Room>(DbRoomStore.GetAll());
+            Elements = new ObservableCollection<Element>(DbElementStore.GetAll());
+            Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
+            Points = new ObservableCollection<MeasPoint>(DbPointStore.GetAll());
+            Measurings = new ObservableCollection<Measuring>(DbMeasuringStore.GetAll());
         }
 
         private void OpenValue(object obj)
@@ -340,9 +340,9 @@ namespace SPOAPAKmmReceiver.ViewModels
             return isChange;
         }
 
-        private ICommand _saveChangesCommand;
+        private LambdaCommand _saveChangesCommand;
 
-        public ICommand SaveChangesCommand => _saveChangesCommand
+        public LambdaCommand SaveChangesCommand => _saveChangesCommand
             ??= new LambdaCommand(OnSaveChangesCommandExecuted, CanSaveChangesCommandExecute);
 
         private void OnSaveChangesCommandExecuted(object p)
@@ -352,6 +352,23 @@ namespace SPOAPAKmmReceiver.ViewModels
                 SelectedOrganization.Name = SelectedOrganizationName;
                 SelectedOrganization.Description = SelectedOrganizationDescription;
                 SelectedOrganization.Address = SelectedOrganizationAddress;
+                DbOrganizationStore.Update(SelectedOrganization);
+            }
+            else if (SelectedValue is Room)
+            {
+                SelectedRoom.Name = SelectedRoomName;
+                SelectedRoom.Description = SelectedRoomDescription;
+                DbOrganizationStore.Update(Organizations.FirstOrDefault(o => o.Rooms.First(r => r.Id == SelectedRoom.Id)));
+            }
+            else if (SelectedValue is Element)
+            {
+                SelectedElement.Name = SelectedElementName;
+                SelectedElement.Description = SelectedElementDescription;
+            }
+            else if (SelectedValue is MeasPoint)
+            {
+                SelectedPoint.Name = SelectedElementName;
+                SelectedPoint.Description = SelectedElementDescription;
             }
         }
 

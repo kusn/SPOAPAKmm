@@ -5,23 +5,21 @@ namespace SPOAPAKmmReceiver.Infrastructure.Commands
 {
     public class LambdaCommand : Command
     {
-        private readonly Action<object> _execute;
-        private readonly Func<object?, bool>? _canExecute;
+        private readonly Action<object> _Execute;
+        private readonly Func<object, bool> _CanExecute;
 
-        public LambdaCommand(Action<object> execute, Func<object?, bool>? canExecute = null)
+        public LambdaCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
-            _execute = execute;
-            _canExecute = canExecute;
+            _Execute = execute;
+            _CanExecute = canExecute;
         }
 
-        public override bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;
-        
-
-        public override void Execute(object? parameter)
+        public override void Execute(object parameter)
         {
             if (CanExecute(parameter))
-                if (parameter != null)
-                    _execute(parameter);
+                _Execute(parameter);
         }
+
+        public override bool CanExecute(object parameter) => _CanExecute?.Invoke(parameter) ?? true;
     }
 }

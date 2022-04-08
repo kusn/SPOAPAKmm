@@ -15,11 +15,11 @@
             <RowDefinition Height="15*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Height="25">
             <MenuItem Header="Настройки" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Menu>
-        <Grid Grid.Row="1" Height="375">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -60,8 +60,12 @@
                     </TreeView.Resources>
                 </local:ExtendedTreeView>
             </DockPanel>
-            <DockPanel Grid.Column="1">
-                <TabControl DockPanel.Dock="Top" Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <TabControl Grid.Row="0" Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                     <TabItem Visibility="Collapsed">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -139,8 +143,8 @@
                         </Grid>
                     </TabItem>
                 </TabControl>
-                <Button Content="Сохранить" DockPanel.Dock="Bottom" Command="{Binding SaveChangesCommand}" Height="20" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-            </DockPanel>
+                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveChangesCommand}" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            </Grid>
         </Grid>
         <StatusBar Grid.Row="2" >
             <StatusBarItem Content="Статус:"></StatusBarItem>
