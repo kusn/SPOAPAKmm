@@ -358,7 +358,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 SelectedRoom.Name = SelectedRoomName;
                 SelectedRoom.Description = SelectedRoomDescription;
-                DbOrganizationStore.Update(Organizations.FirstOrDefault(o => o.Rooms.First(r => r.Id == SelectedRoom.Id)));
+                DbRoomStore.Update(SelectedRoom);
             }
             else if (SelectedValue is Element)
             {
