@@ -25,10 +25,10 @@
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Margin="5,0,0,0">
-                <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Add"/>
-                    <Button Content="Remove"/>
-                    <Button Content="Copy"/>
+                <WrapPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,2,0">
+                    <Button Content="Add" Command="{Binding AddItemCommand}"/>
+                    <Button Content="Remove" Command="{Binding RemoveItemCommand}"/>
+                    <Button Content="Copy" Command="{Binding CopyItemCommand}"/>
                 </WrapPanel>
                 <local:ExtendedTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations}" SelectedItem_="{Binding SelectedValue, Mode=OneWayToSource}">
                     <TreeView.ItemContainerStyle>
@@ -63,87 +63,87 @@
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20*"/>
-                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-                <TabControl Grid.Row="0" Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                    <TabItem Visibility="Collapsed">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="1*"/>
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0">
-                                <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
-                                <TextBox Name="txtBoxOrgName" Text="{Binding SelectedOrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-
-                                </TextBox>
-                            </DockPanel>
-                            <DockPanel Grid.Row="1">
-                                <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedOrganizationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-                            </DockPanel>
-                            <DockPanel Grid.Row="2">
-                                <Label DockPanel.Dock="Top" Content="Описание организации" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedOrganizationDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-                            </DockPanel>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Visibility="Collapsed">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="2*"/>
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0">
-                                <Label DockPanel.Dock="Top" Content="Название помещения" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
-                            </DockPanel>
-                            <DockPanel Grid.Row="1">
-                                <Label DockPanel.Dock="Top" Content="Описание помещения" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedRoomDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
-                            </DockPanel>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Visibility="Collapsed">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="2*"/>
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0">
-                                <Label DockPanel.Dock="Top" Content="Название элемента" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedElementName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
-                            </DockPanel>
-                            <DockPanel Grid.Row="1">
-                                <Label DockPanel.Dock="Top" Content="Описание элемента" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedElementDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
-                            </DockPanel>
-                        </Grid>
-                    </TabItem>
-                    <TabItem Visibility="Collapsed">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="5*"/>
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0">
-                                <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
-                            </DockPanel>
-                            <DockPanel Grid.Row="1">
-                                <Label DockPanel.Dock="Top" Content="Описание точки" HorizontalAlignment="Center"/>
-                                <TextBox Text="{Binding SelectedPointDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
-                            </DockPanel>
-                            <DockPanel Grid.Row="2">
-                                <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
-                                <DataGrid ItemsSource="{Binding  SelectedPoint.Measurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            </DockPanel>
-                        </Grid>
-                    </TabItem>
-                </TabControl>
-                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveChangesCommand}" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <Border Grid.Row="0" BorderThickness="1,1,1,1" BorderBrush="Gray" Margin="0,0,5,5" >
+                    <TabControl Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <TabItem Visibility="Collapsed">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
+                                <DockPanel Grid.Row="0">
+                                    <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
+                                    <TextBox Name="txtBoxOrgName" Text="{Binding SelectedOrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                                </DockPanel>
+                                <DockPanel Grid.Row="1">
+                                    <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedOrganizationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                                </DockPanel>
+                                <DockPanel Grid.Row="2">
+                                    <Label DockPanel.Dock="Top" Content="Описание организации" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedOrganizationDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                                </DockPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Visibility="Collapsed">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="2*"/>
+                                </Grid.RowDefinitions>
+                                <DockPanel Grid.Row="0">
+                                    <Label DockPanel.Dock="Top" Content="Название помещения" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                </DockPanel>
+                                <DockPanel Grid.Row="1">
+                                    <Label DockPanel.Dock="Top" Content="Описание помещения" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedRoomDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                </DockPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Visibility="Collapsed">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="2*"/>
+                                </Grid.RowDefinitions>
+                                <DockPanel Grid.Row="0">
+                                    <Label DockPanel.Dock="Top" Content="Название элемента" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedElementName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                </DockPanel>
+                                <DockPanel Grid.Row="1">
+                                    <Label DockPanel.Dock="Top" Content="Описание элемента" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedElementDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                </DockPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Visibility="Collapsed">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="5*"/>
+                                </Grid.RowDefinitions>
+                                <DockPanel Grid.Row="0">
+                                    <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                </DockPanel>
+                                <DockPanel Grid.Row="1">
+                                    <Label DockPanel.Dock="Top" Content="Описание точки" HorizontalAlignment="Center"/>
+                                    <TextBox Text="{Binding SelectedPointDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                </DockPanel>
+                                <DockPanel Grid.Row="2">
+                                    <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
+                                    <DataGrid ItemsSource="{Binding  SelectedPoint.Measurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DockPanel>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Border>
+                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveChangesCommand}" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,5,5"/>
             </Grid>
         </Grid>
         <StatusBar Grid.Row="2" >

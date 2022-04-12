@@ -340,11 +340,11 @@ namespace SPOAPAKmmReceiver.ViewModels
             return isChange;
         }
 
-        private LambdaCommand _saveChangesCommand;
+        #region SaveChangesCommand
 
+        private LambdaCommand _saveChangesCommand;
         public LambdaCommand SaveChangesCommand => _saveChangesCommand
             ??= new LambdaCommand(OnSaveChangesCommandExecuted, CanSaveChangesCommandExecute);
-
         private void OnSaveChangesCommandExecuted(object p)
         {
             if (SelectedValue is Organization)
@@ -353,25 +353,93 @@ namespace SPOAPAKmmReceiver.ViewModels
                 SelectedOrganization.Description = SelectedOrganizationDescription;
                 SelectedOrganization.Address = SelectedOrganizationAddress;
                 DbOrganizationStore.Update(SelectedOrganization);
+                _originalselectedOrganizationName = SelectedOrganization.Name;
+                _originalselectedOrganizationAddress = SelectedOrganization.Address;
+                _originalselectedOrganizationDescription = SelectedOrganization.Description;
+                IsChanged = false;
             }
             else if (SelectedValue is Room)
             {
                 SelectedRoom.Name = SelectedRoomName;
                 SelectedRoom.Description = SelectedRoomDescription;
                 DbRoomStore.Update(SelectedRoom);
+                _originalselectedRoomName = SelectedRoom.Name;
+                _originalselectedRoomDescription = SelectedRoom.Description;
+                IsChanged = false;
             }
             else if (SelectedValue is Element)
             {
                 SelectedElement.Name = SelectedElementName;
                 SelectedElement.Description = SelectedElementDescription;
+                DbElementStore.Update(SelectedElement);
+                _originalselectedElementName = SelectedElement.Name;
+                _originalselectedElementDescription = SelectedElement.Description;
+                IsChanged = false;
             }
             else if (SelectedValue is MeasPoint)
             {
                 SelectedPoint.Name = SelectedElementName;
                 SelectedPoint.Description = SelectedElementDescription;
+                DbPointStore.Update(SelectedPoint);
+                _originalselectedPointName = SelectedPoint.Name;
+                _originalselectedPointDescription = SelectedPoint.Description;
+                IsChanged = false;
             }
         }
-
         private bool CanSaveChangesCommandExecute(object p) => IsChanged;
+
+        #endregion
+
+        #region AddItemCommand
+
+        private LambdaCommand _addItemCommand;
+
+        public LambdaCommand AddItemCommand => _addItemCommand
+            ??= new LambdaCommand(OnAddItemCommandExecuted, CanAddItemCommandExecute);
+        private void OnAddItemCommandExecuted(object p)
+        {}
+
+        private bool CanAddItemCommandExecute(object p)
+        {
+            bool result = SelectedValue != null;
+            return result;
+        }
+
+        #endregion
+
+        #region RemoveItemCommand
+
+        private LambdaCommand _removeItemCommand;
+
+        public LambdaCommand RemoveItemCommand => _removeItemCommand
+            ??= new LambdaCommand(OnRemoveItemCommandExecuted, CanRemoveItemCommandExecute);
+        private void OnRemoveItemCommandExecuted(object p)
+        {}
+
+        private bool CanRemoveItemCommandExecute(object p)
+        {
+            bool result = SelectedValue != null;
+            return result;
+        }
+
+        #endregion
+
+        #region CopyItemCommand
+
+        private LambdaCommand _copyItemCommand;
+
+        public LambdaCommand CopyItemCommand => _copyItemCommand
+            ??= new LambdaCommand(OnCopyItemCommandExecuted, CanCopyItemCommandExecute);
+        private void OnCopyItemCommandExecuted(object p)
+        {}
+
+        private bool CanCopyItemCommandExecute(object p)
+        {
+            bool result = SelectedValue != null;
+            return result;
+        }
+
+
+        #endregion
     }
 }
