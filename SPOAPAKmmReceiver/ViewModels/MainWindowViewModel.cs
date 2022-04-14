@@ -246,11 +246,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             DbPointStore = dBMeasPoint;
             DbMeasuringStore = dBMeasuring;
 
-            IEnumerable<Organization> organizationsInDb = new List<Organization>();
-
-
-            organizationsInDb = DbOrganizationStore.GetAll();
 #if DEBUG
+            IEnumerable<Organization> organizationsInDb = new List<Organization>();
+            organizationsInDb = DbOrganizationStore.GetAll();
+
             var c = organizationsInDb.Count();
 
             foreach (var org in TestData.TestDataOrganizations)
@@ -349,6 +348,11 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             if (SelectedValue is Organization)
             {
+                if (Organizations.FirstOrDefault(o => o.Name == SelectedOrganizationName) != null)
+                {
+                    MessageBox.Show("Организация с таким названием уже имеется!");
+                    return;
+                }
                 SelectedOrganization.Name = SelectedOrganizationName;
                 SelectedOrganization.Description = SelectedOrganizationDescription;
                 SelectedOrganization.Address = SelectedOrganizationAddress;
@@ -360,6 +364,12 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
             else if (SelectedValue is Room)
             {
+                if (Organizations.FirstOrDefault(o =>
+                        o.Rooms))
+                {
+                    MessageBox.Show("Помещение с данным названием уже имеется!");
+                    return;
+                }
                 SelectedRoom.Name = SelectedRoomName;
                 SelectedRoom.Description = SelectedRoomDescription;
                 DbRoomStore.Update(SelectedRoom);
@@ -396,8 +406,15 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         public LambdaCommand AddItemCommand => _addItemCommand
             ??= new LambdaCommand(OnAddItemCommandExecuted, CanAddItemCommandExecute);
+
         private void OnAddItemCommandExecuted(object p)
-        {}
+        {
+            if (SelectedValue is Organization)
+            {
+                var org = new Organization();
+                org.Name = "Новая организация";
+            }
+        }
 
         private bool CanAddItemCommandExecute(object p)
         {
