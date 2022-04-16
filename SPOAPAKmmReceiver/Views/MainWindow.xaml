@@ -30,7 +30,7 @@
                     <Button Content="Remove" Command="{Binding RemoveItemCommand}"/>
                     <Button Content="Copy" Command="{Binding CopyItemCommand}"/>
                 </WrapPanel>
-                <local:ExtendedTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations}" SelectedItem_="{Binding SelectedValue, Mode=OneWayToSource}">
+                <local:ExtendedTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedItem_="{Binding SelectedValue, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -45,17 +45,50 @@
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type entities:Organization}" ItemsSource="{Binding Rooms}">
-                            <TreeViewItem Header="{Binding Name}"/>
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Organization}" ItemsSource="{Binding Rooms, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <TreeViewItem.ContextMenu>
+                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                    </ContextMenu>
+                                </TreeViewItem.ContextMenu>
+                            </TreeViewItem>
+                            
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type entities:Room}" ItemsSource="{Binding Elements}">
-                            <TreeViewItem Header="{Binding Name }"/>
+                            <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <TreeViewItem.ContextMenu>
+                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                    </ContextMenu>
+                                </TreeViewItem.ContextMenu>
+                            </TreeViewItem>
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type entities:Element}" ItemsSource="{Binding Points}">
-                            <TreeViewItem Header="{Binding Name }"/>
+                            <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <TreeViewItem.ContextMenu>
+                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                    </ContextMenu>
+                                </TreeViewItem.ContextMenu>
+                            </TreeViewItem>
                         </HierarchicalDataTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type entities:MeasPoint}">
-                            <TextBlock Text="{Binding Name }"/>
+                            <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
                 </local:ExtendedTreeView>

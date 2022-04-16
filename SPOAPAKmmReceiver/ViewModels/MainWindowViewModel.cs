@@ -364,8 +364,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
             else if (SelectedValue is Room)
             {
-                if (Organizations.FirstOrDefault(o =>
-                        o.Rooms))
+                if (Rooms.FirstOrDefault(r => r.Name == SelectedRoomName).Organization.Id == SelectedRoom.Organization.Id)
                 {
                     MessageBox.Show("Помещение с данным названием уже имеется!");
                     return;
