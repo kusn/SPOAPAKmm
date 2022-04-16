@@ -4,10 +4,12 @@ using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
 
@@ -56,7 +58,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _originalselectedPointName;
         private string? _originalselectedPointDescription;
 
-        public ObservableCollection<Organization> Organizations { get; set; }
+        //public ObservableCollection<Organization> Organizations { get; set; }
+        public SortableObservableCollection<Organization> Organizations { get; set; }
         public ObservableCollection<Room> Rooms { get; set; }
         public ObservableCollection<Element> Elements { get; set; }
         public ObservableCollection<Device> Devices { get; set; }
@@ -259,7 +262,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
 #endif
 
-            Organizations = new ObservableCollection<Organization>(DbOrganizationStore.GetAll());
+            Organizations = new SortableObservableCollection<Organization>(DbOrganizationStore.GetAll());
+            Organizations.Sort(o => o.Name);
             Rooms = new ObservableCollection<Room>(DbRoomStore.GetAll());
             Elements = new ObservableCollection<Element>(DbElementStore.GetAll());
             Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
@@ -353,10 +357,17 @@ namespace SPOAPAKmmReceiver.ViewModels
                     MessageBox.Show("Организация с таким названием уже имеется!");
                     return;
                 }
-                SelectedOrganization.Name = SelectedOrganizationName;
-                SelectedOrganization.Description = SelectedOrganizationDescription;
-                SelectedOrganization.Address = SelectedOrganizationAddress;
-                DbOrganizationStore.Update(SelectedOrganization);
+
+                var org = SelectedOrganization;
+                org.Name = SelectedOrganizationName;
+                org.Description = SelectedOrganizationDescription;
+                org.Address = SelectedOrganizationAddress;
+                
+                Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedOrganization.Id));
+                Organizations.Add(org);
+                SelectedValue = org;
+
+                //DbOrganizationStore.Update(SelectedOrganization);
                 _originalselectedOrganizationName = SelectedOrganization.Name;
                 _originalselectedOrganizationAddress = SelectedOrganization.Address;
                 _originalselectedOrganizationDescription = SelectedOrganization.Description;

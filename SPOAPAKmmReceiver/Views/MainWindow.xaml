@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPOAPAKmmReceiver.Data"
         xmlns:entities="clr-namespace:SPOAPAKmmReceiver.Entities"
+        xmlns:extensions="clr-namespace:SPOAPAKmmReceiver.Extensions"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
         Title="MainWindow" Height="450" Width="800">
@@ -30,12 +31,12 @@
                     <Button Content="Remove" Command="{Binding RemoveItemCommand}"/>
                     <Button Content="Copy" Command="{Binding CopyItemCommand}"/>
                 </WrapPanel>
-                <local:ExtendedTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedItem_="{Binding SelectedValue, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
+                <local:ExtendedTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedItem_="{Binding SelectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="HorizontalAlignment" Value="Stretch"/>
                             <Setter Property="IsExpanded" Value="False"/>
-                            <Setter Property="IsSelected" Value="False"/>
+                            <!--<Setter Property="IsSelected" Value="False"/>-->
                             <Setter Property="FontWeight" Value="Normal"/>
                             <Style.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
