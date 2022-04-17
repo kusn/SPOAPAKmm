@@ -466,6 +466,18 @@ namespace SPOAPAKmmReceiver.ViewModels
             return result;
         }
 
+        #endregion
+
+        #region SelectedNodeChangedCommand
+
+        private LambdaCommand _selectedNodeChangedCommand;
+        public LambdaCommand SelectedNodeChangedCommand => _selectedNodeChangedCommand
+            ??= new LambdaCommand(OnSelectedNodeChangedCommandExecuted, CanSelectedNodeChangedCommandExecute);
+        private void OnSelectedNodeChangedCommandExecuted(object p)
+        {
+            this.SelectedValue = p;
+        }
+        private bool CanSelectedNodeChangedCommandExecute(object p) => true;
 
         #endregion
     }
