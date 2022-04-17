@@ -367,22 +367,32 @@ namespace SPOAPAKmmReceiver.ViewModels
                 Organizations.Add(org);
                 SelectedValue = org;
 
-                //DbOrganizationStore.Update(SelectedOrganization);
+                DbOrganizationStore.Update(org);
                 _originalselectedOrganizationName = SelectedOrganization.Name;
                 _originalselectedOrganizationAddress = SelectedOrganization.Address;
                 _originalselectedOrganizationDescription = SelectedOrganization.Description;
                 IsChanged = false;
             }
             else if (SelectedValue is Room)
-            {
-                if (Rooms.FirstOrDefault(r => r.Name == SelectedRoomName).Organization.Id == SelectedRoom.Organization.Id)
+            {                
+                var r = Rooms.FirstOrDefault(r => r.Organization.Id == SelectedRoom.Organization.Id && r.Name == SelectedRoomName);
+                if (r != null)
                 {
                     MessageBox.Show("Помещение с данным названием уже имеется!");
                     return;
                 }
-                SelectedRoom.Name = SelectedRoomName;
-                SelectedRoom.Description = SelectedRoomDescription;
-                DbRoomStore.Update(SelectedRoom);
+
+                Room room = SelectedRoom;
+                room.Name = SelectedRoomName;
+                room.Description = SelectedRoomDescription;
+                var org = Organizations.First(o => o.Rooms.Contains(Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id)));
+                org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Name = SelectedRoomName;
+                org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Description = SelectedRoomDescription;
+                Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedRoom.Organization.Id));
+                Organizations.Add(org);
+                SelectedValue = room;
+                
+                //DbRoomStore.Update(room);
                 _originalselectedRoomName = SelectedRoom.Name;
                 _originalselectedRoomDescription = SelectedRoom.Description;
                 IsChanged = false;

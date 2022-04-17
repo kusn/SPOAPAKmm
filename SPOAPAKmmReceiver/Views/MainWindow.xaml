@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:SPOAPAKmmReceiver.Data"
         xmlns:entities="clr-namespace:SPOAPAKmmReceiver.Entities"
         xmlns:extensions="clr-namespace:SPOAPAKmmReceiver.Extensions"
+        xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
         Title="MainWindow" Height="450" Width="800">
@@ -70,7 +71,7 @@
                             </TreeViewItem>
                             
                         </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type entities:Room}" ItemsSource="{Binding Elements}">
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Room}" ItemsSource="{Binding Elements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
                                     <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
@@ -104,6 +105,9 @@
                             </TextBlock>
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction Command="{Binding SelectedNodeChangedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=TreeView}, Path=SelectedValue}"/>
+                    </i:EventTrigger>
                 </local:ExtendedTreeView>
             </DockPanel>
             <Grid Grid.Column="1">
