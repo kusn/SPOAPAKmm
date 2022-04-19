@@ -217,6 +217,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeText(_originalselectedPointDescription, value);
             }
         }
+
         public IStore<Organization> DbOrganizationStore { get; set; }
         public IStore<Room> DbRoomStore { get; set; }
         public IStore<Element> DbElementStore { get; set; }
@@ -385,9 +386,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 Room room = SelectedRoom;
                 room.Name = SelectedRoomName;
                 room.Description = SelectedRoomDescription;
-                var org = Organizations.First(o => o.Rooms.Contains(Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id)));
-                org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Name = SelectedRoomName;
-                org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Description = SelectedRoomDescription;
+                //var org = Organizations.First(o => o.Rooms.Contains(Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id)));
+                //org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Name = SelectedRoomName;
+                //org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Description = SelectedRoomDescription;
                 //Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedRoom.Organization.Id));
                 //Organizations.Add(org);
                 //Organizations.Sort(o => o.Name);
@@ -438,8 +439,26 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             if (SelectedValue is Organization)
             {
-                var org = new Organization();
-                org.Name = "Новая организация";
+                var room = new Room();
+                room.Name = "Новое помещение";
+                room.Organization = (Organization)SelectedValue;
+                ((Organization)SelectedValue).Rooms.Add(room);
+                SelectedValue = room;
+            }
+            else if (SelectedValue is Room)
+            {
+                var element = new Element();
+                element.Name = "Новый элемент";
+                element.Room = (Room)SelectedValue;
+                ((Room)SelectedValue).Elements.Add(element);
+                SelectedValue = element;
+            }
+            else if (SelectedValue is MeasPoint)
+            {
+                var measure = new Measuring();
+                measure.MeasPoint = (MeasPoint)SelectedValue;
+                ((MeasPoint)SelectedValue).Measurings.Add(measure);
+                SelectedValue = measure;
             }
         }
 

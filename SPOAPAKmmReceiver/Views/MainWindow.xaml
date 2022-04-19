@@ -48,9 +48,9 @@
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
                                     <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                        <MenuItem Header="Добавить помещение" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать помещение" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить помещение" Command="{Binding RemoveItemCommand}"/>
                                     </ContextMenu>
                                 </TreeViewItem.ContextMenu>
                             </TreeViewItem>
@@ -59,9 +59,9 @@
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
                                     <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                        <MenuItem Header="Добавить элемент" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать элемент" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить удалить" Command="{Binding RemoveItemCommand}"/>
                                     </ContextMenu>
                                 </TreeViewItem.ContextMenu>
                             </TreeViewItem>
@@ -70,9 +70,9 @@
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
                                     <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                        <MenuItem Header="Добавить точку" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать точку" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить точку" Command="{Binding RemoveItemCommand}"/>
                                     </ContextMenu>
                                 </TreeViewItem.ContextMenu>
                             </TreeViewItem>
@@ -81,9 +81,9 @@
                             <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить" Command="{Binding RemoveItemCommand}"/>
+                                        <MenuItem Header="Добавить измерение" Command="{Binding AddItemCommand}"/>
+                                        <MenuItem Header="Копировать измерение" Command="{Binding CopyItemCommand}"/>
+                                        <MenuItem Header="Удалить измерение" Command="{Binding RemoveItemCommand}"/>
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
                             </TextBlock>
