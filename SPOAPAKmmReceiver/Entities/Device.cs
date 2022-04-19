@@ -4,12 +4,34 @@ namespace SPOAPAKmmReceiver.Entities
 {
     public class Device : Base.Entity
     {
-        public string Type { get; set; }
-        
-        public string Name { get; set; } = null!;
+        private string _name = null!;
+        private string _type;
+        private string _number;
+        private Room _room = null!;
 
-        public string Number { get; set; }
+        public string Type
+        {
+            get => _type;
+            set => Set(ref _type, value);
+        }
 
-        public Room Room { get; set; } = null!;
+        public string Name
+        {
+            get => _name;
+            set => Set(ref _name, value);
+        }
+
+        public string Number
+        {
+            get => _number;
+            set => Set(ref _number, value);
+        }
+
+        public Room Room
+        { 
+            get => _room;
+            set => Set(ref _room, value);
+
+        }
     }
 }

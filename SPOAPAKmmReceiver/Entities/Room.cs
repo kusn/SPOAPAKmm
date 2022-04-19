@@ -5,14 +5,40 @@ namespace SPOAPAKmmReceiver.Entities
 {
     public class Room : Base.Entity
     {
-        public string Name { get; set; } = null!;
+        private string _name = null!;
+        private string? _description;
+        private ICollection<Element> _elements;
+        private ICollection<Device> _devices;
+        private Organization _organization = null!;
 
-        public string? Description { get; set; }
+        public string Name
+        {
+            get => _name;
+            set => Set(ref _name, value);
+        }
 
-        public ICollection<Element> Elements { get; set; }
+        public string? Description
+        {
+            get => _description;
+            set => Set(ref _description, value);
+        }
 
-        public ICollection<Device> Devices { get; set; }
+        public ICollection<Element> Elements
+        {
+            get => _elements;
+            set => Set(ref _elements, value);
+        }
 
-        public Organization Organization { get; set; } = null!;
+        public ICollection<Device> Devices
+        {
+            get => _devices;
+            set => Set(ref _devices, value);
+        }
+
+        public Organization Organization
+        {
+            get => _organization;
+            set => Set(ref _organization, value);
+        }
     }
 }

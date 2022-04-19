@@ -1,11 +1,26 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
 namespace SPOAPAKmmReceiver.Entities.Base
 {
     public abstract class Entity : INotifyPropertyChanged
     {
-        public int Id { get; set; }
+        private int _id;
+        private bool _isSelected;
+
+        public int Id
+        {
+            get => _id;
+            set => Set(ref _id, value);
+        }
+
+        [IgnoreDataMember]
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => Set(ref _isSelected, value);
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
