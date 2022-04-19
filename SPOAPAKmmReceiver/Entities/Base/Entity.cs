@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
@@ -15,7 +16,7 @@ namespace SPOAPAKmmReceiver.Entities.Base
             set => Set(ref _id, value);
         }
 
-        [IgnoreDataMember]
+        [NotMapped]
         public bool IsSelected
         {
             get => _isSelected;
