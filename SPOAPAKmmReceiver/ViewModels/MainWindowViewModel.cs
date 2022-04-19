@@ -58,8 +58,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _originalselectedPointName;
         private string? _originalselectedPointDescription;
 
-        //public ObservableCollection<Organization> Organizations { get; set; }
-        public SortableObservableCollection<Organization> Organizations { get; set; }
+        public ObservableCollection<Organization> Organizations { get; set; }
+        //public SortableObservableCollection<Organization> Organizations { get; set; }
         public ObservableCollection<Room> Rooms { get; set; }
         public ObservableCollection<Element> Elements { get; set; }
         public ObservableCollection<Device> Devices { get; set; }
@@ -261,9 +261,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                     DbOrganizationStore.Add(org);
             }
 #endif
-
-            Organizations = new SortableObservableCollection<Organization>(DbOrganizationStore.GetAll());
-            Organizations.Sort(o => o.Name);
+            Organizations = new ObservableCollection<Organization>(DbOrganizationStore.GetAll());
+            //Organizations = new SortableObservableCollection<Organization>(DbOrganizationStore.GetAll());
+            //Organizations.Sort(o => o.Name);
             Rooms = new ObservableCollection<Room>(DbRoomStore.GetAll());
             Elements = new ObservableCollection<Element>(DbElementStore.GetAll());
             Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
@@ -363,11 +363,11 @@ namespace SPOAPAKmmReceiver.ViewModels
                 org.Description = SelectedOrganizationDescription;
                 org.Address = SelectedOrganizationAddress;
                 
-                Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedOrganization.Id));
-                Organizations.Add(org);
+                //Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedOrganization.Id));
+                //Organizations.Add(org);
                 SelectedValue = org;
 
-                DbOrganizationStore.Update(org);
+                //DbOrganizationStore.Update(org);
                 _originalselectedOrganizationName = SelectedOrganization.Name;
                 _originalselectedOrganizationAddress = SelectedOrganization.Address;
                 _originalselectedOrganizationDescription = SelectedOrganization.Description;
@@ -388,8 +388,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var org = Organizations.First(o => o.Rooms.Contains(Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id)));
                 org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Name = SelectedRoomName;
                 org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Description = SelectedRoomDescription;
-                Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedRoom.Organization.Id));
-                Organizations.Add(org);
+                //Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedRoom.Organization.Id));
+                //Organizations.Add(org);
+                //Organizations.Sort(o => o.Name);
                 SelectedValue = room;
                 
                 //DbRoomStore.Update(room);
@@ -399,18 +400,24 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
             else if (SelectedValue is Element)
             {
-                SelectedElement.Name = SelectedElementName;
-                SelectedElement.Description = SelectedElementDescription;
-                DbElementStore.Update(SelectedElement);
+                Element element = SelectedElement;
+                element.Name = SelectedElementName;
+                element.Description = SelectedElementDescription;
+                SelectedValue = element;
+                
+                //DbElementStore.Update(SelectedElement);
                 _originalselectedElementName = SelectedElement.Name;
                 _originalselectedElementDescription = SelectedElement.Description;
                 IsChanged = false;
             }
             else if (SelectedValue is MeasPoint)
             {
-                SelectedPoint.Name = SelectedElementName;
-                SelectedPoint.Description = SelectedElementDescription;
-                DbPointStore.Update(SelectedPoint);
+                MeasPoint measPoint = SelectedPoint;
+                measPoint.Name = SelectedPointName;
+                measPoint.Description = SelectedPointDescription;
+                SelectedValue = measPoint;
+
+                //DbPointStore.Update(SelectedPoint);
                 _originalselectedPointName = SelectedPoint.Name;
                 _originalselectedPointDescription = SelectedPoint.Description;
                 IsChanged = false;
