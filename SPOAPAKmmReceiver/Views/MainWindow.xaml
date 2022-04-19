@@ -10,10 +10,7 @@
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
         Title="MainWindow" Height="450" Width="800">
-
-    <Window.Resources>
-        <extensions:EqualityConverter x:Key="EqualityConverter"/>
-    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -171,7 +168,16 @@
                                 </DockPanel>
                                 <DockPanel Grid.Row="2">
                                     <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
-                                    <DataGrid ItemsSource="{Binding  SelectedPoint.Measurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPoint.Measurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Binding="{Binding Freq}" Header="Частота"/>
+                                            <DataGridTextColumn Binding="{Binding P1}" Header="P1"/>
+                                            <DataGridTextColumn Binding="{Binding P2}" Header="P2"/>
+                                            <DataGridTextColumn Binding="{Binding MeasPoint.AverageE}" Header="Среднее"/>
+                                            <DataGridTextColumn Binding="{Binding MeasPoint.DX}" Header="dX"/>
+                                            <DataGridTextColumn Binding="{Binding MeasPoint.E}" Header="Э"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
                                 </DockPanel>
                             </Grid>
                         </TabItem>
