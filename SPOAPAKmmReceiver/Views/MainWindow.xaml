@@ -27,11 +27,11 @@
                 <ColumnDefinition Width="3*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Margin="5,0,0,0">
-                <WrapPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,2,0">
+                <!--<WrapPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,2,0">
                     <Button Content="Add" Command="{Binding AddItemCommand}"/>
                     <Button Content="Remove" Command="{Binding RemoveItemCommand}"/>
                     <Button Content="Copy" Command="{Binding CopyItemCommand}"/>
-                </WrapPanel>
+                </WrapPanel>-->
                 <extensions:CustomTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedCustomThing="{Binding SelectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
@@ -39,6 +39,13 @@
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
                         </Style>
                     </TreeView.ItemContainerStyle>
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Добавить организацию" Command="{Binding AddOrganizationCommand}"/>
+                            <MenuItem Header="Копировать организацию" Command="{Binding CopyItemCommand}"/>
+                            <MenuItem Header="Удалить организацию" Command="{Binding RemoveItemCommand}"/>
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
                     <TreeView.Resources>
                         <Style TargetType="TreeViewItem">
                             <Setter Property="IsExpanded" Value="False" />
@@ -157,6 +164,7 @@
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="5*"/>
+                                    <RowDefinition Height="0.5*"/>
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0">
                                     <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center"/>
@@ -178,6 +186,10 @@
                                             <DataGridTextColumn Binding="{Binding MeasPoint.E}" Header="Э"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
+                                </DockPanel>
+                                <DockPanel Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Button DockPanel.Dock="Left" Content="Калибровка" Margin="0,2,2,0"/>
+                                    <Button DockPanel.Dock="Right" Content="Измерения" Margin="2,2,0,0"/>
                                 </DockPanel>
                             </Grid>
                         </TabItem>

@@ -48,6 +48,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string? _selectedElementDescription;
         private string _selectedPointName;
         private string? _selectedPointDescription;
+        private ICollection<Measuring> _selectedPointMeasurings;
         private string _originalselectedOrganizationName;
         private string? _originalselectedOrganizationDescription;
         private string? _originalselectedOrganizationAddress;
@@ -57,6 +58,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string? _originalselectedElementDescription;
         private string _originalselectedPointName;
         private string? _originalselectedPointDescription;
+        private ICollection<Measuring> _originalselectedPointMeasurings;
 
         public ObservableCollection<Organization> Organizations { get; set; }
         //public SortableObservableCollection<Organization> Organizations { get; set; }
@@ -218,6 +220,12 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
 
+        public ICollection<Measuring> SelectedPointMeasurings
+        {
+            get => _selectedPointMeasurings;
+            set => Set(ref _selectedPointMeasurings, value);
+        }
+
         public IStore<Organization> DbOrganizationStore { get; set; }
         public IStore<Room> DbRoomStore { get; set; }
         public IStore<Element> DbElementStore { get; set; }
@@ -327,6 +335,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                     _originalselectedPointName = SelectedPoint.Name;
                     SelectedPointDescription = SelectedPoint.Description;
                     _originalselectedPointDescription = SelectedPoint.Description;
+                    SelectedPointMeasurings = SelectedPoint.Measurings;
+                    _originalselectedPointMeasurings = SelectedPoint.Measurings;
                     IsVisibilityOrganization = Visibility.Hidden;
                     IsVisibilityRoom = Visibility.Hidden;
                     IsVisibilityElement = Visibility.Hidden;
@@ -336,10 +346,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
 
-        private bool IsChangeText(string? oldText, string? newText)
+        private bool IsChangeText(object oldValue, object newValue)
         {
             bool isChange = false;
-            if (oldText != newText)
+            if (oldValue != newValue)
                 isChange = true;
             return isChange;
         }
@@ -416,6 +426,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 MeasPoint measPoint = SelectedPoint;
                 measPoint.Name = SelectedPointName;
                 measPoint.Description = SelectedPointDescription;
+                measPoint.Measurings = SelectedPointMeasurings;
                 SelectedValue = measPoint;
 
                 //DbPointStore.Update(SelectedPoint);
@@ -442,6 +453,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var room = new Room();
                 room.Name = "Новое помещение";
                 room.Organization = (Organization)SelectedValue;
+                ObservableCollection<Element> elements = new ObservableCollection<Element>();
+                room.Elements = elements;
                 ((Organization)SelectedValue).Rooms.Add(room);
                 SelectedValue = room;
             }
@@ -450,8 +463,20 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var element = new Element();
                 element.Name = "Новый элемент";
                 element.Room = (Room)SelectedValue;
+                ObservableCollection<MeasPoint> points = new ObservableCollection<MeasPoint>();
+                element.Points = points;
                 ((Room)SelectedValue).Elements.Add(element);
                 SelectedValue = element;
+            }
+            else if (SelectedValue is Element)
+            {
+                var point = new MeasPoint();
+                point.Name = "Новая точка";
+                point.Element = (Element)SelectedValue;
+                ObservableCollection<Measuring> measurings = new ObservableCollection<Measuring>();
+                point.Measurings = measurings;
+                ((Element)SelectedValue).Points.Add(point);
+                SelectedValue = point;
             }
             else if (SelectedValue is MeasPoint)
             {
@@ -470,14 +495,62 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
+        #region AddOrganizationCommand
+
+        private LambdaCommand _addOrganizationCommand;
+
+        public LambdaCommand AddOrganizationCommand => _addOrganizationCommand
+            ??= new LambdaCommand(OnAddOrganizationCommandExecuted, CanAddOrganizationCommandExecute);
+
+        private void OnAddOrganizationCommandExecuted(object p)
+        {
+            if (Organizations.Count == 0)
+                Organizations = new ObservableCollection<Organization>();
+
+            Organization org = new Organization();
+            org.Name = "Новая организация";
+            ObservableCollection<Room> rooms = new ObservableCollection<Room>();
+            org.Rooms = rooms;
+            Organizations.Add(org);
+            SelectedValue = org;
+        }
+
+        private bool CanAddOrganizationCommandExecute(object p) => true;
+
+        #endregion
+
         #region RemoveItemCommand
 
         private LambdaCommand _removeItemCommand;
 
         public LambdaCommand RemoveItemCommand => _removeItemCommand
             ??= new LambdaCommand(OnRemoveItemCommandExecuted, CanRemoveItemCommandExecute);
+
         private void OnRemoveItemCommandExecuted(object p)
-        {}
+        {
+            if (SelectedValue is Organization)
+            {
+                Organizations.Remove((Organization)SelectedValue);
+                //DbOrganizationStore.Delete(((Organization)SelectedValue).Id);
+            }
+            else if (SelectedValue is Room)
+            {
+                var room = (Room)SelectedValue;
+                var org = Organizations.First(o => o.Name == room.Organization.Name);
+                org.Rooms.Remove(room);
+                //DbRoomStore.Delete(room.Id);
+            }
+            else if (SelectedValue is Element)
+            {
+                var element = (Element)SelectedValue;
+                var org = Organizations.FirstOrDefault(o => o.Rooms.Contains(element.Room));
+                org.Rooms.FirstOrDefault(r => r.Name == element.Room.Name).Elements.Remove(element);
+                //DbElementStore.Delete(element.Id);
+            }
+            else if (SelectedValue is MeasPoint)
+            {
+            }
+        }
 
         private bool CanRemoveItemCommandExecute(object p)
         {
