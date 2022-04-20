@@ -537,7 +537,9 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 var room = (Room)SelectedValue;
                 var org = Organizations.First(o => o.Name == room.Organization.Name);
-                org.Rooms.Remove(room);
+                var rooms = org.Rooms.Where(r => r.Name != room.Name);
+                org.Rooms = new ObservableCollection<Room>(rooms);
+                Organizations.First(o => o.Name == org.Name).Rooms = new List<Room>(rooms);
                 //DbRoomStore.Delete(room.Id);
             }
             else if (SelectedValue is Element)
