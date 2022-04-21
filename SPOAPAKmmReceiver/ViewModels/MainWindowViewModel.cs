@@ -1,4 +1,5 @@
-﻿using SPOAPAKmmReceiver.Data;
+﻿using System;
+using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Entities;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
@@ -460,7 +461,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             if (SelectedValue is Organization)
             {
                 var room = new Room();
-                room.Name = "Новое помещение";
+                var collection = new ObservableCollection<Room>((SelectedValue as Organization).Rooms);
+                room.Name = GetNewName(collection);
                 room.Organization = (Organization)SelectedValue;
                 ObservableCollection<Element> elements = new ObservableCollection<Element>();
                 room.Elements = elements;
@@ -470,7 +472,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is Room)
             {
                 var element = new Element();
-                element.Name = "Новый элемент";
+                element.Name = GetNewName((SelectedValue as Room).Elements);
                 element.Room = (Room)SelectedValue;
                 ObservableCollection<MeasPoint> points = new ObservableCollection<MeasPoint>();
                 element.Points = points;
@@ -480,7 +482,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is Element)
             {
                 var point = new MeasPoint();
-                point.Name = "Новая точка";
+                point.Name = GetNewName((SelectedValue as Element).Points);
                 point.Element = (Element)SelectedValue;
                 ObservableCollection<Measuring> measurings = new ObservableCollection<Measuring>();
                 point.Measurings = measurings;
@@ -517,7 +519,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 Organizations = new ObservableCollection<Organization>();
 
             Organization org = new Organization();
-            org.Name = "Новая организация";
+            org.Name = GetNewName(Organizations);
             ObservableCollection<Room> rooms = new ObservableCollection<Room>();
             org.Rooms = rooms;
             Organizations.Add(org);
@@ -670,5 +672,56 @@ namespace SPOAPAKmmReceiver.ViewModels
         private bool CanSelectedNodeChangedCommandExecute(object p) => true;
 
         #endregion
+
+        private string GetNewName(object collection)
+        {
+            string name = "";
+            var t = collection.GetType().GenericTypeArguments[0].Name;
+
+            if (t == "Organization")
+            {
+                name = "Новая организация";
+                var list = (new List<Organization>(collection as ObservableCollection<Organization>)).FindAll(o => o.Name.Contains(name));
+                name = GetNameAddedItem(name, list);
+            }
+            else if (t == "Room")
+            {
+                name = "Новое помещение";
+                var list = new List<Room>(collection as ObservableCollection<Room>);
+                list = list.FindAll(r => r.Name.Contains(name));
+                name = GetNameAddedItem(name, list);
+            }
+            else if (t == "Element")
+            {
+                name = "Новый элемент";
+                var list = (new List<Element>(collection as ObservableCollection<Element>)).FindAll(o => o.Name.Contains(name));
+                name = GetNameAddedItem(name, list);
+            }
+            else if (t == "MeasPoint")
+            {
+                name = "Новая точка";
+                var list = (new List<MeasPoint>(collection as ObservableCollection<MeasPoint>)).FindAll(o => o.Name.Contains(name));
+                name = GetNameAddedItem(name, list);
+            }
+            return name;
+        }
+
+        private string GetNameAddedItem(string baseName, dynamic list)
+        {
+            if (((IEnumerable<object>)list).Count() > 0)
+            {
+                int n = 0;
+                int nMax = 0;
+                foreach (var item in list)
+                {
+                    var s = item.Name.TrimStart(baseName.ToCharArray());
+                    int.TryParse(s, out n);
+                    if (n > nMax)
+                        nMax = n;
+                }
+                baseName = baseName + (nMax + 1).ToString();
+            }
+            return baseName;
+        }
     }
 }
