@@ -545,12 +545,26 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is Element)
             {
                 var element = (Element)SelectedValue;
-                var org = Organizations.FirstOrDefault(o => o.Rooms.Contains(element.Room));
-                org.Rooms.FirstOrDefault(r => r.Name == element.Room.Name).Elements.Remove(element);
+                var room = element.Room;
+                var elements = room.Elements.Where(e => e.Name != element.Name);
+                room.Elements = new List<Element>(elements);
                 //DbElementStore.Delete(element.Id);
             }
             else if (SelectedValue is MeasPoint)
             {
+                var point = (MeasPoint)SelectedValue;
+                var element = point.Element;
+                var points = element.Points.Where(p => p.Name != point.Name);
+                element.Points = new List<MeasPoint>(points);
+                //DbPointStore.Delete(point.Id);
+            }
+            else if (SelectedValue is Measuring)
+            {
+                var measuring = (Measuring)SelectedValue;
+                var point = measuring.MeasPoint;
+                var measurings = point.Measurings.Where(m => m.Freq != measuring.Freq);
+                point.Measurings = new List<Measuring>(measurings);
+                //DbMeasuringStore.Delete(measuring.Id);
             }
         }
 
