@@ -366,6 +366,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 if (Organizations.FirstOrDefault(o => o.Name == SelectedOrganizationName) != null)
                 {
                     MessageBox.Show("Организация с таким названием уже имеется!");
+                    IsChanged = false;
                     return;
                 }
 
@@ -373,9 +374,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 org.Name = SelectedOrganizationName;
                 org.Description = SelectedOrganizationDescription;
                 org.Address = SelectedOrganizationAddress;
-                
-                //Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedOrganization.Id));
-                //Organizations.Add(org);
                 SelectedValue = org;
 
                 //DbOrganizationStore.Update(org);
@@ -385,23 +383,18 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = false;
             }
             else if (SelectedValue is Room)
-            {                
-                var r = Rooms.FirstOrDefault(r => r.Organization.Id == SelectedRoom.Organization.Id && r.Name == SelectedRoomName);
+            {
+                var r = ((Room)SelectedValue).Organization.Rooms.FirstOrDefault(r => r.Name == SelectedRoomName);
                 if (r != null)
                 {
                     MessageBox.Show("Помещение с данным названием уже имеется!");
+                    IsChanged = false;
                     return;
                 }
 
                 Room room = SelectedRoom;
                 room.Name = SelectedRoomName;
                 room.Description = SelectedRoomDescription;
-                //var org = Organizations.First(o => o.Rooms.Contains(Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id)));
-                //org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Name = SelectedRoomName;
-                //org.Rooms.FirstOrDefault(r => r.Id == SelectedRoom.Id).Description = SelectedRoomDescription;
-                //Organizations.Remove(Organizations.FirstOrDefault(o => o.Id == SelectedRoom.Organization.Id));
-                //Organizations.Add(org);
-                //Organizations.Sort(o => o.Name);
                 SelectedValue = room;
                 
                 //DbRoomStore.Update(room);
@@ -411,6 +404,14 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
             else if (SelectedValue is Element)
             {
+                var e = ((Element)SelectedValue).Room.Elements.FirstOrDefault(e => e.Name == SelectedElementName);
+                if (e != null)
+                {
+                    MessageBox.Show("Элемент с данным названием уже имеется!");
+                    IsChanged = false;
+                    return;
+                }
+
                 Element element = SelectedElement;
                 element.Name = SelectedElementName;
                 element.Description = SelectedElementDescription;
@@ -423,6 +424,14 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
             else if (SelectedValue is MeasPoint)
             {
+                var point = ((MeasPoint)SelectedValue).Element.Points.FirstOrDefault(p => p.Name == SelectedPointName);
+                if (point != null)
+                {
+                    MessageBox.Show("Точка с данным названием уже имеется!");
+                    IsChanged = false;
+                    return;
+                }
+
                 MeasPoint measPoint = SelectedPoint;
                 measPoint.Name = SelectedPointName;
                 measPoint.Description = SelectedPointDescription;
