@@ -539,7 +539,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var org = Organizations.First(o => o.Name == room.Organization.Name);
                 var rooms = org.Rooms.Where(r => r.Name != room.Name);
                 org.Rooms = new ObservableCollection<Room>(rooms);
-                Organizations.First(o => o.Name == org.Name).Rooms = new List<Room>(rooms);
+                Organizations.First(o => o.Name == org.Name).Rooms = new ObservableCollection<Room>(rooms);
                 //DbRoomStore.Delete(room.Id);
             }
             else if (SelectedValue is Element)
@@ -547,7 +547,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var element = (Element)SelectedValue;
                 var room = element.Room;
                 var elements = room.Elements.Where(e => e.Name != element.Name);
-                room.Elements = new List<Element>(elements);
+                room.Elements = new ObservableCollection<Element>(elements);
                 //DbElementStore.Delete(element.Id);
             }
             else if (SelectedValue is MeasPoint)
@@ -555,7 +555,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var point = (MeasPoint)SelectedValue;
                 var element = point.Element;
                 var points = element.Points.Where(p => p.Name != point.Name);
-                element.Points = new List<MeasPoint>(points);
+                element.Points = new ObservableCollection<MeasPoint>(points);
                 //DbPointStore.Delete(point.Id);
             }
             else if (SelectedValue is Measuring)
@@ -563,7 +563,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var measuring = (Measuring)SelectedValue;
                 var point = measuring.MeasPoint;
                 var measurings = point.Measurings.Where(m => m.Freq != measuring.Freq);
-                point.Measurings = new List<Measuring>(measurings);
+                point.Measurings = new ObservableCollection<Measuring>(measurings);
                 //DbMeasuringStore.Delete(measuring.Id);
             }
         }
@@ -582,8 +582,64 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         public LambdaCommand CopyItemCommand => _copyItemCommand
             ??= new LambdaCommand(OnCopyItemCommandExecuted, CanCopyItemCommandExecute);
+
         private void OnCopyItemCommandExecuted(object p)
-        {}
+        {
+            if (SelectedValue is Organization)
+            {
+                var org = (Organization)SelectedValue;
+                var newOrg = new Organization();
+                newOrg.Name = org.Name + "-копия";
+                newOrg.Address = org.Address;
+                newOrg.Description = org.Description;
+                newOrg.Rooms = new ObservableCollection<Room>();
+                newOrg.IsSelected = true;
+                newOrg.IsExpanded = true;
+                Organizations.Add(newOrg);
+                //DbOrganizationStore.Add(newOrg);
+
+            }
+            else if (SelectedValue is Room)
+            {
+                var room = (Room)SelectedValue;
+                var newRoom = new Room();
+                newRoom.Name = room.Name + "-копия";
+                newRoom.Description = room.Description;
+                newRoom.Organization = room.Organization;
+                newRoom.Elements = new ObservableCollection<Element>();
+                newRoom.Devices = new ObservableCollection<Device>();
+                newRoom.IsSelected = true;
+                newRoom.IsExpanded = true;
+                room.Organization.Rooms.Add(newRoom);
+                //DbRoomStore.Add(newRoom);
+            }
+            else if (SelectedValue is Element)
+            {
+                var element = (Element)SelectedValue;
+                var newElement = new Element();
+                newElement.Name = element.Name + "-копия";
+                newElement.Description = element.Description;
+                newElement.Room = element.Room;
+                newElement.Points = new ObservableCollection<MeasPoint>();
+                newElement.IsSelected = true;
+                newElement.IsExpanded = true;
+                element.Room.Elements.Add(newElement);
+                //DbElementStore.Add(newElement);
+            }
+            else if (SelectedValue is MeasPoint)
+            {
+                var point = (MeasPoint)SelectedValue;
+                var newPoint = new MeasPoint();
+                newPoint.Name = point.Name + "-копия";
+                newPoint.Description = point.Description;
+                newPoint.Element = point.Element;
+                newPoint.Measurings = new ObservableCollection<Measuring>();
+                newPoint.IsSelected = true;
+                newPoint.IsExpanded = true;
+                point.Element.Points.Add(newPoint);
+                //DbPointStore.Add(newPoint);
+            }
+        }
 
         private bool CanCopyItemCommandExecute(object p)
         {
