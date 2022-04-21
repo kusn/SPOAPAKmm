@@ -472,7 +472,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is Room)
             {
                 var element = new Element();
-                element.Name = GetNewName((SelectedValue as Room).Elements);
+                var collection = new ObservableCollection<Element>((SelectedValue as Room).Elements);
+                element.Name = GetNewName(collection);
                 element.Room = (Room)SelectedValue;
                 ObservableCollection<MeasPoint> points = new ObservableCollection<MeasPoint>();
                 element.Points = points;
@@ -482,7 +483,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is Element)
             {
                 var point = new MeasPoint();
-                point.Name = GetNewName((SelectedValue as Element).Points);
+                var collection = new ObservableCollection<MeasPoint>((SelectedValue as Element).Points);
+                point.Name = GetNewName(collection);
                 point.Element = (Element)SelectedValue;
                 ObservableCollection<Measuring> measurings = new ObservableCollection<Measuring>();
                 point.Measurings = measurings;
