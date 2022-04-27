@@ -19,10 +19,17 @@ namespace WpfAppTest
     public class MainViewModel : ViewModel
     {
         private object _CurrentNode;
+        private string _reciviedMessage;
         public object CurrentNode
         {
             get => _CurrentNode;
             set => Set(ref _CurrentNode, value);
+        }
+
+        public string ReciviedMessage
+        {
+            get => _reciviedMessage;
+            set => Set(ref _reciviedMessage, value);
         }
 
         // called when the user selects a new node in the tree view
@@ -34,6 +41,18 @@ namespace WpfAppTest
             CurrentNode = p;
         }
         private bool CanSelectedNodeChangedCommandExecute(object p) => true;
+
+        private LambdaCommand _sendMessageCommand;
+        public LambdaCommand SendMessageCommand => _sendMessageCommand
+            ??= new LambdaCommand(OnSendMessageCommandExecuted, CanSendMessageCommandExecute);
+        private void OnSendMessageCommandExecuted(object p)
+        {
+            string s = string.Empty;
+            //ReciviedMessage = null;
+            ReciviedMessage = AsynchronousClient.StartClient("This is a test from WPF client") + ": " + DateTime.Now.TimeOfDay.ToString() + System.Environment.NewLine;
+            //ReciviedMessage = DateTime.Now.TimeOfDay.ToString() + ": " + s + System.Environment.NewLine;
+        }
+        private bool CanSendMessageCommandExecute(object p) => true;
 
         // list of items to display in the tree view
         private SortableObservableCollection<Organization> _Items;

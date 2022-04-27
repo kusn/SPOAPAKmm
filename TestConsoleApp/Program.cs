@@ -121,8 +121,9 @@ namespace TestConsoleApp
                         // client. Display it on the console.  
                         Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
                             content.Length, content);
-                        // Echo the data back to the client.  
-                        Send(handler, "Message from server : " + content);
+                        // Echo the data back to the client.
+                        Thread.Sleep(10000);
+                        Send(handler, "Message from server : " + DateTime.Now.TimeOfDay.ToString() + content);
                     }
                     else
                     {

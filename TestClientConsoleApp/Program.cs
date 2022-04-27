@@ -34,7 +34,7 @@ namespace TestClientConsoleApp
             // The response from the remote device.  
             private static String response = String.Empty;
 
-            private static void StartClient()
+            public static void StartClient()
             {
                 // Connect to a remote device.  
                 try

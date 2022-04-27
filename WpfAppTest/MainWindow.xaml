@@ -91,5 +91,7 @@
             </TreeView.Resources>
         </local:CustomTreeView>
         <TextBox Text="{Binding CurrentNode.Name}"/>
+        <Button Content="Отправить сообщение" Command="{Binding SendMessageCommand}"/>
+        <TextBlock Text="{Binding ReciviedMessage, UpdateSourceTrigger=PropertyChanged}"/>
     </StackPanel>
 </Window>
