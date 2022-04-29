@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace WpfAppTest
 {
@@ -19,7 +20,7 @@ namespace WpfAppTest
         // The response from the remote device.  
         private static String response = String.Empty;
 
-        public static string StartClient(string message)
+        public static async Task<string> StartClient(string message)
         {
             //recievedMessage = String.Empty;
             message += "<EOF>";

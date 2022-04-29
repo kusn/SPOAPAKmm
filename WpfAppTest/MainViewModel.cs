@@ -32,6 +32,8 @@ namespace WpfAppTest
             set => Set(ref _reciviedMessage, value);
         }
 
+        public NotifyTaskCompletion<string> MessageFromServer { get; private set; }
+
         // called when the user selects a new node in the tree view
         private LambdaCommand _selectedNodeChangedCommand;
         public LambdaCommand SelectedNodeChangedCommand => _selectedNodeChangedCommand
@@ -47,10 +49,10 @@ namespace WpfAppTest
             ??= new LambdaCommand(OnSendMessageCommandExecuted, CanSendMessageCommandExecute);
         private void OnSendMessageCommandExecuted(object p)
         {
-            string s = string.Empty;
-            //ReciviedMessage = null;
-            ReciviedMessage = AsynchronousClient.StartClient("This is a test from WPF client") + ": " + DateTime.Now.TimeOfDay.ToString() + System.Environment.NewLine;
-            //ReciviedMessage = DateTime.Now.TimeOfDay.ToString() + ": " + s + System.Environment.NewLine;
+            ConnectWindow connectWindow = new ConnectWindow();
+            connectWindow.Show();
+            //MessageFromServer = new NotifyTaskCompletion<string>(AsynchronousClient.StartClient("This is a test from WPF client"));
+            //ReciviedMessage = MessageFromServer.Result;
         }
         private bool CanSendMessageCommandExecute(object p) => true;
 
@@ -66,7 +68,5 @@ namespace WpfAppTest
         {
             Items = new SortableObservableCollection<Organization>(TestData.TestDataOrganizations);
         }
-
-        
     }
 }
