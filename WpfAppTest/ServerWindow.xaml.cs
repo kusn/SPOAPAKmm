@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace WpfAppTest
 {
     /// <summary>
-    /// Логика взаимодействия для ConnectWindow.xaml
+    /// Логика взаимодействия для ServerWindow.xaml
     /// </summary>
-    public partial class ConnectWindow : Window
+    public partial class ServerWindow : Window
     {
-        public ConnectWindow()
+        public ServerWindow()
         {
             InitializeComponent();
         }
