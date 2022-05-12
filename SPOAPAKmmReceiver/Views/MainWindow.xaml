@@ -3,13 +3,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SPOAPAKmmReceiver.Data"
         xmlns:entities="clr-namespace:SPOAPAKmmReceiver.Entities"
         xmlns:extensions="clr-namespace:SPOAPAKmmReceiver.Extensions"
-        xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="500" Width="900">
     
     <Grid>
         <Grid.RowDefinitions>
@@ -24,7 +22,7 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="4*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Margin="5,0,0,0">
                 <!--<WrapPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,2,0">
@@ -103,6 +101,10 @@
                     <RowDefinition Height="20*"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
                 <Border Grid.Row="0" BorderThickness="1,1,1,1" BorderBrush="Gray" Margin="0,0,5,5" >
                     <TabControl Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <TabItem Visibility="Collapsed">
@@ -196,6 +198,68 @@
                     </TabControl>
                 </Border>
                 <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveChangesCommand}" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,5,5"/>
+                <StackPanel Grid.Column="1" Grid.RowSpan="2">
+                    <GroupBox Header="Установки анализатора" FontWeight="ExtraBold">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2.3*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Content="Параметр" FontWeight="Bold"/>
+                            <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="0" Content="Частота начальная, МГц" FontWeight="Normal"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="2" Grid.Column="0" Content="Частота конечная, МГц" FontWeight="Normal"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="3" Grid.Column="0" Content="Шаг перестройки, МГц" FontWeight="Normal"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="4" Grid.Column="0" Content="Мощность, дБм" FontWeight="Normal"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="5" Grid.Column="0" Content="Время излучения, с" FontWeight="Normal"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="6" Grid.Column="0" Content="Предусилитель" FontWeight="Normal"/>
+                            <CheckBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Button Grid.Row="7" Content="Изменить"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Установки генератора" FontWeight="ExtraBold">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2.3*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold"/>
+                            <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="0" Content="Полоса обзора, кГц" FontWeight="Normal"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="2" Grid.Column="0" Content="Полоса пропускания, кГц" FontWeight="Normal"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="3" Grid.Column="0" Content="Аттенюатор, дБ" FontWeight="Normal"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal"/>
+                            <Label Grid.Row="4" Grid.Column="0" Content="Частоты из предпочтительного ряда" FontWeight="Normal"/>
+                            <CheckBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Button Grid.Row="5" Content="Изменить"/>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
             </Grid>
         </Grid>
         <StatusBar Grid.Row="2" >
