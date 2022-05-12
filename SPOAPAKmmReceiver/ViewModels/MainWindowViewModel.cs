@@ -6,7 +6,11 @@ using SPOAPAKmmReceiver.ViewModels.Base;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -60,6 +64,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _originalselectedPointName;
         private string? _originalselectedPointDescription;
         private ICollection<Measuring> _originalselectedPointMeasurings;
+        private string _sendMessage;
+        private string _recieveMessage;
 
         public ObservableCollection<Organization> Organizations { get; set; }
         //public SortableObservableCollection<Organization> Organizations { get; set; }
@@ -227,12 +233,25 @@ namespace SPOAPAKmmReceiver.ViewModels
             set => Set(ref _selectedPointMeasurings, value);
         }
 
+        public string SendMessage
+        {
+            get => _sendMessage;
+            set => Set(ref _sendMessage, value);
+        }
+        public string RecieveMessage
+        {
+            get => _recieveMessage;
+            set => Set(ref _recieveMessage, value);
+        }
+        
         public IStore<Organization> DbOrganizationStore { get; set; }
         public IStore<Room> DbRoomStore { get; set; }
         public IStore<Element> DbElementStore { get; set; }
         public IStore<MeasPoint> DbPointStore { get; set; }
         public IStore<Device> DbDeviceStore { get; set; }
         public IStore<Measuring> DbMeasuringStore { get; set; }
+
+        public ICommand Send { get; set; }
 
         public ViewModel SelectedViewModel
         {
@@ -279,6 +298,12 @@ namespace SPOAPAKmmReceiver.ViewModels
             Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
             Points = new ObservableCollection<MeasPoint>(DbPointStore.GetAll());
             Measurings = new ObservableCollection<Measuring>(DbMeasuringStore.GetAll());
+
+            Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
+
+            Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);
+            AccessToClientProgram.IsBackground = true;
+            AccessToClientProgram.Start();
         }
 
         private void OpenValue(object obj)
@@ -724,6 +749,51 @@ namespace SPOAPAKmmReceiver.ViewModels
                 baseName = baseName + (nMax + 1).ToString();
             }
             return baseName;
+        }
+
+        private void OnSendExecuted(object p) => SendToClient(SendMessage);
+        private bool CanSendMessageExecute(object arg) => true;
+
+        private void GetAccessToClientProgram()
+        {
+            TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11001));
+            listner.Start();
+            while (true)
+            {
+                TcpClient client = listner.AcceptTcpClient();
+                StreamReader sr = new StreamReader(client.GetStream());
+                
+                Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
+
+                client.Close();
+            }
+        }
+
+        /// <summary>
+        /// Посылает сообщение приложению-клиенту
+        /// </summary>
+        /// <param name="Massage">Передаваемое сообщение</param>
+        private void SendToClient(string Massage)
+        {
+            TcpClient client = new TcpClient();
+            try
+            {
+                client.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000));
+                StreamWriter sw = new StreamWriter(client.GetStream());
+                sw.AutoFlush = true;
+                sw.WriteLine(Massage);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка при подключении к Server.exe");
+            }
+            client.Close();
+        }
+
+        private void Execute(string Data)
+        {
+            //Выводим принятое сообщение на экран
+            App.Current.Dispatcher.Invoke((Action)(() => this.RecieveMessage = Data));
         }
     }
 }
