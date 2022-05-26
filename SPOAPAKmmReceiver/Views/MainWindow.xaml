@@ -217,25 +217,75 @@
                             <Label Grid.Row="0" Content="Параметр" FontWeight="Bold"/>
                             <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
                             <Label Grid.Row="1" Grid.Column="0" Content="Частота начальная, МГц" FontWeight="Normal"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.StartFrequency">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                            <ExceptionValidationRule/>
+                                            <NotifyDataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="2" Grid.Column="0" Content="Частота конечная, МГц" FontWeight="Normal"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.EndFrequency">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="3" Grid.Column="0" Content="Шаг перестройки, МГц" FontWeight="Normal"/>
-                            <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.Step">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="4" Grid.Column="0" Content="Отстройка частоты, МГц" FontWeight="Normal"/>
-                            <TextBox Grid.Row="4" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.Offset">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="5" Grid.Column="0" FontWeight="Normal">
                                 <Label.Content>
                                     <TextBlock TextWrapping="Wrap" Text="Частоты из предпочтительного ряда"/>
                                 </Label.Content>
                             </Label>
-                            <CheckBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <CheckBox.IsChecked>
+                                    <Binding Path="MSettings.IsPreferredRow">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </CheckBox.IsChecked>
+                            </CheckBox>
                             <Label Grid.Row="6" Grid.Column="0" FontWeight="Normal">
                                 <Label.Content>
                                     <TextBlock TextWrapping="Wrap" Text="Частоты из собственного ряда"/>
                                 </Label.Content>
                             </Label>
-                            <CheckBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <CheckBox.IsChecked>
+                                    <Binding Path="MSettings.IsOwnRow">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </CheckBox.IsChecked>
+                            </CheckBox>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Установки генератора" FontWeight="ExtraBold">
@@ -252,9 +302,25 @@
                             <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold"/>
                             <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
                             <Label Grid.Row="1" Grid.Column="0" Content="Мощность, дБм" FontWeight="Normal"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.Power">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="2" Grid.Column="0" Content="Время излучения, с" FontWeight="Normal"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.TimeOfEmission">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Установки анализатора" FontWeight="ExtraBold">
@@ -273,13 +339,45 @@
                             <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold"/>
                             <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
                             <Label Grid.Row="1" Grid.Column="0" Content="Полоса обзора, кГц" FontWeight="Normal"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.Span">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="2" Grid.Column="0" Content="Полоса пропускания, кГц" FontWeight="Normal"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.Rbw">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="3" Grid.Column="0" Content="Аттенюатор, дБ" FontWeight="Normal"/>
-                            <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal">
+                                <TextBox.Text>
+                                    <Binding Path="MSettings.Attenuation">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <Label Grid.Row="4" Grid.Column="0" Content="Предусилитель" FontWeight="Normal"/>
-                            <CheckBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <CheckBox.IsChecked>
+                                    <Binding Path="MSettings.IsPreamp">
+                                        <Binding.ValidationRules>
+                                            <DataErrorValidationRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </CheckBox.IsChecked>
+                            </CheckBox>
                         </Grid>
                     </GroupBox>
                     <Button Content="Применить" FontWeight="Bold" Margin="5,5,5,5"/>

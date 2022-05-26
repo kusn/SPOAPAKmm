@@ -17,6 +17,7 @@ using System.Windows.Input;
 using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
+using SPOAPAKmmReceiver.Models;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -66,6 +67,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private ICollection<Measuring> _originalselectedPointMeasurings;
         private string _sendMessage;
         private string _recieveMessage;
+        private MeasureSettings _mSettings;
 
         public ObservableCollection<Organization> Organizations { get; set; }
         //public SortableObservableCollection<Organization> Organizations { get; set; }
@@ -251,6 +253,12 @@ namespace SPOAPAKmmReceiver.ViewModels
         public IStore<Device> DbDeviceStore { get; set; }
         public IStore<Measuring> DbMeasuringStore { get; set; }
 
+        public MeasureSettings MSettings
+        {
+            get => _mSettings;
+            set => Set(ref _mSettings, value);
+        }
+
         public ICommand Send { get; set; }
 
         public ViewModel SelectedViewModel
@@ -298,6 +306,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
             Points = new ObservableCollection<MeasPoint>(DbPointStore.GetAll());
             Measurings = new ObservableCollection<Measuring>(DbMeasuringStore.GetAll());
+
+            MSettings = new MeasureSettings();
 
             Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
 
