@@ -257,7 +257,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             get => _mSettings;
             set => Set(ref _mSettings, value);
-        }
+        }        
 
         public ICommand Send { get; set; }
 
@@ -307,7 +307,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             Points = new ObservableCollection<MeasPoint>(DbPointStore.GetAll());
             Measurings = new ObservableCollection<Measuring>(DbMeasuringStore.GetAll());
 
-            MSettings = new MeasureSettings();
+            MSettings = new MeasureSettings();            
 
             Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
 
@@ -707,6 +707,16 @@ namespace SPOAPAKmmReceiver.ViewModels
             this.SelectedValue = p;
         }
         private bool CanSelectedNodeChangedCommandExecute(object p) => true;
+
+        #endregion
+
+        #region AutoCalculationFrequencyRowCommand
+
+        private LambdaCommand _autoCalculationFrequencyRowCommand;
+        public LambdaCommand AutoCalculationFrequencyRowCommand => _autoCalculationFrequencyRowCommand
+            ??= new LambdaCommand(OnAutoCalculationFrequencyRowCommandExecuted, CanAutoCalculationFrequencyRowCommandExecute);
+        private void OnAutoCalculationFrequencyRowCommandExecuted(object p) => MSettings.GetFrequencyList();
+        private bool CanAutoCalculationFrequencyRowCommandExecute(object p) => true;
 
         #endregion
 
