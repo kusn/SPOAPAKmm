@@ -3,22 +3,24 @@ using SPOAPAKmmReceiver.Entities.Base;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace SPOAPAKmmReceiver.Models
 {
     [MeasureSettingsValidation]
-    public class MeasureSettings : Entity
+    public class MeasureSettings : Entity, IDataErrorInfo
     {
-        private List<double> _frequencyList;
-        private double _startFrequency = 0.0;
-        private double _endFrequency = 0.0;
+        private ObservableCollection<double> _frequencyList = new ObservableCollection<double>();
+        private double _startFrequency = 0.01;
+        private double _endFrequency = 0.01;
         private double _step = 0.0;
         private double _offset = 0.0;
         private double _power = -30.0;
         private int _timeOfEmission = 0;
         private double _span = 0.0;
         private double _rbw = 0.0;
-        private int _attenuation = -40;
+        private int _attenuation = 40;
         private bool _isPreferredRow = false;
         private bool _isOwnRow = false;
         private bool _isPreamp = false;
@@ -28,25 +30,48 @@ namespace SPOAPAKmmReceiver.Models
             26000.0, 28000.0, 30000.0, 32000.0, 35000.0, 37500.0};
 
         [MinLength(5, ErrorMessage = "Минимальное количество частот равно 5")]
-        public List<double> FrequencyList
+        public ObservableCollection<double> FrequencyList
         {
             get => _frequencyList;
             set => Set(ref _frequencyList, value);
         }
 
-        [Range(0.0, 110000.0)]
+    [Range(0.0, 110000.0)]
         public double StartFrequency
         {
             get => _startFrequency;
             set
             {
                 Set(ref _startFrequency, value);
-                if (value > 37500.0)
+                /*if (value > 37500.0)
                 {
-                    IsPreferredRow = false;
-                    IsOwnRow = true;
-                    GetFrequencyList();
+                    _isPreferredRow = false;
+                    _isOwnRow = true;                    
                 }
+                else if (value > _freqGost[_freqGost.Length - 5])
+                {
+                    _isPreferredRow = false;
+                    _isOwnRow = true;
+                }
+                else if (value <= _freqGost[_freqGost.Length - 5])
+                {
+                    int i = 0;
+                    while (!(_freqGost[i] <= value && _freqGost[i + 1] > value) && i < _freqGost.Length - 5)
+                    {
+                        i++;
+                    }
+                    if (_freqGost[i + 4] > _endFrequency)
+                    {
+                        _isPreferredRow = false;
+                        _isOwnRow = true;
+                    }
+                    else
+                    {
+                        _isPreferredRow = true;
+                        _isOwnRow = false;
+                    }
+                }*/
+                //GetFrequencyList();
             }
         }
 
@@ -54,7 +79,39 @@ namespace SPOAPAKmmReceiver.Models
         public double EndFrequency
         {
             get => _endFrequency;
-            set => Set(ref _endFrequency, value);
+            set 
+            {
+                Set(ref _endFrequency, value);
+                /*if (value > 37500.0)
+                {
+                    IsPreferredRow = false;
+                    IsOwnRow = true;
+                }
+                else if (_startFrequency > _freqGost[_freqGost.Length - 5])
+                {
+                    IsPreferredRow = false;
+                    IsOwnRow = true;
+                }
+                else if (_startFrequency <= _freqGost[_freqGost.Length - 5])
+                {
+                    int i = 0;
+                    while (!(_freqGost[i] <= _startFrequency && _startFrequency < _freqGost[i + 1]) && i < _freqGost.Length - 5)
+                    {
+                        i++;
+                    }
+                    if (_freqGost[i + 4] > value)
+                    {
+                        IsPreferredRow = false;
+                        IsOwnRow = true;
+                    }
+                    else
+                    {
+                        IsPreferredRow = true;
+                        IsOwnRow = false;
+                    }
+                }*/
+                //GetFrequencyList();
+            }
         }
 
         [Range(0.0, 110000.0)]
@@ -74,13 +131,27 @@ namespace SPOAPAKmmReceiver.Models
         public bool IsPreferredRow
         {
             get => _isPreferredRow;
-            set => Set(ref _isPreferredRow, value);
+            set 
+            {
+                Set(ref _isPreferredRow, value);
+                if (value)
+                    _isOwnRow = false;
+                else
+                    _isOwnRow = true;
+            }
         }
 
         public bool IsOwnRow
         {
             get => _isOwnRow;
-            set => Set(ref _isOwnRow, value);
+            set
+            {
+                Set(ref _isOwnRow, value);
+                if (value)
+                    _isPreferredRow = false;
+                else
+                    _isPreferredRow = true;
+            }
         }
 
         [Range(-30, 30)]
@@ -97,7 +168,7 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _timeOfEmission, value);
         }
 
-        [Range(0.0, 40000)]
+        [Range(0.0, 110000.0)]
         public double Span
         {
             get => _span;
@@ -124,6 +195,69 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _isPreamp, value);
         }
 
+        public string Error => throw new NotImplementedException();
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string error = String.Empty;
+                switch(columnName)
+                {
+                    case "StartFrequency":
+                        if (StartFrequency < 0.0 || StartFrequency > 110000.0)
+                            error = "Начальная частота не должна быть отрицательной или больше 110ГГц";
+                        else if (EndFrequency < StartFrequency)
+                            error = "Конечная частота не может быть начальной";
+                        break;
+
+                    case "EndFrequency":
+                        if (EndFrequency < 0.0 || EndFrequency > 110000.0)
+                            error = "Конечная частота не должна быть отрицательной или больше 110ГГц";
+                        else if (EndFrequency < StartFrequency)
+                            error = "Конечная частота не может быть начальной";
+                        break;
+
+                    case "Step":
+                        if (Step < 0.0 || Step > 110000.0)
+                            error = "Величина шага не может быть отрицательной или больше 110ГГц";
+                        break;
+
+                    case "Offset":
+                        if (Offset < 0.0 || Offset > 110000.0)
+                            error = "Величина отстройки не может быть отрицательной или больше 110ГГц";
+                        break;
+
+                    case "Power":
+                        if (Power < -30.0 || Power > 30.0)
+                            error = "Мощность должна быть в диапазоне от -30 до +30 дБм";
+                        break;
+
+                    case "TimeOfEmission":
+                        if (TimeOfEmission < 0.0 || TimeOfEmission > Int32.MaxValue)
+                            error = "Велична времени излучения не может быть отрицательной";
+                        break;
+
+                    case "Span":
+                        if (Span < 0.0 || Span > 10000.0)
+                            error = "Полоса обзора не может быть отрицательной или больше 10 МГц";
+                        break;
+
+                    case "Rbw":
+                        if (Rbw < 0.0 || Rbw > 10000.0)
+                            error = "Полоса пропускания не может быть отрицательной или больше 10 МГц";
+                        break;
+
+                    case "Attenuation":
+                        if (Attenuation < 0.0 || Attenuation > 10000.0)
+                            error = "Аттенюация не может быть отрицательной или больше 40 дБ";
+                        break;
+                }
+
+                return error;
+            }
+        }
+
         public class MeasureSettingsValidationAttribute : ValidationAttribute
         {
             public override bool IsValid(object? value)
@@ -140,7 +274,7 @@ namespace SPOAPAKmmReceiver.Models
                         ErrorMessage = "Конечная частота не должна быть отрицательной или больше 110ГГц";
                         return false;
                     }
-                    if (measureSettings.EndFrequency <= measureSettings.StartFrequency)
+                    if (measureSettings.EndFrequency < measureSettings.StartFrequency)
                     {
                         ErrorMessage = "Конечная частота не может быть начальной";
                         return false;
@@ -173,39 +307,36 @@ namespace SPOAPAKmmReceiver.Models
                             measureSettings.IsPreferredRow = true;
                             measureSettings.IsOwnRow = false;
                         }
-
                     }
                     return true;
                 }
                 return false;
             }
         }
-
+        
         public void GetFrequencyList()
         {
-            if (IsPreferredRow)
+            if (_isPreferredRow)
             {
-                FrequencyList.Clear();
+                _frequencyList.Clear();
 
-                if (StartFrequency <= _freqGost[_freqGost.Length - 5])
+                if (_startFrequency <= _freqGost[_freqGost.Length - 5])
                 {
                     for (int i = 0; i < _freqGost.Length; i++)
                     {
-                        if (_freqGost[i] == StartFrequency)
+                        if (_freqGost[i] == _startFrequency)
                         {
-                            FrequencyList.Add(_freqGost[i] + _offset);
-                            FrequencyList.Add(_freqGost[i + 1] + _offset);
-                            FrequencyList.Add(_freqGost[i + 2] + _offset);
-                            FrequencyList.Add(_freqGost[i + 3] + _offset);
-                            FrequencyList.Add(_freqGost[i + 4] + _offset);
+                            for(int j = i; j < _freqGost.Length && _freqGost[j] <= _endFrequency; j++)
+                            {
+                                _frequencyList.Add(_freqGost[j] + _offset);
+                            }
                         }
-                        else if (_freqGost[i] < StartFrequency && _freqGost[i + 1] > StartFrequency)
+                        else if (_freqGost[i] < _startFrequency && _freqGost[i + 1] > _startFrequency)
                         {
-                            FrequencyList.Add(_freqGost[i] + _offset);
-                            FrequencyList.Add(_freqGost[i + 1] + _offset);
-                            FrequencyList.Add(_freqGost[i + 2] + _offset);
-                            FrequencyList.Add(_freqGost[i + 3] + _offset);
-                            FrequencyList.Add(_freqGost[i + 4] + _offset);
+                            for (int j = i; j < _freqGost.Length && _freqGost[j] <= _endFrequency; j++)
+                            {
+                                _frequencyList.Add(_freqGost[j] + _offset);
+                            }
                         }
                     }
 
@@ -213,12 +344,26 @@ namespace SPOAPAKmmReceiver.Models
             }
             else
             {
-                FrequencyList.Clear();
-                double f = StartFrequency;
-                while (f <= EndFrequency)
+                if (_frequencyList is not null)
+                    _frequencyList.Clear();
+                else
+                    _frequencyList = new ObservableCollection<double>();
+                
+                double f = _startFrequency;
+                if (_step != 0.0)
+                    while (f < _endFrequency)
+                    {
+                        _frequencyList.Add(f + Offset);
+                        f = f + _step;
+                    }
+                else
                 {
-                    FrequencyList.Add(f + Offset);
-                    f = f + Step;
+                    var s = (_endFrequency - _startFrequency) / 4.0;
+                    for(int i = 0; i < 5; i++)
+                    {
+                        _frequencyList.Add(f + _offset);
+                        f = f + s;
+                    }
                 }
             }
         }
