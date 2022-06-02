@@ -5,13 +5,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using SPOAPAKmmReceiver.Extensions;
 
 namespace SPOAPAKmmReceiver.Models
 {
     [MeasureSettingsValidation]
     public class MeasureSettings : Entity, IDataErrorInfo
     {
-        private ObservableCollection<double> _frequencyList = new ObservableCollection<double>();
+        private SortableObservableCollection<double> _frequencyList = new SortableObservableCollection<double>();
         private double _startFrequency = 0.01;
         private double _endFrequency = 0.01;
         private double _step = 0.0;
@@ -30,7 +31,7 @@ namespace SPOAPAKmmReceiver.Models
             26000.0, 28000.0, 30000.0, 32000.0, 35000.0, 37500.0};
 
         [MinLength(5, ErrorMessage = "Минимальное количество частот равно 5")]
-        public ObservableCollection<double> FrequencyList
+        public SortableObservableCollection<double> FrequencyList
         {
             get => _frequencyList;
             set => Set(ref _frequencyList, value);
@@ -42,7 +43,10 @@ namespace SPOAPAKmmReceiver.Models
             get => _startFrequency;
             set
             {
+                if (value > _endFrequency)
+                    EndFrequency = value;
                 Set(ref _startFrequency, value);
+                
                 /*if (value > 37500.0)
                 {
                     _isPreferredRow = false;
@@ -81,6 +85,8 @@ namespace SPOAPAKmmReceiver.Models
             get => _endFrequency;
             set 
             {
+                if (value < _startFrequency)
+                    value = _startFrequency;
                 Set(ref _endFrequency, value);
                 /*if (value > 37500.0)
                 {
@@ -347,7 +353,7 @@ namespace SPOAPAKmmReceiver.Models
                 if (_frequencyList is not null)
                     _frequencyList.Clear();
                 else
-                    _frequencyList = new ObservableCollection<double>();
+                    _frequencyList = new SortableObservableCollection<double>();
                 
                 double f = _startFrequency;
                 if (_step != 0.0)

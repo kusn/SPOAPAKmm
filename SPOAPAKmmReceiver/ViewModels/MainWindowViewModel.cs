@@ -68,6 +68,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _sendMessage;
         private string _recieveMessage;
         private MeasureSettings _mSettings;
+        private string? _extraItemToFrequencyList;
 
         public ObservableCollection<Organization> Organizations { get; set; }
         //public SortableObservableCollection<Organization> Organizations { get; set; }
@@ -257,7 +258,13 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             get => _mSettings;
             set => Set(ref _mSettings, value);
-        }        
+        }
+
+        public string? ExtraItemToFrequencyList
+        {
+            get => _extraItemToFrequencyList;
+            set => Set(ref _extraItemToFrequencyList, value);
+        }
 
         public ICommand Send { get; set; }
 
@@ -717,6 +724,38 @@ namespace SPOAPAKmmReceiver.ViewModels
             ??= new LambdaCommand(OnAutoCalculationFrequencyRowCommandExecuted, CanAutoCalculationFrequencyRowCommandExecute);
         private void OnAutoCalculationFrequencyRowCommandExecuted(object p) => MSettings.GetFrequencyList();
         private bool CanAutoCalculationFrequencyRowCommandExecute(object p) => true;
+
+        #endregion
+
+        #region AddItemToFrequencyListCommand
+
+        private LambdaCommand _addItemToFrequencyListCommand;
+        public LambdaCommand AddItemToFrequencyListCommand => _addItemToFrequencyListCommand
+            ??= new LambdaCommand(OnAddItemToFrequencyListCommandExecuted, CanAddItemToFrequencyListCommandExecute);
+        private void OnAddItemToFrequencyListCommandExecuted(object p)
+        {
+            MSettings.FrequencyList.Add(Convert.ToDouble(ExtraItemToFrequencyList));
+            MSettings.FrequencyList.Sort(l => l);
+        }
+        private bool CanAddItemToFrequencyListCommandExecute(object p)
+        {
+            double f;            
+            bool result = false;
+
+            if (_extraItemToFrequencyList is not null)
+            {
+                if (_extraItemToFrequencyList.Contains('.'))
+                    _extraItemToFrequencyList = _extraItemToFrequencyList.Replace('.', ',');                
+
+                result = Double.TryParse(_extraItemToFrequencyList, out f);
+                if (result)
+                    if (!MSettings.FrequencyList.Contains(f))
+                        result = true;
+                    else result = false;
+            }
+            
+            return result;
+        }
 
         #endregion
 

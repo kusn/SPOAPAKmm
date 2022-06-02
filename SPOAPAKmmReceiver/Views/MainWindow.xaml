@@ -242,7 +242,7 @@
                                 <Label Grid.Row="3" Grid.Column="0" Content="Шаг перестройки, МГц" FontWeight="Normal"/>
                                 <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
-                                        <Binding Path="MSettings.Step" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding Path="MSettings.Step">
                                             <Binding.ValidationRules>
                                                 <DataErrorValidationRule/>
                                             </Binding.ValidationRules>
@@ -252,7 +252,7 @@
                                 <Label Grid.Row="4" Grid.Column="0" Content="Отстройка частоты, МГц" FontWeight="Normal"/>
                                 <TextBox Grid.Row="4" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
-                                        <Binding Path="MSettings.Offset" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding Path="MSettings.Offset">
                                             <Binding.ValidationRules>
                                                 <DataErrorValidationRule/>
                                             </Binding.ValidationRules>
@@ -374,10 +374,10 @@
                                 </Label>
                                 <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsOwnRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>                                
                             </StackPanel>
-                            <Button Content="Авторассчет" Command="{Binding AutoCalculationFrequencyRowCommand}"/>
-                            <TextBox FontWeight="Normal" Margin="0,5,0,5"/>
-                            <Button Content="Добавить"/>
-                            <ScrollViewer CanContentScroll="True"  MaxHeight="420">
+                            <Button Content="Авторасчет" Command="{Binding AutoCalculationFrequencyRowCommand}"/>
+                            <TextBox Text="{Binding ExtraItemToFrequencyList, UpdateSourceTrigger=PropertyChanged}" FontWeight="Normal" Margin="0,5,0,5"/>
+                            <Button Content="Добавить" Command="{Binding AddItemToFrequencyListCommand}"/>
+                            <ScrollViewer CanContentScroll="True"  MaxHeight="350">
                                 <ListBox ItemsSource="{Binding MSettings.FrequencyList}" ScrollViewer.CanContentScroll="True" FontWeight="Normal">
                                 </ListBox>
                             </ScrollViewer>
