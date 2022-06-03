@@ -1,15 +1,13 @@
 ﻿using System;
 using SPOAPAKmmReceiver.Entities.Base;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
 using SPOAPAKmmReceiver.Extensions;
 
 namespace SPOAPAKmmReceiver.Models
 {
     [MeasureSettingsValidation]
+    [Serializable()]
     public class MeasureSettings : Entity, IDataErrorInfo
     {
         private SortableObservableCollection<double> _frequencyList = new SortableObservableCollection<double>();
@@ -29,7 +27,7 @@ namespace SPOAPAKmmReceiver.Models
             16.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0, 125.0, 160.0, 200.0, 300.0, 400.0, 500.0, 600.0, 800.0, 1000.0, 1250.0,
             1600.0, 2000.0, 2500.0, 3000.0, 4000.0, 5000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0, 16000.0, 18000.0, 20000.0, 24000.0,
             26000.0, 28000.0, 30000.0, 32000.0, 35000.0, 37500.0};
-
+                
         [MinLength(5, ErrorMessage = "Минимальное количество частот равно 5")]
         public SortableObservableCollection<double> FrequencyList
         {
@@ -37,7 +35,7 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _frequencyList, value);
         }
 
-    [Range(0.0, 110000.0)]
+        [Range(0.0, 110000.0)]
         public double StartFrequency
         {
             get => _startFrequency;
@@ -45,37 +43,7 @@ namespace SPOAPAKmmReceiver.Models
             {
                 if (value > _endFrequency)
                     EndFrequency = value;
-                Set(ref _startFrequency, value);
-                
-                /*if (value > 37500.0)
-                {
-                    _isPreferredRow = false;
-                    _isOwnRow = true;                    
-                }
-                else if (value > _freqGost[_freqGost.Length - 5])
-                {
-                    _isPreferredRow = false;
-                    _isOwnRow = true;
-                }
-                else if (value <= _freqGost[_freqGost.Length - 5])
-                {
-                    int i = 0;
-                    while (!(_freqGost[i] <= value && _freqGost[i + 1] > value) && i < _freqGost.Length - 5)
-                    {
-                        i++;
-                    }
-                    if (_freqGost[i + 4] > _endFrequency)
-                    {
-                        _isPreferredRow = false;
-                        _isOwnRow = true;
-                    }
-                    else
-                    {
-                        _isPreferredRow = true;
-                        _isOwnRow = false;
-                    }
-                }*/
-                //GetFrequencyList();
+                Set(ref _startFrequency, value);                
             }
         }
 
@@ -87,36 +55,7 @@ namespace SPOAPAKmmReceiver.Models
             {
                 if (value < _startFrequency)
                     value = _startFrequency;
-                Set(ref _endFrequency, value);
-                /*if (value > 37500.0)
-                {
-                    IsPreferredRow = false;
-                    IsOwnRow = true;
-                }
-                else if (_startFrequency > _freqGost[_freqGost.Length - 5])
-                {
-                    IsPreferredRow = false;
-                    IsOwnRow = true;
-                }
-                else if (_startFrequency <= _freqGost[_freqGost.Length - 5])
-                {
-                    int i = 0;
-                    while (!(_freqGost[i] <= _startFrequency && _startFrequency < _freqGost[i + 1]) && i < _freqGost.Length - 5)
-                    {
-                        i++;
-                    }
-                    if (_freqGost[i + 4] > value)
-                    {
-                        IsPreferredRow = false;
-                        IsOwnRow = true;
-                    }
-                    else
-                    {
-                        IsPreferredRow = true;
-                        IsOwnRow = false;
-                    }
-                }*/
-                //GetFrequencyList();
+                Set(ref _endFrequency, value);                
             }
         }
 
@@ -201,8 +140,10 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _isPreamp, value);
         }
 
-        public string Error => throw new NotImplementedException();
+        [field: NonSerialized()]
+        public string Error => String.Empty;
 
+        [field: NonSerialized()]
         public string this[string columnName]
         {
             get
