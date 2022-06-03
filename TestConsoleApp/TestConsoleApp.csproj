@@ -2,11 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Program.cs~RF1fecba.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RsFsw" Version="5.0.0.80" />
+    <PackageReference Include="RsInstrument" Version="1.17.0" />
+    <PackageReference Include="RsSmab" Version="4.70.300.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SPOAPAKmmReceiver\SPOAPAKmmReceiver.csproj" />
   </ItemGroup>
 
 </Project>

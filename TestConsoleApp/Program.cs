@@ -1,8 +1,10 @@
-﻿using System;
+﻿using SPOAPAKmmReceiver.Models;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 
 namespace TestConsoleApp
@@ -20,8 +22,11 @@ namespace TestConsoleApp
             {
                 TcpClient client = listner.AcceptTcpClient();
                 StreamReader sr = new StreamReader(client.GetStream());
-                
-                Console.WriteLine("Сообщение: " + sr.ReadLine() + " получено в " + DateTime.Now.TimeOfDay.ToString());
+
+                var s = sr.ReadLine();
+                var m = JsonSerializer.Deserialize<MeasureSettings>(s);
+
+                Console.WriteLine("Сообщение: " + s + " получено в " + DateTime.Now.TimeOfDay.ToString());
                 //Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
                 //Thread.Sleep(1000);
                 SendToClient("Сообщение отправлено сервером в " + DateTime.Now.TimeOfDay.ToString());
