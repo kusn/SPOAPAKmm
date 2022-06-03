@@ -18,6 +18,7 @@ using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
 using SPOAPAKmmReceiver.Models;
+using System.Text.Json;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -759,6 +760,20 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
+        #region ApplyMeasurementSettingsCommand
+
+        private LambdaCommand _applyMeasurementSettingsCommand;
+        public LambdaCommand ApplyMeasurementSettingsCommand => _applyMeasurementSettingsCommand
+            ??= new LambdaCommand(OnApplyMeasurementSettingsCommandExecuted, CanApplyMeasurementSettingsCommandExecute);
+        private void OnApplyMeasurementSettingsCommandExecuted(object p)
+        {            
+            SendMessage = JsonSerializer.Serialize(MSettings);
+            SendToClient(SendMessage);
+        }
+        private bool CanApplyMeasurementSettingsCommandExecute(object p) => true;
+
+        #endregion
+
         private string GetNewName(object collection)
         {
             string name = "";
@@ -810,7 +825,11 @@ namespace SPOAPAKmmReceiver.ViewModels
             return baseName;
         }
 
-        private void OnSendExecuted(object p) => SendToClient(SendMessage);
+        private void OnSendExecuted(object p)
+        {
+            //SendMessage = JsonSerializer.Serialize(MSettings);
+            SendToClient(SendMessage); 
+        }
         private bool CanSendMessageExecute(object arg) => true;
 
         private void GetAccessToClientProgram()
