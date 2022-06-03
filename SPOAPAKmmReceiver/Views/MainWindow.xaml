@@ -354,7 +354,7 @@
                                 </CheckBox>
                             </Grid>
                         </GroupBox>
-                        <Button Content="Применить" FontWeight="Bold" Margin="5,5,5,5"/>
+                        <Button Content="Применить" Command="{Binding ApplyMeasurementSettingsCommand}" FontWeight="Bold" Margin="5,5,5,5"/>
                     </StackPanel>
                     <GroupBox Header="Список частот"  FontWeight="ExtraBold">
                         <StackPanel Orientation="Vertical">
@@ -388,7 +388,7 @@
             </Grid>
         </Grid>
         <StatusBar Grid.Row="2" >
-            <StatusBarItem Content="Статус:"></StatusBarItem>
+            <StatusBarItem Content="{Binding RecieveMessage}"></StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>
