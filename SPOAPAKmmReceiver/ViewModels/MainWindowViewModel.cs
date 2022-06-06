@@ -33,6 +33,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         
         private bool _isSelected;
         private bool _isChanged;
+        private bool _isEnabledMSettingsPanel;
         private object _selectedValue;
         private Page _userPage;
         private Organization _selectedOrganization;
@@ -138,6 +139,11 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             get => _isChanged;
             set => Set(ref _isChanged, value);
+        }
+        public bool IsEnabledMSettingsPanel
+        {
+            get => _isEnabledMSettingsPanel;
+            set => Set(ref _isEnabledMSettingsPanel, value);
         }
         public object SelectedValue
         {
@@ -345,6 +351,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     IsVisibilityElement = Visibility.Hidden;
                     IsVisibilityPoint = Visibility.Hidden;
                     SelectedTab = 0;
+                    IsEnabledMSettingsPanel = false;
                 }
                 else if (obj is Room)
                 {
@@ -358,6 +365,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     IsVisibilityElement = Visibility.Hidden;
                     IsVisibilityPoint = Visibility.Hidden;
                     SelectedTab = 1;
+                    IsEnabledMSettingsPanel = true;
                 }
                 else if (obj is Element)
                 {
@@ -371,6 +379,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     IsVisibilityElement = Visibility.Visible;
                     IsVisibilityPoint = Visibility.Hidden;
                     SelectedTab = 2;
+                    IsEnabledMSettingsPanel = true;
                 }
                 else if (obj is MeasPoint)
                 {
@@ -386,6 +395,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     IsVisibilityElement = Visibility.Hidden;
                     IsVisibilityPoint = Visibility.Visible;
                     SelectedTab = 3;
+                    IsEnabledMSettingsPanel = true;
                 }
             }
         }

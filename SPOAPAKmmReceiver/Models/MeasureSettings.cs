@@ -21,7 +21,7 @@ namespace SPOAPAKmmReceiver.Models
         private double _rbw = 0.0;
         private int _attenuation = 40;
         private bool _isPreferredRow = false;
-        private bool _isOwnRow = false;
+        private bool _isOwnRow = true;
         private bool _isPreamp = false;
         private double[] _freqGost = {0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.25, 1.6, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.5,
             16.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0, 125.0, 160.0, 200.0, 300.0, 400.0, 500.0, 600.0, 800.0, 1000.0, 1250.0,
