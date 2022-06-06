@@ -24,12 +24,21 @@ namespace TestConsoleApp
                 StreamReader sr = new StreamReader(client.GetStream());
 
                 var s = sr.ReadLine();
-                var m = JsonSerializer.Deserialize<MeasureSettings>(s);
+                var m = JsonSerializer.Deserialize<ReceiverMessage>(s);
 
-                Console.WriteLine("Сообщение: " + s + " получено в " + DateTime.Now.TimeOfDay.ToString());
+                if (m != null)
+                {
+                    if (m.Mode == ReceiverMessage.WorkMode.ApplyMeasureSettings)
+                    {
+                        Console.WriteLine("Получены настройки: " + s);
+                        SendToClient("Настройки приняты " + DateTime.Now.TimeOfDay.ToString());
+                    }
+                }
+
+                //Console.WriteLine("Сообщение: " + s + " получено в " + DateTime.Now.TimeOfDay.ToString());
                 //Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
                 //Thread.Sleep(1000);
-                SendToClient("Сообщение отправлено сервером в " + DateTime.Now.TimeOfDay.ToString());
+                //SendToClient("Сообщение отправлено сервером в " + DateTime.Now.TimeOfDay.ToString());
 
                 client.Close();
             }

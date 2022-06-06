@@ -778,7 +778,9 @@ namespace SPOAPAKmmReceiver.ViewModels
             ??= new LambdaCommand(OnApplyMeasurementSettingsCommandExecuted, CanApplyMeasurementSettingsCommandExecute);
         private void OnApplyMeasurementSettingsCommandExecuted(object p)
         {
-            SendMessage = JsonSerializer.Serialize(new ReceiverMessage(MSettings, Mode.ApplySettings));            
+            var message = new ReceiverMessage(WorkMode.ApplyMeasureSettings);
+            message.FromMeasureSettings(MSettings);
+            SendMessage = JsonSerializer.Serialize(message);            
             SendToClient(SendMessage);
         }
         private bool CanApplyMeasurementSettingsCommandExecute(object p) => true;
