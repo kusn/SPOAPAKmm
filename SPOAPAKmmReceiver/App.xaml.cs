@@ -40,6 +40,7 @@ namespace SPOAPAKmmReceiver
             services.AddScoped(typeof(IStore<>), typeof(DbStore<>));
 
             services.AddScoped<MainWindowViewModel>();
+            services.AddScoped<SettingsWindowViewModel>();
         }
 
         protected override void OnStartup(StartupEventArgs e)

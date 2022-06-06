@@ -20,6 +20,7 @@ using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
 using SPOAPAKmmReceiver.Models;
 using System.Text.Json;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
+using SPOAPAKmmReceiver.Views;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -784,6 +785,20 @@ namespace SPOAPAKmmReceiver.ViewModels
             SendToClient(SendMessage);
         }
         private bool CanApplyMeasurementSettingsCommandExecute(object p) => true;
+
+        #endregion
+
+        #region
+
+        private LambdaCommand _openSettingsWindowCommand;
+        public LambdaCommand OpenSettingsWindowCommand => _openSettingsWindowCommand
+            ??= new LambdaCommand(OnOpenSettingsWindowCommandExecuted, CanOpenSettingsWindowCommandExecute);
+        private void OnOpenSettingsWindowCommandExecuted(object p)
+        {
+            SettingsWindow settingsWindow = new SettingsWindow();
+            settingsWindow.Show();
+        }
+        private bool CanOpenSettingsWindowCommandExecute(object p) => true;
 
         #endregion
 

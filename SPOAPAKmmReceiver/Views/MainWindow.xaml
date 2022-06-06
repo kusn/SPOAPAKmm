@@ -16,7 +16,7 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Height="25">
-            <MenuItem Header="Настройки" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <MenuItem Header="Настройки" Command="{Binding OpenSettingsWindowCommand}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Menu>
         <Grid Grid.Row="1">
