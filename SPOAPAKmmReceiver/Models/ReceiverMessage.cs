@@ -1,19 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SPOAPAKmmReceiver.Models
 {
+    [Serializable()]
     public class ReceiverMessage
     {
-        private Mode _mode { get; set; }
+        public WorkMode Mode { get; set; }
         public List<double> FrequencyList { get; set; }
         public double StartFrequency { get; set; }
         public double EndFrequency { get; set; }
         public double Step { get; set; }
         public double Offset { get; set; }
         public double Power { get; set; }
-        public int TimeOfEmission { get; set; }
+        public int TimeOfEmission { get; set; }        
 
-        public ReceiverMessage(MeasureSettings measureSettings, Mode mode)
+        public ReceiverMessage(WorkMode mode)
+        {
+            Mode = mode;
+        }
+
+        public void FromMeasureSettings(MeasureSettings measureSettings)
         {
             FrequencyList = new List<double>(measureSettings.FrequencyList);
             StartFrequency = measureSettings.StartFrequency;
@@ -21,13 +28,13 @@ namespace SPOAPAKmmReceiver.Models
             Step = measureSettings.Step;
             Offset = measureSettings.Offset;
             Power = measureSettings.Power;
-            TimeOfEmission = measureSettings.TimeOfEmission;
-            _mode = mode;
+            TimeOfEmission = measureSettings.TimeOfEmission;            
         }
 
-        public enum Mode
+        public enum WorkMode : int
         {
-            ApplySettings,
+            ApplyInstrumentSettings,
+            ApplyMeasureSettings,
             Сalibration,
             Find,
             Measuring,
