@@ -4,7 +4,7 @@ namespace SPOAPAKmmReceiver.Models
 {
     public class ReceiverMessage
     {
-        public string Mode { get; set; }
+        private Mode _mode { get; set; }
         public List<double> FrequencyList { get; set; }
         public double StartFrequency { get; set; }
         public double EndFrequency { get; set; }
@@ -13,7 +13,7 @@ namespace SPOAPAKmmReceiver.Models
         public double Power { get; set; }
         public int TimeOfEmission { get; set; }
 
-        ReceiverMessage(MeasureSettings measureSettings, string mode)
+        public ReceiverMessage(MeasureSettings measureSettings, Mode mode)
         {
             FrequencyList = new List<double>(measureSettings.FrequencyList);
             StartFrequency = measureSettings.StartFrequency;
@@ -22,7 +22,16 @@ namespace SPOAPAKmmReceiver.Models
             Offset = measureSettings.Offset;
             Power = measureSettings.Power;
             TimeOfEmission = measureSettings.TimeOfEmission;
-            Mode = mode;
+            _mode = mode;
+        }
+
+        public enum Mode
+        {
+            ApplySettings,
+            Сalibration,
+            Find,
+            Measuring,
+            Searching,
         }
     }
 }
