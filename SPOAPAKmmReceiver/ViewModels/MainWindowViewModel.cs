@@ -19,6 +19,7 @@ using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
 using SPOAPAKmmReceiver.Models;
 using System.Text.Json;
+using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -776,8 +777,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         public LambdaCommand ApplyMeasurementSettingsCommand => _applyMeasurementSettingsCommand
             ??= new LambdaCommand(OnApplyMeasurementSettingsCommandExecuted, CanApplyMeasurementSettingsCommandExecute);
         private void OnApplyMeasurementSettingsCommandExecuted(object p)
-        {            
-            SendMessage = JsonSerializer.Serialize(MSettings);
+        {
+            SendMessage = JsonSerializer.Serialize(new ReceiverMessage(MSettings, Mode.ApplySettings));            
             SendToClient(SendMessage);
         }
         private bool CanApplyMeasurementSettingsCommandExecute(object p) => true;
