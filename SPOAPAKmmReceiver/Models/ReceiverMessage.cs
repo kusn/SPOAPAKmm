@@ -35,7 +35,8 @@ namespace SPOAPAKmmReceiver.Models
         {
             ApplyInstrumentSettings,
             ApplyMeasureSettings,
-            Сalibration,            
+            Сalibration,
+            Checking,
             Measuring,
             Searching,
         }
