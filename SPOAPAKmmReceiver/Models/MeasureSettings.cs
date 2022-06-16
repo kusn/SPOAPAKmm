@@ -1,14 +1,14 @@
 ﻿using System;
-using SPOAPAKmmReceiver.Entities.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using SPOAPAKmmReceiver.Extensions;
+using SPOAPAKmmReceiver.Models.Base;
 
 namespace SPOAPAKmmReceiver.Models
 {
     [MeasureSettingsValidation]
     [Serializable()]
-    public class MeasureSettings : Entity, IDataErrorInfo
+    public class MeasureSettings : Model, IDataErrorInfo
     {
         private SortableObservableCollection<double> _frequencyList = new SortableObservableCollection<double>();
         private double _startFrequency = 0.01;
