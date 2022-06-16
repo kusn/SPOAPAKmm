@@ -327,9 +327,9 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
 
-            /*Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);
+            Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);
             AccessToClientProgram.IsBackground = true;
-            AccessToClientProgram.Start();*/
+            AccessToClientProgram.Start();
         }
 
         private void OpenValue(object obj)
