@@ -1,5 +1,7 @@
-﻿using SPOAPAKmmReceiver.Models;
+﻿using RohdeSchwarz.RsInstrument;
+using SPOAPAKmmReceiver.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -14,6 +16,7 @@ namespace SPOAPAKmmTransmitter
         static private string _ipAddress = "127.0.0.1";
         static private int _listenerPort = 11000;
         static private int _sendPort = 11001;
+        static private List<string> _devicesList = new List<string>();
 
         private static void GetAccessToClientProgram()
         {
@@ -31,7 +34,30 @@ namespace SPOAPAKmmTransmitter
                 {
                     if(m.Mode == WorkMode.Searching)
                     {
+                        Console.WriteLine("Получен запрос: " + s);
+                        _devicesList = new List<string>(RsInstrument.FindResources("?*"));
+                        Dictionary<string, string> data = new Dictionary<string, string>();
 
+                        foreach (string device in _devicesList)
+                        {                            
+                            string descr;
+                            try
+                            {
+                                RsInstrument instrument = new RsInstrument(device);
+                                descr = instrument.QueryString("*IDN?");                                
+                            }
+                            catch (Exception ex)
+                            {
+
+                                descr = ex.Message;
+                            }
+                            data.Add(device, descr);
+                        }
+                        TransmitterMessage transmitterMessage = new TransmitterMessage();
+                        transmitterMessage.Mode = m.Mode;
+                        transmitterMessage.DevicesList = data;
+                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                        SendToClient(message);
                     }
                     else if (m.Mode == WorkMode.ApplyInstrumentSettings)
                     {
@@ -40,11 +66,24 @@ namespace SPOAPAKmmTransmitter
                     else if (m.Mode == WorkMode.ApplyMeasureSettings)
                     {
                         Console.WriteLine("Получены настройки: " + s);
-                        SendToClient("Настройки приняты: " + DateTime.Now.TimeOfDay.ToString());
+                        TransmitterMessage transmitterMessage = new TransmitterMessage();
+                        transmitterMessage.Mode = m.Mode;
+                        transmitterMessage.IsOk = true;
+                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                        SendToClient(message);                        
                     }
                     else if (m.Mode == WorkMode.Сalibration)
                     {
-
+                        
+                    }
+                    else if (m.Mode == WorkMode.Checking)
+                    {
+                        Console.WriteLine("Получен запрос: " + s);
+                        TransmitterMessage transmitterMessage = new TransmitterMessage();
+                        transmitterMessage.Mode = m.Mode;
+                        transmitterMessage.IsOk = true;
+                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                        SendToClient(message);
                     }
                     else if (m.Mode == WorkMode.Measuring)
                     {
