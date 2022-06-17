@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Data.Stores.InDb;
+using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.Models;
 using SPOAPAKmmReceiver.ViewModels;
@@ -31,7 +32,7 @@ namespace SPOAPAKmmReceiver
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)                
-                .ConfigureAppConfiguration(opt => opt.AddJsonFile("appsettings.json", true, true))
+                .ConfigureAppConfiguration(opt => opt.AddJsonFile("appsettings.json", false, true))
                 .ConfigureServices(ConfigureServices);
         
         private static void ConfigureServices(HostBuilderContext host, IServiceCollection services)
@@ -44,7 +45,7 @@ namespace SPOAPAKmmReceiver
             services.AddScoped<SettingsWindowViewModel>();
 
             services.Configure<InstrumentSettings>(InstrumentSettings.Generator, host.Configuration.GetSection("InstrumentSettings:Generator"));
-            services.Configure<InstrumentSettings>(InstrumentSettings.Receiver, host.Configuration.GetSection("InstrumentSettings:Receiver"));
+            services.Configure<InstrumentSettings>(InstrumentSettings.Receiver, host.Configuration.GetSection("InstrumentSettings:Receiver"));            
         }
 
         protected override void OnStartup(StartupEventArgs e)

@@ -5,13 +5,20 @@ namespace SPOAPAKmmReceiver.Extensions.DTO
 {
     public static class Mapper
     {
-        //public static InstrumentSettings InstrumentSettingsFromStringArray(this string[] item) => item is null
-        //    ? null
-        //    : new InstrumentSettings
-        //    {
-        //        InstrAddress = item[0],
-        //        IpAddress = System.Net.IPAddress.Parse(item[1]),
-        //        Port = Convert.ToInt32(item[2]),
-        //    };
+        public static InstrumentSettingsConfig InstrumentSettingsToConfigSection(this InstrumentSettings item) => item is null
+            ? null
+            : new InstrumentSettingsConfig
+            {
+                InstrAddress = item.InstrAddress,
+                IpAddress = item.IpAddress,
+                Port = item.Port,
+            };
+
+        public class InstrumentSettingsConfig
+        {
+            public string IpAddress { get; set; }
+            public string InstrAddress { get; set; }
+            public int Port { get; set; }            
+        }
     }
 }

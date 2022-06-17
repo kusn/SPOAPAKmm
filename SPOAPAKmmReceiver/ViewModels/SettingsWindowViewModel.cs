@@ -7,7 +7,6 @@ using SPOAPAKmmReceiver.Extensions.DTO;
 using System;
 using System.Collections.ObjectModel;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
-using System.Text.Json;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
@@ -16,6 +15,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
+using static SPOAPAKmmReceiver.Extensions.DTO.Mapper;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -25,7 +27,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         private static int _timeOut = 500;
 
         private readonly IConfiguration _configuration;
-        IOptionsSnapshot<InstrumentSettings> _namedOptionsAccessor;
+        private IOptionsSnapshot<InstrumentSettings> _namedOptionsAccessor;
+
         private InstrumentSettings _receiverSettings;
         private InstrumentSettings _generatorSettings;
         private string _descriptionSelectedReceiver;
@@ -116,10 +119,11 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         public ICommand Send { get; set; }
 
-        public SettingsWindowViewModel(IOptionsSnapshot<InstrumentSettings> namedOptionsAccessor)
+        public SettingsWindowViewModel(IOptionsSnapshot<InstrumentSettings> namedOptionsAccessor, IConfiguration configuration)
         {
-            //_configuration = configuration;
+            _configuration = configuration;
             _namedOptionsAccessor = namedOptionsAccessor;
+            
             GetAppSettings();
 
             Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
@@ -169,7 +173,7 @@ namespace SPOAPAKmmReceiver.ViewModels
            
             StartListen();
             var message = new ReceiverMessage(WorkMode.Checking);            
-            SendMessage = JsonSerializer.Serialize(message);
+            SendMessage = System.Text.Json.JsonSerializer.Serialize(message);
             SendToClient(SendMessage);
         }
         private bool CanTestSelectedGeneratorCommandExecute(object p) => true;
@@ -187,20 +191,36 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             StartListen();
             var message = new ReceiverMessage(WorkMode.Searching);            
-            SendMessage = JsonSerializer.Serialize(message);
+            SendMessage = System.Text.Json.JsonSerializer.Serialize(message);
             SendToClient(SendMessage);
         }
         private bool CanSearchGeneratorsCommandExecute(object p) => true;
 
         #endregion
 
+        #region SaveSettingsCommand
+
+        private LambdaCommand _saveSettingsCommand;
+        public LambdaCommand SaveSettingsCommand => _saveSettingsCommand
+            ??= new LambdaCommand(OnSaveSettingsCommandExecuted, CanSaveSettingsCommandExecute);
+        private void OnSaveSettingsCommandExecuted(object p)
+        {
+            var v = System.Text.Json.JsonSerializer.Serialize<InstrumentSettingsConfig>(ReceiverSettings.InstrumentSettingsToConfigSection());
+            SetAppSettingValue("InstrumentSettings:Receiver", v);
+            v = System.Text.Json.JsonSerializer.Serialize<InstrumentSettingsConfig>(GeneratorSettings.InstrumentSettingsToConfigSection());
+            SetAppSettingValue("InstrumentSettings:Generator", v);
+        }
+        private bool CanSaveSettingsCommandExecute(object p) => true;
+
+        #endregion
+
         private void GetAppSettings()
-        {            
+        {
             //ReceiverSettings = _configuration.GetSection("InstrumentSettings:Receiver").Get<InstrumentSettings>();
             //GeneratorSettings = _configuration.GetSection("InstrumentSettings:Generator").Get<InstrumentSettings>();
 
             ReceiverSettings = _namedOptionsAccessor.Get(InstrumentSettings.Receiver);
-            GeneratorSettings = _namedOptionsAccessor.Get(InstrumentSettings.Generator);            
+            GeneratorSettings = _namedOptionsAccessor.Get(InstrumentSettings.Generator);
         }
 
         private void OnSendExecuted(object p)
@@ -259,7 +279,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             //App.Current.Dispatcher.Invoke((Action)(() => this.RecieveMessage = Data));
             App.Current.Dispatcher.Invoke((Action)(() =>
             {
-                var message = JsonSerializer.Deserialize<TransmitterMessage>(data);
+                var message = System.Text.Json.JsonSerializer.Deserialize<TransmitterMessage>(data);
                 if (message != null)
                     if (message.Mode == WorkMode.Checking)
                     {
@@ -296,6 +316,39 @@ namespace SPOAPAKmmReceiver.ViewModels
             /*Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);
             AccessToClientProgram.IsBackground = true;
             AccessToClientProgram.Start();*/
+        }
+
+        private static void SetAppSettingValue(string key, string value, string appSettingsJsonFilePath = null)
+        {
+            if (appSettingsJsonFilePath == null)
+            {
+                appSettingsJsonFilePath = System.IO.Path.Combine(System.AppContext.BaseDirectory, "appsettings.json");
+            }
+            var config = File.ReadAllText(appSettingsJsonFilePath);
+            var json = JObject.Parse(config);
+            var updatedConfigDict = UpdateJson(key, value, json);
+            File.WriteAllText(appSettingsJsonFilePath, updatedConfigDict.ToString());
+        }
+
+        private static JObject UpdateJson(string key, object value, JObject jsonSegment)
+        {
+            const char keySeparator = ':';
+            
+            var keyParts = key.Split(keySeparator);
+            var isKeyNested = keyParts.Length > 1;
+            if (isKeyNested)
+            {
+                var firstKeyPart = keyParts[0];
+                var remainingKey = string.Join(keySeparator, keyParts.Skip(1));
+
+                var newJsonSegment = (JObject)jsonSegment.SelectToken(firstKeyPart);
+                jsonSegment[firstKeyPart] = UpdateJson(remainingKey, value, newJsonSegment);
+            }
+            else
+            {
+                jsonSegment[key] = JObject.Parse(value.ToString());
+            }
+            return jsonSegment;
         }
     }
 }

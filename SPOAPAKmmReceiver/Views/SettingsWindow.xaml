@@ -60,6 +60,6 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сохранить"/>
+        <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сохранить" Command="{Binding SaveSettingsCommand}"/>
     </Grid>
 </Window>
