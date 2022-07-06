@@ -7,6 +7,7 @@ namespace SPOAPAKmmReceiver.Models
     public class ReceiverMessage
     {
         public WorkMode Mode { get; set; }
+        public string InstrAddress { get; set; }
         public List<double> FrequencyList { get; set; }
         public double StartFrequency { get; set; }
         public double EndFrequency { get; set; }
