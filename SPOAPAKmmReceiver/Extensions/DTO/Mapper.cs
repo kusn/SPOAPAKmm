@@ -14,6 +14,15 @@ namespace SPOAPAKmmReceiver.Extensions.DTO
                 Port = item.Port,
             };
 
+        public static InstrumentSettings ConfigSectionToInstrumentSettings(this InstrumentSettingsConfig item) => item is null
+            ? null
+            : new InstrumentSettings
+            {
+                InstrAddress = item.InstrAddress,
+                IpAddress = item.IpAddress,
+                Port = item.Port,                
+            };
+
         public class InstrumentSettingsConfig
         {
             public string IpAddress { get; set; }
