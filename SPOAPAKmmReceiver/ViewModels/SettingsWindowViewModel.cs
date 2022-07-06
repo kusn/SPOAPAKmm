@@ -18,12 +18,14 @@ using Microsoft.Extensions.Options;
 using static SPOAPAKmmReceiver.Extensions.DTO.Mapper;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Microsoft.Win32;
+using System.Windows;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
     public class SettingsWindowViewModel : ViewModel
     {
-        private static bool _simulation = true;
+        private static bool _simulation = false;
         private static int _timeOut = 500;
 
         private readonly IConfiguration _configuration;
@@ -43,6 +45,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancelTokenSource;
         private TcpListener _listner;
+        private string _connectionString;
 
         public InstrumentSettings ReceiverSettings
         {
@@ -104,6 +107,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Set(ref _selectedItemDeviceListTransmitter, value);
                 DescriptionSelectedGenerator = DevicesListTransmitter[value];
+                GeneratorSettings.InstrAddress = value;
             }
         }
         public string SendMessage
@@ -115,6 +119,11 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             get => _recieveMessage;
             set => Set(ref _recieveMessage, value);
+        }
+        public string ConnectionString
+        {
+            get => _connectionString;
+            set => Set(ref _connectionString, value);
         }
 
         public ICommand Send { get; set; }
@@ -141,7 +150,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             ??= new LambdaCommand(OnTestSelectedReceiverCommandExecuted, CanTestSelectedReceiverCommandExecute);
         private void OnTestSelectedReceiverCommandExecuted(object p)
         {
-            DevicesListReciever = new ObservableCollection<string>();            
+            RsInstrument instr = new RsInstrument(SelectedItemDeviceListReceiver, "Simulate = " + _simulation);
+            DescriptionSelectedReceiver = instr.QueryString("*IDN?");
         }
         private bool CanTestSelectedReceiverCommandExecute(object p) => true;
 
@@ -172,7 +182,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
            
             StartListen();
-            var message = new ReceiverMessage(WorkMode.Checking);            
+            var message = new ReceiverMessage(WorkMode.Checking);
+            message.InstrAddress = GeneratorSettings.InstrAddress;
             SendMessage = System.Text.Json.JsonSerializer.Serialize(message);
             SendToClient(SendMessage);
         }
@@ -209,8 +220,36 @@ namespace SPOAPAKmmReceiver.ViewModels
             SetAppSettingValue("InstrumentSettings:Receiver", v);
             v = System.Text.Json.JsonSerializer.Serialize<InstrumentSettingsConfig>(GeneratorSettings.InstrumentSettingsToConfigSection());
             SetAppSettingValue("InstrumentSettings:Generator", v);
+            //v = System.Text.Json.JsonSerializer.Serialize("Filename=.\\" + ConnectionString);
+            //SetAppSettingValue("ConnectionStrings:Default", v);
+            Application.Current.Shutdown();
         }
         private bool CanSaveSettingsCommandExecute(object p) => true;
+
+        #endregion
+
+        #region OpenConnectionStringCommand
+
+        private LambdaCommand _openConnectionStringCommand;
+        public LambdaCommand OpenConnectionStringCommand => _openConnectionStringCommand
+            ??= new LambdaCommand(OnOpenConnectionStringCommandExecuted, CanOpenConnectionStringCommandExecute);
+        private void OnOpenConnectionStringCommandExecuted(object p)
+        {
+            /*SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = System.AppContext.BaseDirectory;
+            saveFileDialog.FileName = ConnectionString;
+            if(saveFileDialog.ShowDialog() != null)
+            {
+                var v = saveFileDialog.FileName;
+                //FileInfo fileInfo = new FileInfo(v);
+                //var dir = fileInfo.DirectoryName;
+                if (v.Contains(System.AppContext.BaseDirectory))
+                    ConnectionString = v.Remove(0, System.AppContext.BaseDirectory.Length);
+                else
+                    ConnectionString = v;
+            }*/
+        }
+        private bool CanOpenConnectionStringCommandExecute(object p) => true;
 
         #endregion
 
@@ -221,6 +260,8 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             ReceiverSettings = _namedOptionsAccessor.Get(InstrumentSettings.Receiver);
             GeneratorSettings = _namedOptionsAccessor.Get(InstrumentSettings.Generator);
+            //ConnectionString = _configuration.GetSection("ConnectionStrings:Default").Get<string>();
+            ConnectionString = _configuration.GetConnectionString("Default").Remove(0, ("Filename=.\\").Length);
         }
 
         private void OnSendExecuted(object p)
@@ -284,6 +325,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     if (message.Mode == WorkMode.Checking)
                     {
                         this.RecieveMessage = message.IsOk.ToString();
+                        this.DescriptionSelectedGenerator = message.Message;
                         _cancelTokenSource.Cancel();
                         //_cancelTokenSource.Dispose();
                     }
