@@ -13,10 +13,17 @@
     <PackageReference Include="RsFsw" Version="5.0.0.80" />
     <PackageReference Include="RsInstrument" Version="1.17.0" />
     <PackageReference Include="RsSmab" Version="4.70.300.36" />
+    <PackageReference Include="RsSmw" Version="5.0.44.91" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SPOAPAKmmReceiver\SPOAPAKmmReceiver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="InstrumentDrivers\Internal\SessionSettings.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
