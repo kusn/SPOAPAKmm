@@ -34,7 +34,12 @@
                 <StackPanel Orientation="Vertical">
                     <Label Content="Адрес"/>
                     <TextBox Text="{Binding ReceiverSettings.InstrAddress, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Content="Тест" Command="{Binding TestSelectedReceiverCommand}"/>                    
+                    <Button Content="Тест" Command="{Binding TestSelectedReceiverCommand}"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="Адрес БД"/>
+                    <TextBox Text="{Binding ConnectionString}"/>
+                    <Button Content="Открыть" Command="{Binding OpenConnectionStringCommand}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
