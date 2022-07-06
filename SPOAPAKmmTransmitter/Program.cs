@@ -17,6 +17,7 @@ namespace SPOAPAKmmTransmitter
         static private int _listenerPort = 11000;
         static private int _sendPort = 11001;
         static private List<string> _devicesList = new List<string>();
+        static private bool _IsSimulate = false;
 
         private static void GetAccessToClientProgram()
         {
@@ -44,11 +45,11 @@ namespace SPOAPAKmmTransmitter
                             try
                             {
                                 RsInstrument instrument = new RsInstrument(device);
-                                descr = instrument.QueryString("*IDN?");                                
+                                descr = instrument.QueryString("*IDN?");
+                                instrument.Dispose();
                             }
                             catch (Exception ex)
                             {
-
                                 descr = ex.Message;
                             }
                             data.Add(device, descr);
@@ -79,9 +80,24 @@ namespace SPOAPAKmmTransmitter
                     else if (m.Mode == WorkMode.Checking)
                     {
                         Console.WriteLine("Получен запрос: " + s);
+
                         TransmitterMessage transmitterMessage = new TransmitterMessage();
                         transmitterMessage.Mode = m.Mode;
-                        transmitterMessage.IsOk = true;
+                        var resourceString = m.InstrAddress;
+                        
+                        try
+                        {
+                            RsInstrument instrument = new RsInstrument(resourceString, true, true, "Simulate = " + _IsSimulate.ToString());
+                            transmitterMessage.Message = instrument.Query("*IDN?");
+                            transmitterMessage.IsOk = true;
+                            instrument.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            transmitterMessage.IsOk = false;                            
+                            transmitterMessage.Message = ex.Message;
+                        }
+                        
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
                     }
