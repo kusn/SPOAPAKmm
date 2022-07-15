@@ -2,7 +2,7 @@
 //using RohdeSchwarz.RsSmab;
 using System;
 using System.Collections.Generic;
-using TestConsoleApp.RS;
+using RSSigGen.RS;
 
 namespace TestConsoleApp
 {

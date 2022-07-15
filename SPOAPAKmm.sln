@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsoleApp", "TestConso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClientConsoleApp", "TestClientConsoleApp\TestClientConsoleApp.csproj", "{1657882E-032F-4D61-BF2B-1C74F064E547}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClientWpfApp", "TestClientWpfApp\TestClientWpfApp.csproj", "{D94BF039-DBDA-4E3E-B933-FEE75C03661B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClientWpfApp", "TestClientWpfApp\TestClientWpfApp.csproj", "{D94BF039-DBDA-4E3E-B933-FEE75C03661B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSSigGen", "RSSigGen\RSSigGen.csproj", "{FE03BAB4-8A99-4A05-A040-A81D665DB094}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{D94BF039-DBDA-4E3E-B933-FEE75C03661B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D94BF039-DBDA-4E3E-B933-FEE75C03661B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D94BF039-DBDA-4E3E-B933-FEE75C03661B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE03BAB4-8A99-4A05-A040-A81D665DB094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE03BAB4-8A99-4A05-A040-A81D665DB094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE03BAB4-8A99-4A05-A040-A81D665DB094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE03BAB4-8A99-4A05-A040-A81D665DB094}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
