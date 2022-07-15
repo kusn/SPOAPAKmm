@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ROOT>
+	<Config>
+		<Settings
+		  PreferRsVisa = "false"
+		  Simulate = "false"
+		  ViClearExeMode = "ExecuteOnAll"
+		  IdnModelFullName = "true"
+		  IoSegmentSize = "10000000"
+		  OpcWaitMode = "StbPolling"
+		  VisaTimeout = "10000"
+		  OpcTimeout = "30000"
+		  SelfTestTimeout = "600000"
+		  OptionsParseMode = "Auto"
+		  BinFloatNumbersFormat = "Single4Bytes"
+		  BinIntNumbersFormat = "Integer324Bytes"
+		  OpcQueryAfterEachSetting = "false"
+		  QueryInstrumentStatus = "true"
+		  StbInErrorCheck = "True"
+		  DisableOpcQuery = "False"
+    />
+	</Config>
+	<Config SessionKind="Nrpz">
+		<Settings
+		OptionsParseMode = "Skip"
+		StbInErrorCheck = "False"
+		DisableOpcQuery = "True"
+  />
+	</Config>
+</ROOT>
