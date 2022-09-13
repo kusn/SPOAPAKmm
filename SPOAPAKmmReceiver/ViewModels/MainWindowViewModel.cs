@@ -21,27 +21,38 @@ using SPOAPAKmmReceiver.Models;
 using System.Text.Json;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 using SPOAPAKmmReceiver.Views;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
+using RohdeSchwarz.RsFsw;
+using System.Windows.Documents;
+using System.Runtime;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
+        static private bool _isSimulate = false;
+
         private IStore<Organization> _dBOrganization;
         private IStore<Room> _dBRoom;
         private IStore<Element> _dBElement;
         private IStore<Device> _dBDevice;
         private IStore<MeasPoint> _dBMeasPoint;
         private IStore<Measuring> _dBMeasuring;
-        
+
         private bool _isSelected;
         private bool _isChanged;
         private bool _isEnabledMSettingsPanel;
+        private bool _isChangedFrequencyList;
+        private bool _isCalibratedFrequenciesList = false;
         private object _selectedValue;
         private Page _userPage;
         private Organization _selectedOrganization;
         private Room _selectedRoom;
         private Element _selectedElement;
         private MeasPoint _selectedPoint;
+        private MeasPoint _measPoint;
         private ViewModel _selectedViewModel;
         private Visibility _isVisibilityOrganization = Visibility.Collapsed;
         private Visibility _isVisibilityRoom = Visibility.Collapsed;
@@ -73,6 +84,16 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _recieveMessage;
         private MeasureSettings _mSettings;
         private string? _extraItemToFrequencyList;
+        private CancellationTokenSource _cancelTokenSource;
+        private CancellationToken _cancellationToken;
+        private InstrumentSettings _receiverSettings;
+        private InstrumentSettings _generatorSettings;
+        private IConfiguration _configuration;
+        private TcpListener _listner;
+        private INetConnection _connection;
+        private Dictionary<double, double> _calibratedFrequenciesDict;
+        private Dictionary<double, double> _calibrationLevelDict;
+        private RsFsw _specAn;
 
         public ObservableCollection<Organization> Organizations { get; set; }
         //public SortableObservableCollection<Organization> Organizations { get; set; }
@@ -100,7 +121,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         public MeasPoint SelectedPoint
         {
             get => _selectedPoint;
-            set => Set(ref _selectedPoint, value);
+            set => Set(ref _selectedPoint, value);            
         }
         public Visibility IsVisibilityOrganization
         {
@@ -164,7 +185,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Set(ref _selectedOrganizationName, value);
                 IsChanged = IsChangeText(_originalselectedOrganizationName, value);
-            } 
+            }
         }
         public string? SelectedOrganizationAddress
         {
@@ -255,7 +276,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             get => _recieveMessage;
             set => Set(ref _recieveMessage, value);
         }
-        
+
         public IStore<Organization> DbOrganizationStore { get; set; }
         public IStore<Room> DbRoomStore { get; set; }
         public IStore<Element> DbElementStore { get; set; }
@@ -273,6 +294,12 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             get => _extraItemToFrequencyList;
             set => Set(ref _extraItemToFrequencyList, value);
+        }
+
+        public bool IsChangedFrequencyList
+        {
+            get => _isChangedFrequencyList;
+            set => Set(ref _isChangedFrequencyList, value);
         }
 
         public ICommand Send { get; set; }
@@ -293,7 +320,9 @@ namespace SPOAPAKmmReceiver.ViewModels
             IStore<Element> dBElement,
             IStore<Device> dBDevice,
             IStore<MeasPoint> dBMeasPoint,
-            IStore<Measuring> dBMeasuring)
+            IStore<Measuring> dBMeasuring,
+            IConfiguration configuration,
+            INetConnection netConnection)
         {
             DbOrganizationStore = dBOrganization;
             DbRoomStore = dBRoom;
@@ -301,6 +330,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             DbDeviceStore = dBDevice;
             DbPointStore = dBMeasPoint;
             DbMeasuringStore = dBMeasuring;
+
+            _connection = netConnection;
 
 #if DEBUG
             IEnumerable<Organization> organizationsInDb = new List<Organization>();
@@ -310,7 +341,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             foreach (var org in TestData.TestDataOrganizations)
             {
-                if(c == 0 || (organizationsInDb.FirstOrDefault(o => o.Name == org.Name) == null))
+                if (c == 0 || (organizationsInDb.FirstOrDefault(o => o.Name == org.Name) == null))
                     DbOrganizationStore.Add(org);
             }
 #endif
@@ -323,7 +354,9 @@ namespace SPOAPAKmmReceiver.ViewModels
             Points = new ObservableCollection<MeasPoint>(DbPointStore.GetAll());
             Measurings = new ObservableCollection<Measuring>(DbMeasuringStore.GetAll());
 
-            MSettings = new MeasureSettings();            
+            MSettings = new MeasureSettings();
+
+            _configuration = configuration;
 
             Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
 
@@ -452,7 +485,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 room.Name = SelectedRoomName;
                 room.Description = SelectedRoomDescription;
                 SelectedValue = room;
-                
+
                 //DbRoomStore.Update(room);
                 _originalselectedRoomName = SelectedRoom.Name;
                 _originalselectedRoomDescription = SelectedRoom.Description;
@@ -472,7 +505,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 element.Name = SelectedElementName;
                 element.Description = SelectedElementDescription;
                 SelectedValue = element;
-                
+
                 //DbElementStore.Update(SelectedElement);
                 _originalselectedElementName = SelectedElement.Name;
                 _originalselectedElementDescription = SelectedElement.Description;
@@ -735,7 +768,11 @@ namespace SPOAPAKmmReceiver.ViewModels
         private LambdaCommand _autoCalculationFrequencyRowCommand;
         public LambdaCommand AutoCalculationFrequencyRowCommand => _autoCalculationFrequencyRowCommand
             ??= new LambdaCommand(OnAutoCalculationFrequencyRowCommandExecuted, CanAutoCalculationFrequencyRowCommandExecute);
-        private void OnAutoCalculationFrequencyRowCommandExecuted(object p) => MSettings.GetFrequencyList();
+        private void OnAutoCalculationFrequencyRowCommandExecuted(object p)
+        {
+            MSettings.GetFrequencyList();
+            IsChangedFrequencyList = true;
+        }
         private bool CanAutoCalculationFrequencyRowCommandExecute(object p) => true;
 
         #endregion
@@ -749,6 +786,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             MSettings.FrequencyList.Add(Convert.ToDouble(ExtraItemToFrequencyList));
             MSettings.FrequencyList.Sort(l => l);
+            IsChangedFrequencyList = true;
         }
         private bool CanAddItemToFrequencyListCommandExecute(object p)
         {
@@ -772,23 +810,33 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
-        #region ApplyMeasurementSettingsCommand
+        #region ApplyMeasurementSettingsCommand - Команда открытия окна настроек
 
         private LambdaCommand _applyMeasurementSettingsCommand;
         public LambdaCommand ApplyMeasurementSettingsCommand => _applyMeasurementSettingsCommand
             ??= new LambdaCommand(OnApplyMeasurementSettingsCommandExecuted, CanApplyMeasurementSettingsCommandExecute);
         private void OnApplyMeasurementSettingsCommandExecuted(object p)
         {
-            var message = new ReceiverMessage(WorkMode.ApplyMeasureSettings);
-            message.FromMeasureSettings(MSettings);
-            SendMessage = JsonSerializer.Serialize(message);            
-            SendToClient(SendMessage);
+            if (MSettings.FrequencyList.Count >= 5)
+            {
+                StartListen();
+
+                var message = new ReceiverMessage(WorkMode.ApplyMeasureSettings);
+                message.FromMeasureSettings(MSettings);
+                SendMessage = JsonSerializer.Serialize(message);
+                SendToClient(SendMessage);
+            }
+            else
+            {
+                MessageBox.Show("Задайте список частот!");
+            }
+            
         }
         private bool CanApplyMeasurementSettingsCommandExecute(object p) => true;
 
         #endregion
 
-        #region
+        #region OpenSettingsWindowCommand - Команда открытия окна настроек
 
         private LambdaCommand _openSettingsWindowCommand;
         public LambdaCommand OpenSettingsWindowCommand => _openSettingsWindowCommand
@@ -799,6 +847,116 @@ namespace SPOAPAKmmReceiver.ViewModels
             settingsWindow.Show();
         }
         private bool CanOpenSettingsWindowCommandExecute(object p) => true;
+
+        #endregion
+
+        #region RunCalibrationCommand - Команда калибровки
+
+        private LambdaCommand _runCalibrationCommand;
+        public LambdaCommand RunCalibrationCommand => _runCalibrationCommand 
+            ??= new LambdaCommand(OnRunCalibrationCommandExecuted, CanRunCalibrationCommandExecute);
+        private void OnRunCalibrationCommandExecuted(object p)
+        {
+            bool _isOk = false;
+
+
+            if (MSettings.FrequencyList.Count >= 5)
+            {
+                if (SelectedPoint.Measurings.Count == 0)
+                    _isOk = true;
+                else
+                {
+                    var result = MessageBox.Show("Удалить предыдущие измерения?", "Внимание!", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        SelectedPoint.Measurings.Clear();
+                        _isOk = true;
+                    }
+                    else if (result == MessageBoxResult.No)
+                        _isOk = true;
+                    else
+                        _isOk = false;
+                }                
+            }
+            else
+            {
+                MessageBox.Show("Задайте список частот!");
+            }            
+
+            if (_isOk == true)
+            {
+                CancellationTokenSource cts = new CancellationTokenSource();
+                GetInstrumentsSettings();
+
+                StartListen();
+                var message = new ReceiverMessage(WorkMode.Сalibration);
+                message.FromMeasureSettings(MSettings);
+                message.InstrAddress = _generatorSettings.InstrAddress;
+                SendMessage = JsonSerializer.Serialize(message);
+                SendToClient(SendMessage);
+
+                if (InitializeReciever())
+                    Calibrate();
+                else
+                    MessageBox.Show("Ошибка инициализации приёмника!");
+            }
+        }
+        private bool CanRunCalibrationCommandExecute(object p) => true;
+
+        #endregion
+
+        #region RunFrequencyCalibrationCommand - Команда калибровки частоты
+
+        private LambdaCommand _runFrequencyCalibrationCommand;
+        public LambdaCommand RunFrequencyCalibrationCommand => _runFrequencyCalibrationCommand
+            ??= new LambdaCommand(OnRunFrequencyCalibrationCommandExecuted, CanRunFrequencyCalibrationCommandExecute);
+        private void OnRunFrequencyCalibrationCommandExecuted(object p)
+        {
+            bool _isOk = false;
+
+
+            if (MSettings.FrequencyList.Count >= 5)
+            {
+                if (SelectedPoint.Measurings.Count == 0)
+                    _isOk = true;
+                else
+                {
+                    var result = MessageBox.Show("Удалить предыдущие измерения?", "Внимание!", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        SelectedPoint.Measurings.Clear();
+                        _isOk = true;
+                    }
+                    else if (result == MessageBoxResult.No)
+                        _isOk = true;
+                    else
+                        _isOk = false;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Задайте список частот!");
+            }
+
+            if (_isOk == true)
+            {
+                CancellationTokenSource cts = new CancellationTokenSource();
+                GetInstrumentsSettings();
+
+                StartListen();
+                var message = new ReceiverMessage(WorkMode.Сalibration);
+                message.FromMeasureSettings(MSettings);
+                message.InstrAddress = _generatorSettings.InstrAddress;
+                SendMessage = JsonSerializer.Serialize(message);
+                SendToClient(SendMessage);
+
+                if (InitializeReciever())
+                    FrequencyCalibrate();
+                else
+                    MessageBox.Show("Ошибка инициализации приёмника!");
+            }
+        }
+        private bool CanRunFrequencyCalibrationCommandExecute(object p) => true;
 
         #endregion
 
@@ -860,9 +1018,31 @@ namespace SPOAPAKmmReceiver.ViewModels
         }
         private bool CanSendMessageExecute(object arg) => true;
 
-        private void GetAccessToClientProgram()
+        private void GetAccessToClientProgram(CancellationToken token)
         {
-            TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11001));
+            GetInstrumentsSettings();
+
+            while (!token.IsCancellationRequested)
+            {
+                if (_listner is null)
+                    _listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_receiverSettings.IpAddress), _receiverSettings.Port));
+                _listner.Start();
+                while (true)
+                {
+                    TcpClient client = _listner.AcceptTcpClient();
+                    StreamReader sr = new StreamReader(client.GetStream());
+
+                    Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
+
+                    client.Close();
+                }
+            }
+            if (token.IsCancellationRequested)
+            {
+                _listner.Stop();
+            }
+
+            /*TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11001));
             listner.Start();
             while (true)
             {
@@ -872,7 +1052,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
 
                 client.Close();
-            }
+            }*/
         }
 
         /// <summary>
@@ -881,10 +1061,11 @@ namespace SPOAPAKmmReceiver.ViewModels
         /// <param name="Massage">Передаваемое сообщение</param>
         private void SendToClient(string Massage)
         {
+            GetInstrumentsSettings();
             TcpClient client = new TcpClient();
             try
             {
-                client.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000));
+                client.Connect(new IPEndPoint(IPAddress.Parse(_generatorSettings.IpAddress), _generatorSettings.Port));
                 StreamWriter sw = new StreamWriter(client.GetStream());
                 sw.AutoFlush = true;
                 sw.WriteLine(Massage);
@@ -899,7 +1080,162 @@ namespace SPOAPAKmmReceiver.ViewModels
         private void Execute(string Data)
         {
             //Выводим принятое сообщение на экран
-            App.Current.Dispatcher.Invoke((Action)(() => this.RecieveMessage = Data));
+            App.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                this.RecieveMessage = Data;
+                var m = JsonSerializer.Deserialize<TransmitterMessage>(Data);
+                if(m.Mode == WorkMode.Сalibration)
+                {
+                    
+                    
+                }
+            }
+            ));
+        }
+
+        private void StartListen()
+        {
+            _cancelTokenSource = new CancellationTokenSource();
+            Task task = new Task(() =>
+            {
+                GetAccessToClientProgram(_cancellationToken);
+                
+            }, _cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
+            task.Start();
+
+            /*Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);
+            AccessToClientProgram.IsBackground = true;
+            AccessToClientProgram.Start();*/
+        }
+
+        private void GetInstrumentsSettings()
+        {
+            _receiverSettings = _configuration.GetSection("InstrumentSettings:Receiver").Get<InstrumentSettings>();
+            _generatorSettings = _configuration.GetSection("InstrumentSettings:Generator").Get<InstrumentSettings>();
+        }
+
+        private bool InitializeReciever()
+        {
+            var resourceString = _receiverSettings.InstrAddress;
+            try
+            {
+                _specAn = new RsFsw(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
+                Console.WriteLine("Приёмник проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
+                _specAn.Utilities.InstrumentStatusChecking = true;
+                _specAn.System.Display.Update.Set(true);
+                _specAn.Initiate.Continuous.Set(true);
+                _specAn.Sense.Bandwidth.Resolution.Set(MSettings.Rbw * 1.0e+3);
+                _specAn.Sense.Bandwidth.Video.Set(MSettings.Rbw * 1.0e+3);
+                _specAn.Sense.Window.Detector.Function.Set(DetectorBenum.POSitive, WindowRepCap.Nr1, TraceRepCap.Tr1);
+                _specAn.Sense.Window.Detector.Function.Set(DetectorBenum.AVERage, WindowRepCap.Nr1, TraceRepCap.Tr2);
+                _specAn.Sense.Frequency.Span.Set(MSettings.Span * 1.0e+3);
+                _specAn.Display.Window.Trace.Mode.Set(TraceModeCenum.AVERage);                ;
+                _specAn.Input.Attenuation.Set(MSettings.Attenuation);
+                _specAn.Calculate.Unit.Power.Set(PowerUnitEnum.DBM);
+                _specAn.Format.Data.Set(DataFormatEnum.ASCii);
+                _specAn.Initiate.ImmediateAndWait();
+                _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.WRITe, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr1);
+                _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.AVERage, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr2);
+
+                
+
+                return true;
+            }
+            catch (Exception ex)
+            {                
+                MessageBox.Show(ex.Message);
+                return false;
+            }
+        }
+
+        private void FrequencyCalibrate()
+        {
+            try
+            {
+                _calibratedFrequenciesDict = new Dictionary<double, double>();                
+
+                foreach (var freq in MSettings.FrequencyList)
+                {
+                    _specAn.Sense.Frequency.Center.Set(freq * 1.0e+6);
+                    _specAn.Calculate.Marker.Maximum.Peak.Set();
+
+                    _specAn.Calculate.Marker.Trace.Set(2, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    _specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    double m2x = _specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    Thread.Sleep(MSettings.TimeOfEmission * 1000);
+
+
+                    //specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    //double m1x = specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+
+
+                    //var trace = specAn.Trace.Data.Get(TraceNumberEnum.TRACe1);
+                    //var x = specAn.Calculate.Marker.X.Get();
+                    //var y = specAn.Calculate.Marker.Y.Get();
+
+                    _calibratedFrequenciesDict.Add(freq, m2x);
+
+                }
+
+                _isCalibratedFrequenciesList = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Calibrate()
+        {
+            int d = 10;
+            double m1y = 0.0;
+            double y = 0.0;
+            List<double> _freqList;
+            _calibrationLevelDict = new Dictionary<double, double>();
+            Measuring measuring = null;
+            _measPoint = SelectedPoint;
+
+            if (_isCalibratedFrequenciesList)
+            {
+                _freqList = new List<double>();
+                _calibratedFrequenciesDict.Values.ToList().ForEach(freq => _freqList.Add(freq));
+            }
+            else
+            {
+                _freqList = new List<double>();
+                MSettings.FrequencyList.ToList().ForEach(freq => _freqList.Add(freq * 1.0e+6));                
+            }
+
+            foreach (var freq in _freqList)
+            {
+                _specAn.Initiate.Continuous.Set(true);
+                _specAn.Sense.Frequency.Center.Set(freq);
+                _specAn.Calculate.Marker.Trace.Set(1, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                _specAn.Calculate.Marker.X.Set(freq);
+                m1y = 0.0;
+                y = 0.0;
+
+                for (int i = 0; i < d; i++)
+                {
+                    measuring = new Measuring();
+                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    m1y = m1y + y;
+                    measuring.Freq = freq / 1.0e+6;
+                    measuring.P1 = y;
+                    if (_measPoint.Measurings is null)
+                        _measPoint.Measurings = new List<Measuring>();
+                    _measPoint.Measurings.Add(measuring);
+                    Thread.Sleep(MSettings.TimeOfEmission * 1000 / d);
+                }
+                
+                //_calibrationLevelDict.Add(freq, m1y / d);
+                SelectedPoint.Measurings.Add(new Measuring { Freq = freq / 1.0e+6, P1 = m1y / 10 });
+            }
+        }
+
+        private void Measure()
+        {
+
         }
     }
 }
