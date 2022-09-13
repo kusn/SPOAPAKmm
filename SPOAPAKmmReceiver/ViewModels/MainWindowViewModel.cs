@@ -917,7 +917,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                         MSettings.FrequencyList.ToList().ForEach(freq => freqList.Add(freq * 1.0e+6));
                     }
 
-                    Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Calibrate(freqList));
+                    Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Measuring(freqList));
                     task.Start();
                     measureList = task.Result;
                     
@@ -1228,7 +1228,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
 
-        private List<(double, double)> Calibrate(List<double> frequencyList)
+        private List<(double, double)> Measuring(List<double> frequencyList)
         {
             int d = 10;            
             double y = 0.0;            
