@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace SPOAPAKmmReceiver.Models
 {
     [Serializable()]
-    public class ReceiverMessage
+    public partial class ReceiverMessage
     {
         public WorkMode Mode { get; set; }
         public string InstrAddress { get; set; }
@@ -30,16 +30,6 @@ namespace SPOAPAKmmReceiver.Models
             Offset = measureSettings.Offset;
             Power = measureSettings.Power;
             TimeOfEmission = measureSettings.TimeOfEmission;            
-        }
-
-        public enum WorkMode : int
-        {
-            ApplyInstrumentSettings,
-            ApplyMeasureSettings,
-            Сalibration,
-            Checking,
-            Measuring,
-            Searching,
         }
     }
 }
