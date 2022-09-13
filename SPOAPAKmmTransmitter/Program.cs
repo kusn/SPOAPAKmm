@@ -1,4 +1,5 @@
 ﻿using RohdeSchwarz.RsInstrument;
+using SPOAPAKmmReceiver.Entities;
 using SPOAPAKmmReceiver.Models;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
+using RSSigGen;
+using RSSigGen.RS;
 
 namespace SPOAPAKmmTransmitter
 {
@@ -17,7 +20,7 @@ namespace SPOAPAKmmTransmitter
         static private int _listenerPort = 11000;
         static private int _sendPort = 11001;
         static private List<string> _devicesList = new List<string>();
-        static private bool _IsSimulate = false;
+        static private bool _isSimulate = true;
 
         private static void GetAccessToClientProgram()
         {
@@ -75,7 +78,35 @@ namespace SPOAPAKmmTransmitter
                     }
                     else if (m.Mode == WorkMode.Сalibration)
                     {
-                        
+                        Console.WriteLine("Получено запрос:" + s);
+                        TransmitterMessage transmitterMessage = new TransmitterMessage();
+                        transmitterMessage.Mode = m.Mode;
+                        try
+                        {
+                            var resourceString = m.InstrAddress;
+                            RsSmab smab = new RsSmab(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
+                            Console.WriteLine("Генератор проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
+                            smab.Utilities.InstrumentStatusChecking = true;
+                            smab.Utilities.Reset();
+                            smab.Output.State.Value = true;
+                            smab.Source.Power.Level.Immediate.Amplitude = m.Power;
+                            foreach(var freq in m.FrequencyList)
+                            {
+                                smab.Source.Frequency.Fixed.Value = freq * 1e+6;
+                                Thread.Sleep(m.TimeOfEmission * 1000);
+                            }
+                            smab.Output.State.Value = false;                            
+                            transmitterMessage.IsOk = true;
+                        }
+                        catch (Exception ex)
+                        {
+
+                            transmitterMessage.IsOk = false;
+                            transmitterMessage.Message = ex.Message;
+                        }
+
+                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                        SendToClient(message);
                     }
                     else if (m.Mode == WorkMode.Checking)
                     {
@@ -87,7 +118,7 @@ namespace SPOAPAKmmTransmitter
                         
                         try
                         {
-                            RsInstrument instrument = new RsInstrument(resourceString, true, true, "Simulate = " + _IsSimulate.ToString());
+                            RsInstrument instrument = new RsInstrument(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
                             transmitterMessage.Message = instrument.Query("*IDN?");
                             transmitterMessage.IsOk = true;
                             instrument.Dispose();
