@@ -32,7 +32,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        static private bool _isSimulate = true;
+        static private bool _isSimulate = false;
 
         private IStore<Organization> _dBOrganization;
         private IStore<Room> _dBRoom;
@@ -898,7 +898,8 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                 if (InitializeReciever())
                 {
-                    List<double> _freqList;
+                    List<double> freqList;
+                    List<(double, double)> measureList = new List<(double, double)>();
 
                     if (_measurings is null)
                         _measurings = new List<Measuring>();
@@ -907,28 +908,31 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                     if (_isCalibratedFrequenciesList)
                     {
-                        _freqList = new List<double>();
-                        _calibratedFrequenciesDict.Values.ToList().ForEach(freq => _freqList.Add(freq));
+                        freqList = new List<double>();
+                        _calibratedFrequenciesDict.Values.ToList().ForEach(freq => freqList.Add(freq));
                     }
                     else
                     {
-                        _freqList = new List<double>();
-                        MSettings.FrequencyList.ToList().ForEach(freq => _freqList.Add(freq * 1.0e+6));
+                        freqList = new List<double>();
+                        MSettings.FrequencyList.ToList().ForEach(freq => freqList.Add(freq * 1.0e+6));
                     }
 
-                    _measurings = Calibrate(_freqList);
-                    foreach(var freq in MSettings.FrequencyList)
+                    Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Calibrate(freqList));
+                    task.Start();
+                    measureList = task.Result;
+                    
+                    foreach (var freq in MSettings.FrequencyList)
                     {
-                        Measuring mm;
-                        var meas = _measurings.FindAll(m => m.Freq == freq);
-                        double temp = 0.0;
+                        Measuring mm;                        
+                        var meas = measureList.FindAll(m => m.Item1 == freq);
+                        double level = 0.0;
                         foreach(var m in meas)
-                        {
-                            temp = temp + m.P1;
+                        {                            
+                            level = level + m.Item2;
                         }
                         mm = new Measuring {
                             Freq = freq,
-                            P1 = temp / 10.0,
+                            P1 = level / 10.0,
                         };
                         if (SelectedPoint.Measurings.FirstOrDefault(m => m.Freq == freq) == null)
                             SelectedPoint.Measurings.Add(mm);
@@ -1224,13 +1228,13 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
 
-        private List<Measuring> Calibrate(List<double> frequencyList)
+        private List<(double, double)> Calibrate(List<double> frequencyList)
         {
             int d = 10;            
             double y = 0.0;            
             
             Measuring measuring = null;
-            List<Measuring> measurings = new List<Measuring>();
+            //List<Measuring> measurings = new List<Measuring>();
             List<(double, double)> list = new List<(double, double)>();
 
             foreach (var freq in frequencyList)
@@ -1243,21 +1247,21 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                 for (int i = 0; i < d; i++)
                 {
-                    measuring = new Measuring();
-                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);                    
-                    measuring.Freq = freq / 1.0e+6;
-                    measuring.P1 = y;                    
-                    measurings.Add(measuring);
+                    //measuring = new Measuring();
+                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    //measuring.Freq = freq / 1.0e+6;                   
+                    //measuring.P1 = y;                    
+                    //measurings.Add(measuring);
                     list.Add(new (freq / 1.0e+6, y));
                     Thread.Sleep(MSettings.TimeOfEmission * 1000 / d);
                 }                
             }
-            return measurings;
+            return list;
         }
 
-        private List<Measuring> Measure()
-        {
+        //private List<Measuring> Measure()
+        //{
 
-        }
+        //}
     }
 }
