@@ -27,6 +27,7 @@ namespace SPOAPAKmmReceiver.ViewModels
     {
         private static bool _simulation = false;
         private static int _timeOut = 500;
+        private Window _window = null;
 
         private readonly IConfiguration _configuration;
         private IOptionsSnapshot<InstrumentSettings> _namedOptionsAccessor;
@@ -143,21 +144,26 @@ namespace SPOAPAKmmReceiver.ViewModels
             //StartListen();
         }
 
-        #region TestSelectedReceiverCommand
+        #region TestSelectedReceiverCommand - Команда тестирования выбранного приёмника
 
         private LambdaCommand _testSelectedReceiverCommand;
         public LambdaCommand TestSelectedReceiverCommand => _testSelectedReceiverCommand
             ??= new LambdaCommand(OnTestSelectedReceiverCommandExecuted, CanTestSelectedReceiverCommandExecute);
         private void OnTestSelectedReceiverCommandExecuted(object p)
         {
-            RsInstrument instr = new RsInstrument(SelectedItemDeviceListReceiver, "Simulate = " + _simulation);
-            DescriptionSelectedReceiver = instr.QueryString("*IDN?");
+            if (ReceiverSettings.InstrAddress is null)
+                MessageBox.Show("Выберите приёмник из списка");
+            else
+            {
+                RsInstrument instr = new RsInstrument(ReceiverSettings.InstrAddress, "Simulate = " + _simulation);
+                DescriptionSelectedReceiver = instr.QueryString("*IDN?");
+            }
         }
         private bool CanTestSelectedReceiverCommandExecute(object p) => true;
 
         #endregion
 
-        #region SearchReceiversCommand
+        #region SearchReceiversCommand - Команда поиска приёмников
 
         private LambdaCommand _searchReceiversCommand;
         public LambdaCommand SearchReceiversCommand => _searchReceiversCommand
@@ -172,7 +178,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
-        #region TestSelectedGeneratorCommand
+        #region TestSelectedGeneratorCommand - Команда тестирования выбранного генератора
 
         private LambdaCommand _testSelectedGeneratorCommand;
         public LambdaCommand TestSelectedGeneratorCommand => _testSelectedGeneratorCommand
@@ -191,7 +197,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
-        #region SearchGeneratorsCommand
+        #region SearchGeneratorsCommand - Команда поиска генераторов
 
         private LambdaCommand _searchGeneratorsCommand;
         public LambdaCommand SearchGeneratorsCommand => _searchGeneratorsCommand
@@ -222,7 +228,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             SetAppSettingValue("InstrumentSettings:Generator", v);
             //v = System.Text.Json.JsonSerializer.Serialize("Filename=.\\" + ConnectionString);
             //SetAppSettingValue("ConnectionStrings:Default", v);
-            Application.Current.Shutdown();
+
+            _window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.Title.Contains("Настройки"));
+            _window.Close();
+            //Application.Current.Shutdown();
         }
         private bool CanSaveSettingsCommandExecute(object p) => true;
 
