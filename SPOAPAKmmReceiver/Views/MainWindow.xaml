@@ -190,8 +190,9 @@
                                     </DataGrid>
                                 </DockPanel>
                                 <DockPanel Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button DockPanel.Dock="Left" Content="Калибровка" Margin="0,2,2,0"/>
-                                    <Button DockPanel.Dock="Right" Content="Измерения" Margin="2,2,0,0"/>
+                                    <Button Command="{Binding RunFrequencyCalibrationCommand}" Content="Калибровка частоты" IsEnabled="{Binding IsChangedFrequencyList}" DockPanel.Dock="Left" Margin="0,2,2,0"/>
+                                    <Button Command="{Binding RunCalibrationCommand}" Content="Калибровка" DockPanel.Dock="Left" Margin="0,2,2,0"/>
+                                    <Button Content="Измерения" DockPanel.Dock="Right" Margin="2,2,0,0"/>
                                 </DockPanel>
                             </Grid>
                         </TabItem>
