@@ -7,6 +7,9 @@ namespace SPOAPAKmmReceiver.Entities
         private double _freq;
         private double _p1;
         private double _p2;
+        private double _averageE;
+        private double _dX;
+        private double _e;
         private MeasPoint _measPoint = null!;
 
         public double Freq
@@ -25,6 +28,23 @@ namespace SPOAPAKmmReceiver.Entities
         {
             get => _p2;
             set => Set(ref _p2, value);
+        }
+        public double AverageE
+        {
+            get => _averageE;
+            set => Set(ref _averageE, value);
+        }
+
+        public double DX
+        {
+            get => _dX;
+            set => Set(ref _dX, value);
+        }
+
+        public double E
+        {
+            get => _e;
+            set => Set(ref _e, value);
         }
 
         public MeasPoint MeasPoint
