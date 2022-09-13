@@ -32,7 +32,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        static private bool _isSimulate = false;
+        static private bool _isSimulate = true;
 
         private IStore<Organization> _dBOrganization;
         private IStore<Room> _dBRoom;
@@ -53,6 +53,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private Element _selectedElement;
         private MeasPoint _selectedPoint;
         private MeasPoint _measPoint;
+        private List<Measuring> _measurings;
         private ViewModel _selectedViewModel;
         private Visibility _isVisibilityOrganization = Visibility.Collapsed;
         private Visibility _isVisibilityRoom = Visibility.Collapsed;
@@ -896,7 +897,45 @@ namespace SPOAPAKmmReceiver.ViewModels
                 SendToClient(SendMessage);
 
                 if (InitializeReciever())
-                    Calibrate();
+                {
+                    List<double> _freqList;
+
+                    if (_measurings is null)
+                        _measurings = new List<Measuring>();
+                    if (SelectedPoint.Measurings is null)
+                        SelectedPoint.Measurings = new List<Measuring>();
+
+                    if (_isCalibratedFrequenciesList)
+                    {
+                        _freqList = new List<double>();
+                        _calibratedFrequenciesDict.Values.ToList().ForEach(freq => _freqList.Add(freq));
+                    }
+                    else
+                    {
+                        _freqList = new List<double>();
+                        MSettings.FrequencyList.ToList().ForEach(freq => _freqList.Add(freq * 1.0e+6));
+                    }
+
+                    _measurings = Calibrate(_freqList);
+                    foreach(var freq in MSettings.FrequencyList)
+                    {
+                        Measuring mm;
+                        var meas = _measurings.FindAll(m => m.Freq == freq);
+                        double temp = 0.0;
+                        foreach(var m in meas)
+                        {
+                            temp = temp + m.P1;
+                        }
+                        mm = new Measuring {
+                            Freq = freq,
+                            P1 = temp / 10.0,
+                        };
+                        if (SelectedPoint.Measurings.FirstOrDefault(m => m.Freq == freq) == null)
+                            SelectedPoint.Measurings.Add(mm);
+                        else
+                            SelectedPoint.Measurings.FirstOrDefault(m => m.Freq == freq).P1 = mm.P1;
+                    }
+                }
                 else
                     MessageBox.Show("Ошибка инициализации приёмника!");
             }
@@ -1185,55 +1224,38 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
 
-        private void Calibrate()
+        private List<Measuring> Calibrate(List<double> frequencyList)
         {
-            int d = 10;
-            double m1y = 0.0;
-            double y = 0.0;
-            List<double> _freqList;
-            _calibrationLevelDict = new Dictionary<double, double>();
+            int d = 10;            
+            double y = 0.0;            
+            
             Measuring measuring = null;
-            _measPoint = SelectedPoint;
+            List<Measuring> measurings = new List<Measuring>();
+            List<(double, double)> list = new List<(double, double)>();
 
-            if (_isCalibratedFrequenciesList)
-            {
-                _freqList = new List<double>();
-                _calibratedFrequenciesDict.Values.ToList().ForEach(freq => _freqList.Add(freq));
-            }
-            else
-            {
-                _freqList = new List<double>();
-                MSettings.FrequencyList.ToList().ForEach(freq => _freqList.Add(freq * 1.0e+6));                
-            }
-
-            foreach (var freq in _freqList)
+            foreach (var freq in frequencyList)
             {
                 _specAn.Initiate.Continuous.Set(true);
                 _specAn.Sense.Frequency.Center.Set(freq);
                 _specAn.Calculate.Marker.Trace.Set(1, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-                _specAn.Calculate.Marker.X.Set(freq);
-                m1y = 0.0;
+                _specAn.Calculate.Marker.X.Set(freq);                
                 y = 0.0;
 
                 for (int i = 0; i < d; i++)
                 {
                     measuring = new Measuring();
-                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-                    m1y = m1y + y;
+                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);                    
                     measuring.Freq = freq / 1.0e+6;
-                    measuring.P1 = y;
-                    if (_measPoint.Measurings is null)
-                        _measPoint.Measurings = new List<Measuring>();
-                    _measPoint.Measurings.Add(measuring);
+                    measuring.P1 = y;                    
+                    measurings.Add(measuring);
+                    list.Add(new (freq / 1.0e+6, y));
                     Thread.Sleep(MSettings.TimeOfEmission * 1000 / d);
-                }
-                
-                //_calibrationLevelDict.Add(freq, m1y / d);
-                SelectedPoint.Measurings.Add(new Measuring { Freq = freq / 1.0e+6, P1 = m1y / 10 });
+                }                
             }
+            return measurings;
         }
 
-        private void Measure()
+        private List<Measuring> Measure()
         {
 
         }
