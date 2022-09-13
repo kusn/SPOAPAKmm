@@ -14,6 +14,7 @@ using SPOAPAKmmReceiver.Data.Stores.InDb;
 using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.Models;
+using SPOAPAKmmReceiver.Services;
 using SPOAPAKmmReceiver.ViewModels;
 
 namespace SPOAPAKmmReceiver
@@ -43,6 +44,7 @@ namespace SPOAPAKmmReceiver
 
             services.AddScoped<MainWindowViewModel>();
             services.AddScoped<SettingsWindowViewModel>();
+            services.AddSingleton(typeof(INetConnection), typeof(NetConnection));
 
             services.Configure<InstrumentSettings>(InstrumentSettings.Generator, host.Configuration.GetSection("InstrumentSettings:Generator"));
             services.Configure<InstrumentSettings>(InstrumentSettings.Receiver, host.Configuration.GetSection("InstrumentSettings:Receiver"));            
