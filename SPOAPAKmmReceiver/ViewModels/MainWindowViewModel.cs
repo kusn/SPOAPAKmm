@@ -32,20 +32,22 @@ namespace SPOAPAKmmReceiver.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        static private bool _isSimulate = false;
+        static private bool _isSimulate = true;
 
         private IStore<Organization> _dBOrganization;
         private IStore<Room> _dBRoom;
         private IStore<Element> _dBElement;
         private IStore<Device> _dBDevice;
         private IStore<MeasPoint> _dBMeasPoint;
-        private IStore<Measuring> _dBMeasuring;
+        private IStore<MeasureItem> _dBMeasueItem;
+        private IStore<Levels> _dBLevels;
 
         private bool _isSelected;
         private bool _isChanged;
         private bool _isEnabledMSettingsPanel;
         private bool _isChangedFrequencyList;
         private bool _isCalibratedFrequenciesList = false;
+        private bool _isCalibrated = false;
         private object _selectedValue;
         private Page _userPage;
         private Organization _selectedOrganization;
@@ -53,7 +55,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private Element _selectedElement;
         private MeasPoint _selectedPoint;
         private MeasPoint _measPoint;
-        private List<Measuring> _measurings;
+        private List<MeasureItem> _measurings;
         private ViewModel _selectedViewModel;
         private Visibility _isVisibilityOrganization = Visibility.Collapsed;
         private Visibility _isVisibilityRoom = Visibility.Collapsed;
@@ -70,7 +72,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string? _selectedElementDescription;
         private string _selectedPointName;
         private string? _selectedPointDescription;
-        private ICollection<Measuring> _selectedPointMeasurings;
+        private ICollection<MeasureItem> _selectedPointMeasurings;
         private string _originalselectedOrganizationName;
         private string? _originalselectedOrganizationDescription;
         private string? _originalselectedOrganizationAddress;
@@ -80,7 +82,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string? _originalselectedElementDescription;
         private string _originalselectedPointName;
         private string? _originalselectedPointDescription;
-        private ICollection<Measuring> _originalselectedPointMeasurings;
+        private ICollection<MeasureItem> _originalselectedPointMeasurings;
         private string _sendMessage;
         private string _recieveMessage;
         private MeasureSettings _mSettings;
@@ -102,7 +104,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         public ObservableCollection<Element> Elements { get; set; }
         public ObservableCollection<Device> Devices { get; set; }
         public ObservableCollection<MeasPoint> Points { get; set; }
-        public ObservableCollection<Measuring> Measurings { get; set; }
+        public ObservableCollection<MeasureItem> Measurings { get; set; }
+        public ObservableCollection<Levels> Levels { get; set; }
 
         public Organization SelectedOrganization
         {
@@ -261,7 +264,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
 
-        public ICollection<Measuring> SelectedPointMeasurings
+        public ICollection<MeasureItem> SelectedPointMeasurings
         {
             get => _selectedPointMeasurings;
             set => Set(ref _selectedPointMeasurings, value);
@@ -283,7 +286,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         public IStore<Element> DbElementStore { get; set; }
         public IStore<MeasPoint> DbPointStore { get; set; }
         public IStore<Device> DbDeviceStore { get; set; }
-        public IStore<Measuring> DbMeasuringStore { get; set; }
+        public IStore<MeasureItem> DbMeasuringStore { get; set; }
+        public IStore<Levels> DbLevelsStore { get; set; }
 
         public MeasureSettings MSettings
         {
@@ -321,7 +325,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             IStore<Element> dBElement,
             IStore<Device> dBDevice,
             IStore<MeasPoint> dBMeasPoint,
-            IStore<Measuring> dBMeasuring,
+            IStore<MeasureItem> dBMeasuring,
+            IStore<Levels> dBLevels,
             IConfiguration configuration,
             INetConnection netConnection)
         {
@@ -331,6 +336,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             DbDeviceStore = dBDevice;
             DbPointStore = dBMeasPoint;
             DbMeasuringStore = dBMeasuring;
+            DbLevelsStore = dBLevels;
 
             _connection = netConnection;
 
@@ -353,7 +359,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             Elements = new ObservableCollection<Element>(DbElementStore.GetAll());
             Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
             Points = new ObservableCollection<MeasPoint>(DbPointStore.GetAll());
-            Measurings = new ObservableCollection<Measuring>(DbMeasuringStore.GetAll());
+            Measurings = new ObservableCollection<MeasureItem>(DbMeasuringStore.GetAll());
+            Levels = new ObservableCollection<Levels>(DbLevelsStore.GetAll());
 
             MSettings = new MeasureSettings();
 
@@ -424,8 +431,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                     _originalselectedPointName = SelectedPoint.Name;
                     SelectedPointDescription = SelectedPoint.Description;
                     _originalselectedPointDescription = SelectedPoint.Description;
-                    SelectedPointMeasurings = SelectedPoint.Measurings;
-                    _originalselectedPointMeasurings = SelectedPoint.Measurings;
+                    SelectedPointMeasurings = SelectedPoint.MeasureItems;
+                    _originalselectedPointMeasurings = SelectedPoint.MeasureItems;
                     IsVisibilityOrganization = Visibility.Hidden;
                     IsVisibilityRoom = Visibility.Hidden;
                     IsVisibilityElement = Visibility.Hidden;
@@ -525,7 +532,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 MeasPoint measPoint = SelectedPoint;
                 measPoint.Name = SelectedPointName;
                 measPoint.Description = SelectedPointDescription;
-                measPoint.Measurings = SelectedPointMeasurings;
+                measPoint.MeasureItems = SelectedPointMeasurings;
                 SelectedValue = measPoint;
 
                 //DbPointStore.Update(SelectedPoint);
@@ -575,16 +582,16 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var collection = new ObservableCollection<MeasPoint>((SelectedValue as Element).Points);
                 point.Name = GetNewName(collection);
                 point.Element = (Element)SelectedValue;
-                ObservableCollection<Measuring> measurings = new ObservableCollection<Measuring>();
-                point.Measurings = measurings;
+                ObservableCollection<MeasureItem> measurings = new ObservableCollection<MeasureItem>();
+                point.MeasureItems = measurings;
                 ((Element)SelectedValue).Points.Add(point);
                 SelectedValue = point;
             }
             else if (SelectedValue is MeasPoint)
             {
-                var measure = new Measuring();
+                var measure = new MeasureItem();
                 measure.MeasPoint = (MeasPoint)SelectedValue;
-                ((MeasPoint)SelectedValue).Measurings.Add(measure);
+                ((MeasPoint)SelectedValue).MeasureItems.Add(measure);
                 SelectedValue = measure;
             }
         }
@@ -660,12 +667,12 @@ namespace SPOAPAKmmReceiver.ViewModels
                 element.Points = new ObservableCollection<MeasPoint>(points);
                 //DbPointStore.Delete(point.Id);
             }
-            else if (SelectedValue is Measuring)
+            else if (SelectedValue is MeasureItem)
             {
-                var measuring = (Measuring)SelectedValue;
+                var measuring = (MeasureItem)SelectedValue;
                 var point = measuring.MeasPoint;
-                var measurings = point.Measurings.Where(m => m.Freq != measuring.Freq);
-                point.Measurings = new ObservableCollection<Measuring>(measurings);
+                var measurings = point.MeasureItems.Where(m => m.Freq != measuring.Freq);
+                point.MeasureItems = new ObservableCollection<MeasureItem>(measurings);
                 //DbMeasuringStore.Delete(measuring.Id);
             }
         }
@@ -735,7 +742,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 newPoint.Name = point.Name + "-копия";
                 newPoint.Description = point.Description;
                 newPoint.Element = point.Element;
-                newPoint.Measurings = new ObservableCollection<Measuring>();
+                newPoint.MeasureItems = new ObservableCollection<MeasureItem>();
                 newPoint.IsSelected = true;
                 newPoint.IsExpanded = true;
                 point.Element.Points.Add(newPoint);
@@ -863,14 +870,17 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             if (MSettings.FrequencyList.Count >= 5)
             {
-                if (SelectedPoint.Measurings.Count == 0)
+                if(SelectedPoint.MeasureItems is null)
+                    SelectedPoint.MeasureItems = new List<MeasureItem>();
+
+                if (SelectedPoint.MeasureItems.Count == 0)
                     _isOk = true;
                 else
                 {
                     var result = MessageBox.Show("Удалить предыдущие измерения?", "Внимание!", MessageBoxButton.YesNoCancel);
                     if (result == MessageBoxResult.Yes)
                     {
-                        SelectedPoint.Measurings.Clear();
+                        SelectedPoint.MeasureItems.Clear();
                         _isOk = true;
                     }
                     else if (result == MessageBoxResult.No)
@@ -900,11 +910,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 {
                     List<double> freqList;
                     List<(double, double)> measureList = new List<(double, double)>();
-
-                    if (_measurings is null)
-                        _measurings = new List<Measuring>();
-                    if (SelectedPoint.Measurings is null)
-                        SelectedPoint.Measurings = new List<Measuring>();
+                    
+                    if (SelectedPoint.MeasureItems is null)
+                        SelectedPoint.MeasureItems = new List<MeasureItem>();
 
                     if (_isCalibratedFrequenciesList)
                     {
@@ -921,24 +929,24 @@ namespace SPOAPAKmmReceiver.ViewModels
                     task.Start();
                     measureList = task.Result;
                     
-                    foreach (var freq in MSettings.FrequencyList)
-                    {
-                        Measuring mm;                        
-                        var meas = measureList.FindAll(m => m.Item1 == freq);
-                        double level = 0.0;
+                    foreach (var freq in freqList)
+                    {                                               
+                        var meas = measureList.FindAll(m => m.Item1 == freq / 1.0e+6);
+                        List<Levels> levels = new List<Levels>();
+                        meas.ToList().ForEach(m => levels.Add(new Levels { P1 = m.Item2}));
+                        MeasureItem measureItem = new MeasureItem();
+                        measureItem.Levels = new List<Levels>(levels);
+                        
+                        double level = 0.0;                        
                         foreach(var m in meas)
                         {                            
-                            level = level + m.Item2;
+                            level = level + m.Item2;                            
                         }
-                        mm = new Measuring {
-                            Freq = freq,
-                            P1 = level / 10.0,
-                        };
-                        if (SelectedPoint.Measurings.FirstOrDefault(m => m.Freq == freq) == null)
-                            SelectedPoint.Measurings.Add(mm);
-                        else
-                            SelectedPoint.Measurings.FirstOrDefault(m => m.Freq == freq).P1 = mm.P1;
+                        measureItem.Freq = freq / 1.0e+6;
+                        measureItem.P1 = level / 10.0;                        
+                        SelectedPoint.MeasureItems.Add(measureItem);                        
                     }
+                    _isCalibrated = true;
                 }
                 else
                     MessageBox.Show("Ошибка инициализации приёмника!");
@@ -960,14 +968,14 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             if (MSettings.FrequencyList.Count >= 5)
             {
-                if (SelectedPoint.Measurings.Count == 0)
+                if (SelectedPoint.MeasureItems.Count == 0)
                     _isOk = true;
                 else
                 {
                     var result = MessageBox.Show("Удалить предыдущие измерения?", "Внимание!", MessageBoxButton.YesNoCancel);
                     if (result == MessageBoxResult.Yes)
                     {
-                        SelectedPoint.Measurings.Clear();
+                        SelectedPoint.MeasureItems.Clear();
                         _isOk = true;
                     }
                     else if (result == MessageBoxResult.No)
@@ -1000,6 +1008,81 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
         private bool CanRunFrequencyCalibrationCommandExecute(object p) => true;
+
+        #endregion
+
+        #region RunCalibrationCommand - Команда измерения
+
+        private LambdaCommand _runMeasuringCommand;
+        public LambdaCommand RunMeasuringCommand => _runMeasuringCommand
+            ??= new LambdaCommand(OnRunMeasuringCommandExecuted, CanRunMeasuringCommandExecute);
+        private void OnRunMeasuringCommandExecuted(object p)
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            GetInstrumentsSettings();
+
+            StartListen();
+            var message = new ReceiverMessage(WorkMode.Сalibration);
+            message.FromMeasureSettings(MSettings);
+            message.InstrAddress = _generatorSettings.InstrAddress;
+            SendMessage = JsonSerializer.Serialize(message);
+            SendToClient(SendMessage);
+
+            if (InitializeReciever())
+            {
+                List<double> freqList;
+                List<(double, double)> measureList = new List<(double, double)>();
+
+                freqList = new List<double>();
+                SelectedPoint.MeasureItems.ToList().ForEach(o => freqList.Add(o.Freq * 1.0e+6));
+
+                Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Measuring(freqList));
+                task.Start();
+                measureList = task.Result;
+
+                foreach (var freq in freqList)
+                {
+                    MeasureItem mm;
+                    var meas = measureList.FindAll(m => m.Item1 == freq / 1.0e+6);
+                    double aLevel = 0.0;
+                    List<double> mLevels = new List<double>();
+                    List<Levels> lLevels = new List<Levels>(SelectedPoint.MeasureItems.FirstOrDefault(o => o.Freq == freq / 1.0e+6).Levels);
+                    meas.ToList().ForEach(m => mLevels.Add(m.Item2));
+
+                    int i = 0;
+                    List<double> qiList = new List<double>();
+                    double q = 0.0;
+                    foreach (var level in lLevels)
+                    {
+                        level.P2 = mLevels.ToArray()[i];
+                        qiList.Add(level.P1 - level.P2);
+                        q = q + (level.P1 - level.P2);
+                        aLevel = aLevel + level.P2;
+                        i++;
+                    }
+                    q = q / 10.0;
+                    aLevel = aLevel / 10.0;
+
+                    double sn = 0.0;
+                    foreach (var qi in qiList)
+                    {
+                        sn = q - qi;
+                    }
+                    sn = Math.Sqrt(sn / 9.0);
+                    double sx = sn / Math.Sqrt(10.0);
+                    double dx = 2.26 * sx;
+
+                    SelectedPoint.MeasureItems.FirstOrDefault(o => o.Freq == freq / 1.0e+6).E = q;
+                    SelectedPoint.MeasureItems.FirstOrDefault(o => o.Freq == freq / 1.0e+6).AverageE = q;
+                    SelectedPoint.MeasureItems.FirstOrDefault(o => o.Freq == freq / 1.0e+6).P2 = aLevel;
+                    SelectedPoint.MeasureItems.FirstOrDefault(o => o.Freq == freq / 1.0e+6).DX = dx;
+                    SelectedPoint.MeasureItems.FirstOrDefault(o => o.Freq == freq / 1.0e+6).Levels = lLevels;
+                }
+            }
+            else
+                MessageBox.Show("Ошибка инициализации приёмника!");
+        }
+        private bool CanRunMeasuringCommandExecute(object p) => _isCalibrated;
 
         #endregion
 
@@ -1178,9 +1261,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 _specAn.Format.Data.Set(DataFormatEnum.ASCii);
                 _specAn.Initiate.ImmediateAndWait();
                 _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.WRITe, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr1);
-                _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.AVERage, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr2);
-
-                
+                _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.AVERage, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr2);                
 
                 return true;
             }
@@ -1207,10 +1288,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                     double m2x = _specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Thread.Sleep(MSettings.TimeOfEmission * 1000);
 
-
                     //specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     //double m1x = specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-
 
                     //var trace = specAn.Trace.Data.Get(TraceNumberEnum.TRACe1);
                     //var x = specAn.Calculate.Marker.X.Get();
@@ -1233,8 +1312,6 @@ namespace SPOAPAKmmReceiver.ViewModels
             int d = 10;            
             double y = 0.0;            
             
-            Measuring measuring = null;
-            //List<Measuring> measurings = new List<Measuring>();
             List<(double, double)> list = new List<(double, double)>();
 
             foreach (var freq in frequencyList)
@@ -1246,22 +1323,13 @@ namespace SPOAPAKmmReceiver.ViewModels
                 y = 0.0;
 
                 for (int i = 0; i < d; i++)
-                {
-                    //measuring = new Measuring();
-                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-                    //measuring.Freq = freq / 1.0e+6;                   
-                    //measuring.P1 = y;                    
-                    //measurings.Add(measuring);
+                {                    
+                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);                    
                     list.Add(new (freq / 1.0e+6, y));
                     Thread.Sleep(MSettings.TimeOfEmission * 1000 / d);
                 }                
             }
             return list;
-        }
-
-        //private List<Measuring> Measure()
-        //{
-
-        //}
+        }        
     }
 }

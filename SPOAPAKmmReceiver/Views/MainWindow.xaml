@@ -178,21 +178,21 @@
                                 </DockPanel>
                                 <DockPanel Grid.Row="2">
                                     <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
-                                    <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPoint.Measurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
+                                    <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPoint.MeasureItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Freq}" Header="Частота"/>
                                             <DataGridTextColumn Binding="{Binding P1}" Header="P1"/>
                                             <DataGridTextColumn Binding="{Binding P2}" Header="P2"/>
-                                            <DataGridTextColumn Binding="{Binding MeasPoint.AverageE}" Header="Среднее"/>
-                                            <DataGridTextColumn Binding="{Binding MeasPoint.DX}" Header="dX"/>
-                                            <DataGridTextColumn Binding="{Binding MeasPoint.E}" Header="Э"/>
+                                            <DataGridTextColumn Binding="{Binding AverageE}" Header="Среднее"/>
+                                            <DataGridTextColumn Binding="{Binding DX}" Header="dX"/>
+                                            <DataGridTextColumn Binding="{Binding StringFormat=±{0}, Path=E}" Header="Э"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </DockPanel>
                                 <DockPanel Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Button Command="{Binding RunFrequencyCalibrationCommand}" Content="Калибровка частоты" IsEnabled="{Binding IsChangedFrequencyList}" DockPanel.Dock="Left" Margin="0,2,2,0"/>
                                     <Button Command="{Binding RunCalibrationCommand}" Content="Калибровка" DockPanel.Dock="Left" Margin="0,2,2,0"/>
-                                    <Button Content="Измерения" DockPanel.Dock="Right" Margin="2,2,0,0"/>
+                                    <Button Command="{Binding RunMeasuringCommand}" Content="Измерения" DockPanel.Dock="Right" Margin="2,2,0,0"/>
                                 </DockPanel>
                             </Grid>
                         </TabItem>
