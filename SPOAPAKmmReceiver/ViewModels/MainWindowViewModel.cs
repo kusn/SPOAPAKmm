@@ -1255,8 +1255,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 _specAn.Sense.Window.Detector.Function.Set(DetectorBenum.POSitive, WindowRepCap.Nr1, TraceRepCap.Tr1);
                 _specAn.Sense.Window.Detector.Function.Set(DetectorBenum.AVERage, WindowRepCap.Nr1, TraceRepCap.Tr2);
                 _specAn.Sense.Frequency.Span.Set(MSettings.Span * 1.0e+3);
-                _specAn.Display.Window.Trace.Mode.Set(TraceModeCenum.AVERage);                ;
+                _specAn.Display.Window.Trace.Mode.Set(TraceModeCenum.AVERage);
                 _specAn.Input.Attenuation.Set(MSettings.Attenuation);
+                _specAn.Input.Gain.State.Set(MSettings.IsPreamp);
                 _specAn.Calculate.Unit.Power.Set(PowerUnitEnum.DBM);
                 _specAn.Format.Data.Set(DataFormatEnum.ASCii);
                 _specAn.Initiate.ImmediateAndWait();
