@@ -178,7 +178,7 @@
                                 </DockPanel>
                                 <DockPanel Grid.Row="2">
                                     <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
-                                    <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPoint.MeasureItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
+                                    <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPointMeasurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Freq}" Header="Частота"/>
                                             <DataGridTextColumn Binding="{Binding P1}" Header="P1"/>
