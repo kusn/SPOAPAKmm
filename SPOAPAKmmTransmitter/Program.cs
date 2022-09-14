@@ -78,7 +78,7 @@ namespace SPOAPAKmmTransmitter
                     }
                     else if (m.Mode == WorkMode.Сalibration)
                     {
-                        Console.WriteLine("Получено запрос:" + s);
+                        Console.WriteLine("Получен запрос:" + s);
                         TransmitterMessage transmitterMessage = new TransmitterMessage();
                         transmitterMessage.Mode = m.Mode;
                         try
@@ -87,10 +87,10 @@ namespace SPOAPAKmmTransmitter
                             RsSmab smab = new RsSmab(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
                             Console.WriteLine("Генератор проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
                             smab.Utilities.InstrumentStatusChecking = true;
-                            smab.Utilities.Reset();
-                            smab.Output.State.Value = true;
+                            smab.Utilities.Reset();                            
                             smab.Source.Power.Level.Immediate.Amplitude = m.Power;
-                            foreach(var freq in m.FrequencyList)
+                            smab.Output.State.Value = true;
+                            foreach (var freq in m.FrequencyList)
                             {
                                 smab.Source.Frequency.Fixed.Value = freq * 1e+6;
                                 Thread.Sleep(m.TimeOfEmission * 1000);
@@ -134,7 +134,36 @@ namespace SPOAPAKmmTransmitter
                     }
                     else if (m.Mode == WorkMode.Measuring)
                     {
+                        Console.WriteLine("Получен запрос:" + s);
+                        TransmitterMessage transmitterMessage = new TransmitterMessage();
+                        transmitterMessage.Mode = m.Mode;
+                        try
+                        {
+                            var resourceString = m.InstrAddress;
+                            RsSmab smab = new RsSmab(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
+                            Console.WriteLine("Генератор проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
+                            smab.Utilities.InstrumentStatusChecking = true;
+                            smab.Utilities.Reset();                            
+                            smab.Source.Power.Level.Immediate.Amplitude = m.Power;
+                            Thread.Sleep(60000);
+                            smab.Output.State.Value = true;
+                            foreach (var freq in m.FrequencyList)
+                            {
+                                smab.Source.Frequency.Fixed.Value = freq * 1e+6;
+                                Thread.Sleep(m.TimeOfEmission * 1000);
+                            }
+                            smab.Output.State.Value = false;
+                            transmitterMessage.IsOk = true;
+                        }
+                        catch (Exception ex)
+                        {
 
+                            transmitterMessage.IsOk = false;
+                            transmitterMessage.Message = ex.Message;
+                        }
+
+                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                        SendToClient(message);
                     }
                 }
 
