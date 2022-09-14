@@ -13,9 +13,11 @@ namespace SPOAPAKmmReceiver.Data
 
         public DbSet<MeasPoint> MeasPoints { get; set; }
 
-        public DbSet<Measuring> Measurings { get; set; }
+        public DbSet<MeasureItem> Measurings { get; set; }
 
         public DbSet<Device> Devices { get; set; }
+
+        public DbSet<Levels> Levels { get; set; }
 
         public SPOAPAKmmDB(DbContextOptions<SPOAPAKmmDB> opt) : base(opt) { }
 

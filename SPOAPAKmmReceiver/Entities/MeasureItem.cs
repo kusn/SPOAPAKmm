@@ -1,8 +1,9 @@
 ﻿using SPOAPAKmmReceiver.Entities.Base;
+using System.Collections.Generic;
 
 namespace SPOAPAKmmReceiver.Entities
 {
-    public class Measuring : Base.Entity
+    public class MeasureItem : Entity
     {
         private double _freq;
         private double _p1;
@@ -11,6 +12,7 @@ namespace SPOAPAKmmReceiver.Entities
         private double _dX;
         private double _e;
         private MeasPoint _measPoint = null!;
+        private ICollection<Levels> _levels;
 
         public double Freq
         {
@@ -29,6 +31,7 @@ namespace SPOAPAKmmReceiver.Entities
             get => _p2;
             set => Set(ref _p2, value);
         }
+
         public double AverageE
         {
             get => _averageE;
@@ -47,10 +50,17 @@ namespace SPOAPAKmmReceiver.Entities
             set => Set(ref _e, value);
         }
 
+        public ICollection<Levels> Levels
+        {
+            get => _levels;
+            set => Set(ref _levels, value);
+        }
+
         public MeasPoint MeasPoint
         {
             get => _measPoint;
             set => Set(ref _measPoint, value);
         }
+
     }
 }

@@ -74,28 +74,25 @@ namespace SPOAPAKmmReceiver.Data
             ICollection<MeasPoint> measPoints = new List<MeasPoint>
             {
                 new()
-                {
-                    AverageE = 90,
-                    DX = 0.2,
-                    E = 90,
-                    Measurings = GetMeasurings(),
+                {                    
                     Name = "Верх",
+                    MeasureItems = GetMeasurings(),
                 },
             };
 
             return measPoints;
         }
 
-        public static ICollection<Measuring> GetMeasurings()
+        public static ICollection<MeasureItem> GetMeasurings()
         {
             Random rnd = new Random();
-            ICollection<Measuring> measurings = new List<Measuring>();
+            ICollection<MeasureItem> measurings = new List<MeasureItem>();
             for (int i = 0; i < 5; i++)
             {
                 double freq = rnd.Next(1000, 5000);
                 double _P1 = rnd.Next(-60, -50);
                 double _P2 = rnd.Next(-130, -120);
-                Measuring meas = new Measuring()
+                MeasureItem meas = new MeasureItem()
                 {
                     Freq = freq,
                     P1 = _P1,

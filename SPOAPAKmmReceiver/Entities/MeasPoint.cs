@@ -3,14 +3,11 @@ using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Entities
 {
-    public class MeasPoint : Base.Entity
+    public class MeasPoint : Entity
     {
         private string _name = null!;
-        private string? _description;
-        private double _averageE;
-        private double _dX;
-        private double _e;
-        private ICollection<Measuring> _measurings;
+        private string? _description;        
+        private ICollection<MeasureItem> _measureItems;
         private Element _element = null!;
 
         public string Name
@@ -25,28 +22,10 @@ namespace SPOAPAKmmReceiver.Entities
             set => Set(ref _description, value);
         }
 
-        public double AverageE
+        public ICollection<MeasureItem> MeasureItems
         {
-            get => _averageE;
-            set => Set(ref _averageE, value);
-        }
-
-        public double DX
-        {
-            get => _dX;
-            set => Set(ref _dX, value);
-        }
-
-        public double E
-        {
-            get => _e;
-            set => Set(ref _e, value);
-        }
-
-        public ICollection<Measuring> Measurings
-        {
-            get => _measurings;
-            set => Set(ref _measurings, value);
+            get => _measureItems;
+            set => Set(ref _measureItems, value);
         }
 
         public Element Element
