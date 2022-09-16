@@ -92,11 +92,13 @@ namespace SPOAPAKmmReceiver.Data
                 double freq = rnd.Next(1000, 5000);
                 double _P1 = rnd.Next(-60, -50);
                 double _P2 = rnd.Next(-130, -120);
+                string _E = "";
                 MeasureItem meas = new MeasureItem()
                 {
                     Freq = freq,
                     P1 = _P1,
                     P2 = _P2,
+                    E = _E,
                 };
                 measurings.Add(meas);
             }

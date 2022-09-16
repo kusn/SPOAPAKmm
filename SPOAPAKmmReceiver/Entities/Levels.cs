@@ -3,8 +3,7 @@
 namespace SPOAPAKmmReceiver.Entities
 {
     public class Levels : Entity
-    {
-        private double _freq;
+    {        
         private double _p1;
         private double _p2;        
         private MeasureItem _measureItem = null!;

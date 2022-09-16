@@ -1086,7 +1086,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     double sx = sn / Math.Sqrt(10.0);
                     double dx = 2.26 * sx;
 
-                    SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).E = q;
+                    SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).E = q.ToString() + "±" + dx.ToString();
                     SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).AverageE = q;
                     SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).P2 = aLevel;
                     SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).DX = dx;

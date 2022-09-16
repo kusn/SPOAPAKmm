@@ -10,7 +10,7 @@ namespace SPOAPAKmmReceiver.Entities
         private double _p2;
         private double _averageE;
         private double _dX;
-        private double _e;
+        private string _e = null!;
         private MeasPoint _measPoint = null!;
         private ICollection<Levels> _levels;
 
@@ -44,7 +44,7 @@ namespace SPOAPAKmmReceiver.Entities
             set => Set(ref _dX, value);
         }
 
-        public double E
+        public string E
         {
             get => _e;
             set => Set(ref _e, value);

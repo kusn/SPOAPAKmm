@@ -24,13 +24,17 @@
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="4*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0" Margin="5,0,0,0">
+            <Grid Grid.Column="0" Margin="5,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="18*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
                 <!--<WrapPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,2,0">
                     <Button Content="Add" Command="{Binding AddItemCommand}"/>
                     <Button Content="Remove" Command="{Binding RemoveItemCommand}"/>
                     <Button Content="Copy" Command="{Binding CopyItemCommand}"/>
                 </WrapPanel>-->
-                <extensions:CustomTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedCustomThing="{Binding SelectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <extensions:CustomTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedCustomThing="{Binding SelectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Margin="5,5,5,0">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
@@ -95,7 +99,8 @@
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
                 </extensions:CustomTreeView>
-            </DockPanel>
+                <Button Content="Создать отчёт" Grid.Row="1" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,5,5" FontWeight="Bold"/>
+            </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20*"/>
@@ -185,7 +190,7 @@
                                             <DataGridTextColumn Binding="{Binding P2}" Header="P2"/>
                                             <DataGridTextColumn Binding="{Binding AverageE}" Header="Среднее"/>
                                             <DataGridTextColumn Binding="{Binding DX}" Header="dX"/>
-                                            <DataGridTextColumn Binding="{Binding StringFormat=±{0}, Path=E}" Header="Э"/>
+                                            <DataGridTextColumn Binding="{Binding E}" Header="Э"/>                                            
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </DockPanel>
