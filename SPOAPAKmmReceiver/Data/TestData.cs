@@ -22,10 +22,10 @@ namespace SPOAPAKmmReceiver.Data
                         Name = "317",
                         Devices = new List<Device>
                         {
-                            new() { Type = "Анализатор спектра", Name = "R&S FSV40", Number = "11111111", },
-                            new() { Type = "Генератор", Name = "R&S SMB100A", Number = "22222222", },
-                            new() { Type = "Антенна", Name = "П6-151", Number = "33333333", },
-                            new() { Type = "Антенна", Name = "П6-151", Number = "44444444", },
+                            new() { Type = new() {Name = "Анализатор спектра"}, Name = "R&S FSV40", Number = "11111111", },
+                            new() { Type = new() {Name = "Генератор"}, Name = "R&S SMB100A", Number = "22222222", },
+                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "33333333", },
+                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "44444444", },
                         },
                         Elements = GetElements(),
                     }
@@ -43,10 +43,10 @@ namespace SPOAPAKmmReceiver.Data
                         Name = "215",
                         Devices = new List<Device>
                         {
-                            new() { Type = "Анализатор спектра", Name = "R&S FSV40", Number = "11111111", },
-                            new() { Type = "Генератор", Name = "R&S SMB100A", Number = "22222222", },
-                            new() { Type = "Антенна", Name = "П6-151", Number = "33333333", },
-                            new() { Type = "Антенна", Name = "П6-151", Number = "44444444", },
+                            new() { Type = new() {Name = "Анализатор спектра"}, Name = "R&S FSV40", Number = "11111111", },
+                            new() { Type = new() {Name = "Генератор"}, Name = "R&S SMB100A", Number = "22222222", },
+                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "33333333", },
+                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "44444444", },
                         },
                         Elements = GetElements(),
                     }

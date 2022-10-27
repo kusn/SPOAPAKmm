@@ -1,15 +1,19 @@
-﻿using SPOAPAKmmReceiver.Entities.Base;
+﻿using System;
 
 namespace SPOAPAKmmReceiver.Entities
 {
     public class Device : Base.Entity
     {
         private string _name = null!;
-        private string _type;
+        private DeviceType _type;
         private string _number;
+        private MeasRange _range;
+        private DateTime _verificationDate;
+        private string _verificationInformation;
+        private string _verificationOrganization;
         private Room _room = null!;
 
-        public string Type
+        public DeviceType Type
         {
             get => _type;
             set => Set(ref _type, value);
@@ -25,6 +29,30 @@ namespace SPOAPAKmmReceiver.Entities
         {
             get => _number;
             set => Set(ref _number, value);
+        }
+
+        public MeasRange Range
+        {
+            get => _range;
+            set => Set(ref _range, value);
+        }
+
+        public DateTime VerificationDate
+        {
+            get => _verificationDate;
+            set => Set(ref _verificationDate, value);
+        }
+
+        public string VerificationInformation
+        {
+            get => _verificationInformation;
+            set => Set(ref _verificationInformation, value);
+        }
+
+        public string VerificationOrganization
+        {
+            get => _verificationOrganization;
+            set => Set(ref _verificationOrganization, value);
         }
 
         public Room Room

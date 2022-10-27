@@ -32,7 +32,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        static private bool _isSimulate = true;
+        static private bool _isSimulate = false;
 
         private IStore<Organization> _dBOrganization;
         private IStore<Room> _dBRoom;
