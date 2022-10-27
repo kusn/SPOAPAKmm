@@ -20,13 +20,7 @@ namespace SPOAPAKmmReceiver.Data
                     new Room()
                     {
                         Name = "317",
-                        Devices = new List<Device>
-                        {
-                            new() { Type = new() {Name = "Анализатор спектра"}, Name = "R&S FSV40", Number = "11111111", },
-                            new() { Type = new() {Name = "Генератор"}, Name = "R&S SMB100A", Number = "22222222", },
-                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "33333333", },
-                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "44444444", },
-                        },
+                        Devices = GetDevices(),
                         Elements = GetElements(),
                     }
                 },
@@ -41,13 +35,7 @@ namespace SPOAPAKmmReceiver.Data
                     new Room()
                     {
                         Name = "215",
-                        Devices = new List<Device>
-                        {
-                            new() { Type = new() {Name = "Анализатор спектра"}, Name = "R&S FSV40", Number = "11111111", },
-                            new() { Type = new() {Name = "Генератор"}, Name = "R&S SMB100A", Number = "22222222", },
-                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "33333333", },
-                            new() { Type = new() {Name = "Антенна"}, Name = "П6-151", Number = "44444444", },
-                        },
+                        Devices = GetDevices(),
                         Elements = GetElements(),
                     }
                 },
@@ -104,6 +92,57 @@ namespace SPOAPAKmmReceiver.Data
             }
 
             return measurings;
+        }
+
+        public static ICollection<Device> GetDevices()
+        {
+            ICollection<Device> devices = new List<Device>();
+            devices = new List<Device>
+            {
+                new()
+                {
+                    Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Анализатор спектра"),
+                    Name = "R&S FSV40",
+                    Number = "11111111",
+                    Range = new MeasRange() { SartFreq = 0.00001, EndFreq = 40000},
+                    VerificationDate = new DateTime(2001,01,01),
+                    
+                },
+                new()
+                {
+                    Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Генератор"),
+                    Name = "R&S SMB100A",
+                    Number = "22222222",
+                    Range = new MeasRange() { SartFreq = 0.1, EndFreq = 40000},
+                    VerificationDate = new DateTime(2001,01,01),
+                },
+                new()
+                {
+                    Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Антенна"),
+                    Name = "П6-151",
+                    Number = "33333333",
+                    Range = new MeasRange() { SartFreq = 800, EndFreq = 16000},
+                    VerificationDate = new DateTime(2001,01,01),
+                },
+                new()
+                {
+                    Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Антенна"),
+                    Name = "П6-151",
+                    Number = "44444444",
+                    Range = new MeasRange() { SartFreq = 800, EndFreq = 16000},
+                    VerificationDate = new DateTime(2001,01,01),
+                },
+            };
+            return devices;
+        }
+
+        public static ICollection<DeviceType> GeDeviceTypes()
+        {
+            ICollection<DeviceType> deviceTypes = new List<DeviceType>();
+            deviceTypes.Add(new DeviceType() { Name = "Анализатор спектра" });
+            deviceTypes.Add(new DeviceType() { Name = "Генератор" });
+            deviceTypes.Add(new DeviceType() { Name = "Антенна" });
+            return deviceTypes;
         }
     }
 }
