@@ -25,7 +25,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 {
     public class SettingsWindowViewModel : ViewModel
     {
-        private static bool _simulation = true;
+        private static bool _simulation = false;
         private static int _timeOut = 500;
         private Window _window = null;
 

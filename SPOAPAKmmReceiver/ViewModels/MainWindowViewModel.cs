@@ -1044,15 +1044,16 @@ namespace SPOAPAKmmReceiver.ViewModels
                 SelectedPointMeasurings.ToList().ForEach(o => freqList.Add(o.Freq * 1.0e+6));
 
                 StartListen();
+                Task messageTask = new Task(() => MessageBox.Show("Закройте дверь!"));
+                messageTask.Start();
+                //MessageBox.Show("Закройте дверь!");
+                Console.WriteLine("Закройте дверь!");
                 var message = new ReceiverMessage(WorkMode.Measuring);
                 message.FromMeasureSettings(MSettings);
                 message.InstrAddress = _generatorSettings.InstrAddress;
                 SendMessage = JsonSerializer.Serialize(message);
                 SendToClient(SendMessage);
                 Console.WriteLine("Отправлено сообщение: " + SendMessage);
-
-                MessageBox.Show("Закройте дверь!");
-                Console.WriteLine("Закройте дверь!");
                 Thread.Sleep(60000);
 
                 Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Measuring(freqList));
@@ -1325,8 +1326,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                     _specAn.Calculate.Marker.Maximum.Peak.Set();
 
                     _specAn.Calculate.Marker.Trace.Set(2, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-                    _specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Thread.Sleep(MSettings.TimeOfEmission * 1000);
+                    _specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     double m2x = _specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Console.WriteLine("Измеренная частота: " + m2x / 1e+6 + "МГц");
 
