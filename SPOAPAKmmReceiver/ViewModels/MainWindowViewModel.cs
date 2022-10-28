@@ -24,6 +24,7 @@ using SPOAPAKmmReceiver.Views;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
+using System.Diagnostics;
 using RohdeSchwarz.RsFsw;
 using System.Windows.Documents;
 using System.Runtime;
@@ -910,13 +911,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 CancellationTokenSource cts = new CancellationTokenSource();
                 GetInstrumentsSettings();
 
-                StartListen();
-                var message = new ReceiverMessage(WorkMode.Сalibration);
-                message.FromMeasureSettings(MSettings);
-                message.InstrAddress = _generatorSettings.InstrAddress;
-                SendMessage = JsonSerializer.Serialize(message);
-                SendToClient(SendMessage);
-
                 if (InitializeReciever())
                 {
                     List<double> freqList;
@@ -936,6 +930,12 @@ namespace SPOAPAKmmReceiver.ViewModels
                         MSettings.FrequencyList.ToList().ForEach(freq => freqList.Add(freq * 1.0e+6));
                     }
 
+                    StartListen();
+                    var message = new ReceiverMessage(WorkMode.Сalibration);
+                    message.FromMeasureSettings(MSettings);
+                    message.InstrAddress = _generatorSettings.InstrAddress;
+                    SendMessage = JsonSerializer.Serialize(message);
+                    SendToClient(SendMessage);
                     Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Measuring(freqList));
                     task.Start();
                     measureList = task.Result;
@@ -1004,16 +1004,17 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 CancellationTokenSource cts = new CancellationTokenSource();
                 GetInstrumentsSettings();
-
-                StartListen();
-                var message = new ReceiverMessage(WorkMode.Сalibration);
-                message.FromMeasureSettings(MSettings);
-                message.InstrAddress = _generatorSettings.InstrAddress;
-                SendMessage = JsonSerializer.Serialize(message);
-                SendToClient(SendMessage);
-
+                
                 if (InitializeReciever())
+                {
+                    StartListen();
+                    var message = new ReceiverMessage(WorkMode.Сalibration);
+                    message.FromMeasureSettings(MSettings);
+                    message.InstrAddress = _generatorSettings.InstrAddress;
+                    SendMessage = JsonSerializer.Serialize(message);
+                    SendToClient(SendMessage);
                     FrequencyCalibrate();
+                }
                 else
                     MessageBox.Show("Ошибка инициализации приёмника!");
             }
@@ -1029,18 +1030,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             ??= new LambdaCommand(OnRunMeasuringCommandExecuted, CanRunMeasuringCommandExecute);
         private void OnRunMeasuringCommandExecuted(object p)
         {
+            Console.WriteLine("---ИЗМЕРЕНЕИЕ---");
+            
             CancellationTokenSource cts = new CancellationTokenSource();
             GetInstrumentsSettings();
-
-            MessageBox.Show("Закройте дверь!");
-            Thread.Sleep(60000);
-
-            StartListen();
-            var message = new ReceiverMessage(WorkMode.Measuring);
-            message.FromMeasureSettings(MSettings);
-            message.InstrAddress = _generatorSettings.InstrAddress;
-            SendMessage = JsonSerializer.Serialize(message);
-            SendToClient(SendMessage);
 
             if (InitializeReciever())
             {
@@ -1049,6 +1042,18 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                 freqList = new List<double>();
                 SelectedPointMeasurings.ToList().ForEach(o => freqList.Add(o.Freq * 1.0e+6));
+
+                StartListen();
+                var message = new ReceiverMessage(WorkMode.Measuring);
+                message.FromMeasureSettings(MSettings);
+                message.InstrAddress = _generatorSettings.InstrAddress;
+                SendMessage = JsonSerializer.Serialize(message);
+                SendToClient(SendMessage);
+                Console.WriteLine("Отправлено сообщение: " + SendMessage);
+
+                MessageBox.Show("Закройте дверь!");
+                Console.WriteLine("Закройте дверь!");
+                Thread.Sleep(60000);
 
                 Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Measuring(freqList));
                 task.Start();
@@ -1094,7 +1099,10 @@ namespace SPOAPAKmmReceiver.ViewModels
                 }
             }
             else
+            {
                 MessageBox.Show("Ошибка инициализации приёмника!");
+                Console.WriteLine("Ошибка инициализации приёмника!");
+            }
         }
         private bool CanRunMeasuringCommandExecute(object p) => _isCalibrated;
 
@@ -1257,51 +1265,70 @@ namespace SPOAPAKmmReceiver.ViewModels
         private bool InitializeReciever()
         {
             var resourceString = _receiverSettings.InstrAddress;
+
+            Console.WriteLine("---ИНИЦИАЛИЗАЦИЯ ПРИЁМНИКА---");
             try
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
                 _specAn = new RsFsw(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
                 Console.WriteLine("Приёмник проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
                 _specAn.Utilities.InstrumentStatusChecking = true;
                 _specAn.System.Display.Update.Set(true);
                 _specAn.Initiate.Continuous.Set(true);
                 _specAn.Sense.Bandwidth.Resolution.Set(MSettings.Rbw * 1.0e+3);
+                Console.WriteLine("RBW: " + MSettings.Rbw * 1.0e+3 + "кГц");
                 _specAn.Sense.Bandwidth.Video.Set(MSettings.Rbw * 1.0e+3);
+                Console.WriteLine("VBW: " + MSettings.Rbw * 1.0e+3 + "кГц");
                 _specAn.Sense.Window.Detector.Function.Set(DetectorBenum.POSitive, WindowRepCap.Nr1, TraceRepCap.Tr1);
                 _specAn.Sense.Window.Detector.Function.Set(DetectorBenum.AVERage, WindowRepCap.Nr1, TraceRepCap.Tr2);
                 _specAn.Sense.Frequency.Span.Set(MSettings.Span * 1.0e+3);
+                Console.WriteLine("Полоса обзора: " + MSettings.Span * 1.0e+3 + "кГц");
                 _specAn.Display.Window.Trace.Mode.Set(TraceModeCenum.AVERage);
                 _specAn.Input.Attenuation.Set(MSettings.Attenuation);
+                Console.WriteLine("Ослабление: " + MSettings.Attenuation + "дБ");
                 _specAn.Input.Gain.State.Set(MSettings.IsPreamp);
+                Console.WriteLine("Предусилитель вкл.: " + MSettings.IsPreamp);
                 _specAn.Calculate.Unit.Power.Set(PowerUnitEnum.DBM);
                 _specAn.Format.Data.Set(DataFormatEnum.ASCii);
                 _specAn.Initiate.ImmediateAndWait();
                 _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.WRITe, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr1);
-                _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.AVERage, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr2);                
+                _specAn.Display.Window.Subwindow.Trace.Mode.Set(TraceModeCenum.AVERage, WindowRepCap.Nr1, SubWindowRepCap.Default, RohdeSchwarz.RsFsw.TraceRepCap.Tr2);
+
+                Console.WriteLine("Время инициализации приёмника: " + stopwatch.ElapsedMilliseconds + "мс");
 
                 return true;
             }
             catch (Exception ex)
             {                
                 MessageBox.Show(ex.Message);
+                Console.WriteLine("Ошибка: " + ex.Message);
                 return false;
             }
         }
 
         private void FrequencyCalibrate()
         {
+            Console.WriteLine("---КАЛИБРОВКА ЧАСТОТЫ---");
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             try
             {
-                _calibratedFrequenciesDict = new Dictionary<double, double>();                
+                _calibratedFrequenciesDict = new Dictionary<double, double>();
 
                 foreach (var freq in MSettings.FrequencyList)
                 {
                     _specAn.Sense.Frequency.Center.Set(freq * 1.0e+6);
+                    Console.WriteLine("Частота: " + freq + "МГц");
                     _specAn.Calculate.Marker.Maximum.Peak.Set();
 
                     _specAn.Calculate.Marker.Trace.Set(2, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     _specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-                    double m2x = _specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Thread.Sleep(MSettings.TimeOfEmission * 1000);
+                    double m2x = _specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    Console.WriteLine("Измеренная частота: " + m2x / 1e+6 + "МГц");
 
                     //specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     //double m1x = specAn.Calculate.Marker.X.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
@@ -1319,13 +1346,17 @@ namespace SPOAPAKmmReceiver.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                Console.WriteLine("Ошибка: " + ex.Message);
             }
+            stopwatch.Stop();
+            Console.WriteLine("Время калибровки частоты: " + stopwatch.ElapsedMilliseconds + "мс");
         }
 
         private List<(double, double)> Measuring(List<double> frequencyList)
         {
             int d = 10;            
-            double y = 0.0;            
+            double y = 0.0;
+            Stopwatch stopwatch = Stopwatch.StartNew();
             
             List<(double, double)> list = new List<(double, double)>();
 
@@ -1333,17 +1364,23 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 _specAn.Initiate.Continuous.Set(true);
                 _specAn.Sense.Frequency.Center.Set(freq);
+                Console.WriteLine("Частота: " + freq + "МГц");
                 _specAn.Calculate.Marker.Trace.Set(1, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                 _specAn.Calculate.Marker.X.Set(freq);                
                 y = 0.0;
 
                 for (int i = 0; i < d; i++)
-                {                    
-                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);                    
+                {
+                    Thread.Sleep(MSettings.TimeOfEmission * 1000 / d - 1);
+                    y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
+                    Console.WriteLine("Измеренное значение: " + y + "дБм");
                     list.Add(new (freq / 1.0e+6, y));
-                    Thread.Sleep(MSettings.TimeOfEmission * 1000 / d);
                 }                
             }
+
+            stopwatch.Stop();
+            Console.WriteLine("Время измерения: " + stopwatch.ElapsedMilliseconds + "мс");
+
             return list;
         }        
     }

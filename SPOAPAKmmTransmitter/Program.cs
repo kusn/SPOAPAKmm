@@ -3,6 +3,7 @@ using SPOAPAKmmReceiver.Entities;
 using SPOAPAKmmReceiver.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -21,6 +22,7 @@ namespace SPOAPAKmmTransmitter
         static private int _sendPort = 11001;
         static private List<string> _devicesList = new List<string>();
         static private bool _isSimulate = true;
+        static private int _timeCorrection = 194;       //Поправка времени 
 
         private static void GetAccessToClientProgram()
         {
@@ -36,9 +38,12 @@ namespace SPOAPAKmmTransmitter
 
                 if (m != null)
                 {
-                    if(m.Mode == WorkMode.Searching)
+                    //_ipAddress = m.InstrAddress;
+                    Console.WriteLine("Получен запрос: " + s);
+
+                    if (m.Mode == WorkMode.Searching)
                     {
-                        Console.WriteLine("Получен запрос: " + s);
+                        Console.WriteLine("Режим поиска подключённых устройств.");
                         _devicesList = new List<string>(RsInstrument.FindResources("?*"));
                         Dictionary<string, string> data = new Dictionary<string, string>();
 
@@ -49,11 +54,13 @@ namespace SPOAPAKmmTransmitter
                             {
                                 RsInstrument instrument = new RsInstrument(device);
                                 descr = instrument.QueryString("*IDN?");
+                                Console.WriteLine("Найдено устройство - " + descr);
                                 instrument.Dispose();
                             }
                             catch (Exception ex)
                             {
                                 descr = ex.Message;
+                                Console.WriteLine("Ошибка: " + ex.Message);
                             }
                             data.Add(device, descr);
                         }
@@ -62,6 +69,7 @@ namespace SPOAPAKmmTransmitter
                         transmitterMessage.DevicesList = data;
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
+                        Console.WriteLine("Отправлено сообщение: " + message);
                     }
                     else if (m.Mode == WorkMode.ApplyInstrumentSettings)
                     {
@@ -69,16 +77,22 @@ namespace SPOAPAKmmTransmitter
                     }
                     else if (m.Mode == WorkMode.ApplyMeasureSettings)
                     {
+                        Console.WriteLine("Режим получения настроек");
                         Console.WriteLine("Получены настройки: " + s);
                         TransmitterMessage transmitterMessage = new TransmitterMessage();
                         transmitterMessage.Mode = m.Mode;
                         transmitterMessage.IsOk = true;
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
-                        SendToClient(message);                        
+                        SendToClient(message);
+                        Console.WriteLine("Отправлено сообщение: " + message);
                     }
                     else if (m.Mode == WorkMode.Сalibration)
                     {
-                        Console.WriteLine("Получен запрос:" + s);
+                        Console.WriteLine("Режим калибровки");
+
+                        Stopwatch stopwatch = new Stopwatch();
+                        stopwatch.Start();
+
                         TransmitterMessage transmitterMessage = new TransmitterMessage();
                         transmitterMessage.Mode = m.Mode;
                         try
@@ -87,15 +101,19 @@ namespace SPOAPAKmmTransmitter
                             RsSmab smab = new RsSmab(resourceString, true, true, "Simulate = " + _isSimulate.ToString());
                             Console.WriteLine("Генератор проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
                             smab.Utilities.InstrumentStatusChecking = true;
-                            smab.Utilities.Reset();                            
+                            smab.Utilities.Reset();
                             smab.Source.Power.Level.Immediate.Amplitude = m.Power;
+                            Console.WriteLine("Выставлена выходная мощность: " + m.Power);
                             smab.Output.State.Value = true;
+                            Console.WriteLine("Излучение влючено");
                             foreach (var freq in m.FrequencyList)
                             {
                                 smab.Source.Frequency.Fixed.Value = freq * 1e+6;
-                                Thread.Sleep(m.TimeOfEmission * 1000);
+                                Console.WriteLine("Частота: " + freq * 1e+6);
+                                Thread.Sleep(m.TimeOfEmission * 1000 + _timeCorrection);
                             }
-                            smab.Output.State.Value = false;                            
+                            smab.Output.State.Value = false;
+                            Console.WriteLine("Излучение выключено");
                             transmitterMessage.IsOk = true;
                         }
                         catch (Exception ex)
@@ -103,14 +121,19 @@ namespace SPOAPAKmmTransmitter
 
                             transmitterMessage.IsOk = false;
                             transmitterMessage.Message = ex.Message;
+                            Console.WriteLine("Ошибка: " + ex.Message);
                         }
+
+                        stopwatch.Stop();
+                        Console.WriteLine("Время работы: " + stopwatch.ElapsedMilliseconds + "мс");
 
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
+                        Console.WriteLine("Отправлено сообщение: " + message);
                     }
                     else if (m.Mode == WorkMode.Checking)
                     {
-                        Console.WriteLine("Получен запрос: " + s);
+                        Console.WriteLine("Режим проверки");
 
                         TransmitterMessage transmitterMessage = new TransmitterMessage();
                         transmitterMessage.Mode = m.Mode;
@@ -122,19 +145,26 @@ namespace SPOAPAKmmTransmitter
                             transmitterMessage.Message = instrument.Query("*IDN?");
                             transmitterMessage.IsOk = true;
                             instrument.Dispose();
+                            Console.WriteLine("Генератор проинициализирован по адрессу {0}. Симуляция - {1}", resourceString, _isSimulate);
                         }
                         catch (Exception ex)
                         {
                             transmitterMessage.IsOk = false;                            
                             transmitterMessage.Message = ex.Message;
+                            Console.WriteLine("Ошибка: " + ex.Message);
                         }
                         
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
+                        Console.WriteLine("Отправлено сообщение: " + message);
                     }
                     else if (m.Mode == WorkMode.Measuring)
                     {
-                        Console.WriteLine("Получен запрос:" + s);
+                        Console.WriteLine("Режим измерения");
+
+                        Stopwatch stopwatch = new Stopwatch();
+                        stopwatch.Start();
+
                         TransmitterMessage transmitterMessage = new TransmitterMessage();
                         transmitterMessage.Mode = m.Mode;
                         try
@@ -145,14 +175,18 @@ namespace SPOAPAKmmTransmitter
                             smab.Utilities.InstrumentStatusChecking = true;
                             smab.Utilities.Reset();                            
                             smab.Source.Power.Level.Immediate.Amplitude = m.Power;
+                            Console.WriteLine("Выставлена выходная мощность: " + m.Power);
                             Thread.Sleep(60000);
                             smab.Output.State.Value = true;
+                            Console.WriteLine("Излучение выключено");
                             foreach (var freq in m.FrequencyList)
                             {
                                 smab.Source.Frequency.Fixed.Value = freq * 1e+6;
-                                Thread.Sleep(m.TimeOfEmission * 1000);
+                                Console.WriteLine("Частота: " + freq * 1e+6);
+                                Thread.Sleep(m.TimeOfEmission * 1000 + _timeCorrection);
                             }
                             smab.Output.State.Value = false;
+                            Console.WriteLine("Излучение выключено");
                             transmitterMessage.IsOk = true;
                         }
                         catch (Exception ex)
@@ -160,10 +194,15 @@ namespace SPOAPAKmmTransmitter
 
                             transmitterMessage.IsOk = false;
                             transmitterMessage.Message = ex.Message;
+                            Console.WriteLine("Ошибка: " + ex.Message);
                         }
+
+                        stopwatch.Stop();
+                        Console.WriteLine("Время работы: " + stopwatch.ElapsedMilliseconds + "мс");
 
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
+                        Console.WriteLine("Отправлено сообщение: " + message);
                     }
                 }
 
