@@ -293,6 +293,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                     Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
 
+                    sr.Close();
                     client.Close();                    
                 }                
             }

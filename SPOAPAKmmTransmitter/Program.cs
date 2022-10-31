@@ -26,10 +26,11 @@ namespace SPOAPAKmmTransmitter
 
         private static void GetAccessToClientProgram()
         {
-            TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_ipAddress), _listenerPort));
-            listner.Start();
             while (true)
             {
+                TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_ipAddress), _listenerPort));
+                listner.Start();
+
                 TcpClient client = listner.AcceptTcpClient();
                 StreamReader sr = new StreamReader(client.GetStream());
 
@@ -70,6 +71,7 @@ namespace SPOAPAKmmTransmitter
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
                         Console.WriteLine("Отправлено сообщение: " + message);
+                        
                     }
                     else if (m.Mode == WorkMode.ApplyInstrumentSettings)
                     {
@@ -157,6 +159,7 @@ namespace SPOAPAKmmTransmitter
                         var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
                         SendToClient(message);
                         Console.WriteLine("Отправлено сообщение: " + message);
+                        
                     }
                     else if (m.Mode == WorkMode.Measuring)
                     {
@@ -211,7 +214,9 @@ namespace SPOAPAKmmTransmitter
                 //Thread.Sleep(1000);
                 //SendToClient("Сообщение отправлено сервером в " + DateTime.Now.TimeOfDay.ToString());
 
+                sr.Close();
                 client.Close();
+                listner.Stop();
             }
         }
 
@@ -224,6 +229,7 @@ namespace SPOAPAKmmTransmitter
                 StreamWriter sw = new StreamWriter(client.GetStream());
                 sw.AutoFlush = true;
                 sw.WriteLine(Massage);
+                sw.Close();
             }
             catch
             {
