@@ -16,9 +16,9 @@ namespace SPOAPAKmmReceiver.Models
         private double _step = 0.0;
         private double _offset = 0.0;
         private double _power = -30.0;
-        private int _timeOfEmission = 0;
-        private double _span = 0.0;
-        private double _rbw = 0.0;
+        private int _timeOfEmission = 5;
+        private double _span = 10.0;
+        private double _rbw = 1.0;
         private int _attenuation = 40;
         private bool _isPreferredRow = false;
         private bool _isOwnRow = true;

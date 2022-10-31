@@ -21,6 +21,10 @@ namespace SPOAPAKmmReceiver.Data
 
         public DbSet<DeviceType> DeviceTypes { get; set; }
 
+        public DbSet<MeasSettings> MeasSettings { get; set; }
+        
+        public DbSet<Frequency> Frequencies { get; set; }
+
         public SPOAPAKmmDB(DbContextOptions<SPOAPAKmmDB> opt) : base(opt) { }
 
         /*protected override void OnModelCreating(ModelBuilder modelBuilder)

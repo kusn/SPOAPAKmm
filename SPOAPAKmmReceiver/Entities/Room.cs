@@ -9,6 +9,7 @@ namespace SPOAPAKmmReceiver.Entities
         private string? _description;
         private ICollection<Element> _elements;
         private ICollection<Device> _devices;
+        private MeasSettings _measSettings;
         private Organization _organization = null!;
 
         public string Name
@@ -33,6 +34,12 @@ namespace SPOAPAKmmReceiver.Entities
         {
             get => _devices;
             set => Set(ref _devices, value);
+        }
+
+        public MeasSettings MeasSettings
+        {
+            get => _measSettings;
+            set => Set(ref _measSettings, value);
         }
 
         public Organization Organization

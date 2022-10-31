@@ -63,6 +63,18 @@ namespace SPOAPAKmmReceiver.Data
                 await _db.DeviceTypes.AddRangeAsync();
                 await _db.SaveChangesAsync();
             }
+
+            if (!await _db.MeasSettings.AnyAsync())
+            {
+                await _db.MeasSettings.AddRangeAsync();
+                await _db.SaveChangesAsync();
+            }
+
+            if (!await _db.Frequencies.AnyAsync())
+            {
+                await _db.Frequencies.AddRangeAsync();
+                await _db.SaveChangesAsync();
+            }
 #endif
 
         }
