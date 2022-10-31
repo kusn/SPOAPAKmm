@@ -1318,13 +1318,13 @@ namespace SPOAPAKmmReceiver.ViewModels
             try
             {
                 _calibratedFrequenciesDict = new Dictionary<double, double>();
+                Thread.Sleep(300);
 
                 foreach (var freq in MSettings.FrequencyList)
                 {
                     _specAn.Sense.Frequency.Center.Set(freq * 1.0e+6);
                     Console.WriteLine("Частота: " + freq + "МГц");
                     _specAn.Calculate.Marker.Maximum.Peak.Set();
-
                     _specAn.Calculate.Marker.Trace.Set(2, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Thread.Sleep(MSettings.TimeOfEmission * 1000);
                     _specAn.Calculate.Marker.Maximum.Peak.Set(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
@@ -1357,26 +1357,29 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             int d = 10;            
             double y = 0.0;
+            int genTiming = 1000;
             Stopwatch stopwatch = Stopwatch.StartNew();
-            
             List<(double, double)> list = new List<(double, double)>();
 
             foreach (var freq in frequencyList)
             {
+                int timing = MSettings.TimeOfEmission * 1000;
                 _specAn.Initiate.Continuous.Set(true);
                 _specAn.Sense.Frequency.Center.Set(freq);
                 Console.WriteLine("Частота: " + freq + "МГц");
                 _specAn.Calculate.Marker.Trace.Set(1, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                 _specAn.Calculate.Marker.X.Set(freq);                
                 y = 0.0;
+                timing = timing - 20;           //Учёт времени инициализации
+                Thread.Sleep(genTiming);   //Учёт времени перестройки генератора
 
                 for (int i = 0; i < d; i++)
                 {
-                    Thread.Sleep(MSettings.TimeOfEmission * 1000 / d - 1);
                     y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Console.WriteLine("Измеренное значение: " + y + "дБм");
                     list.Add(new (freq / 1.0e+6, y));
-                }                
+                }
+                Thread.Sleep(timing - genTiming - d * 5);      //(d*5) - Учёт времени на иттерацию измерения
             }
 
             stopwatch.Stop();
