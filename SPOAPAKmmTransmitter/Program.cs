@@ -21,7 +21,7 @@ namespace SPOAPAKmmTransmitter
         static private int _listenerPort = 11000;
         static private int _sendPort = 11001;
         static private List<string> _devicesList = new List<string>();
-        static private bool _isSimulate = false;
+        static private bool _isSimulate = true;
         static private int _timeCorrection = 150;       //Поправка времени 
 
         private static void GetAccessToClientProgram()

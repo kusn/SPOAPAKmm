@@ -10,7 +10,8 @@ namespace SPOAPAKmmReceiver.Entities
         private double _p2;
         private double _averageE;
         private double _dX;
-        private string _e = null!;
+        //private string _e = null!;
+        private string _e = "";
         private MeasPoint _measPoint = null!;
         private ICollection<Levels> _levels;
 
