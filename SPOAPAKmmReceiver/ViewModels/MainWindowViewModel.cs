@@ -34,7 +34,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        static private bool _isSimulate = true;
+        static private bool _isSimulate = false;
 
         private IStore<Organization> _dBOrganization;
         private IStore<Room> _dBRoom;
@@ -1108,10 +1108,10 @@ namespace SPOAPAKmmReceiver.ViewModels
                 foreach (var freq in freqList)
                 {
                     MeasureItem mm;
-                    var meas = measureList.FindAll(m => m.Item1 == freq / 1.0e+6);
+                    var meas = measureList.FindAll(m => m.Item1 == freq / 1.0e+6);  //Выбираем измерения для частоты freq
                     double aLevel = 0.0;
                     List<double> mLevels = new List<double>();
-                    List<Levels> lLevels = new List<Levels>(SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).Levels);
+                    List<Levels> lLevels = new List<Levels>(SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).Levels);   //Выбираем измерения для freq
                     meas.ToList().ForEach(m => mLevels.Add(m.Item2));
 
                     int i = 0;
@@ -1131,11 +1131,13 @@ namespace SPOAPAKmmReceiver.ViewModels
                     double sn = 0.0;
                     foreach (var qi in qiList)
                     {
-                        sn = q - qi;
+                        sn = sn + q - qi;
                     }
                     sn = Math.Sqrt(sn / 9.0);
                     double sx = sn / Math.Sqrt(10.0);
                     double dx = 2.26 * sx;
+                    if (dx is Double.NaN)
+                        dx = 0.0;
 
                     SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).E = q.ToString() + "±" + dx.ToString();
                     SelectedPointMeasurings.FirstOrDefault(o => o.Freq == freq / 1.0e+6).AverageE = q;

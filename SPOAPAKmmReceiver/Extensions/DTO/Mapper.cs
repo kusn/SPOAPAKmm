@@ -70,6 +70,9 @@ namespace SPOAPAKmmReceiver.Extensions.DTO
                 return null;
             else
             {
+                if (item.FrequencyList is null)
+                    item.FrequencyList = new List<Frequency>();
+
                 foreach (var rsFrequency in item.FrequencyList)
                 {
                     double f;
