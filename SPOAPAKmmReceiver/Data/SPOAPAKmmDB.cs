@@ -27,9 +27,10 @@ namespace SPOAPAKmmReceiver.Data
 
         public SPOAPAKmmDB(DbContextOptions<SPOAPAKmmDB> opt) : base(opt) { }
 
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-        }*/
+            modelBuilder.Entity<DeviceType>()
+                .HasIndex(t => t.Name).IsUnique();
+        }
     }
 }

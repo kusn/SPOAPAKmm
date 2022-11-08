@@ -11,7 +11,7 @@ namespace SPOAPAKmmReceiver.Entities
         private DateTime _verificationDate;
         private string _verificationInformation = "";
         private string _verificationOrganization = "";
-        private Room _room = null!;
+        //private Room _room = null!;
 
         public DeviceType Type
         {

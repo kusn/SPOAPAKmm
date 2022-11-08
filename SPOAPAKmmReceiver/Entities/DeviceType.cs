@@ -1,5 +1,7 @@
-﻿namespace SPOAPAKmmReceiver.Entities
-{
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace SPOAPAKmmReceiver.Entities
+{    
     public class DeviceType : Base.Entity
     {
         private string _name = null!;

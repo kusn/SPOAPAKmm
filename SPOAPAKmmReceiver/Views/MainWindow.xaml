@@ -164,11 +164,11 @@
                                             </Grid.ColumnDefinitions>
                                             <DockPanel Grid.Row="0" Grid.Column="0">
                                                 <Label DockPanel.Dock="Top" Content="Тип" HorizontalAlignment="Center"/>
-                                                <ComboBox ItemsSource="{Binding DeviceTypeNamesList}"/>
+                                                <ComboBox ItemsSource="{Binding DeviceTypeNameList}" SelectedItem="{Binding SelectedDeviceTypeName}"/>
                                             </DockPanel>
                                             <DockPanel Grid.Row="0" Grid.Column="1">
                                                 <Label DockPanel.Dock="Top" Content="Наименование" HorizontalAlignment="Center"/>
-                                                <ComboBox ItemsSource="{Binding DevicesNamesList}"/>
+                                                <ComboBox ItemsSource="{Binding DeviceNameList}" SelectedItem="{Binding SelectedDeviceName}"/>
                                             </DockPanel>
                                             <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить"/>
                                             <ListBox Grid.Row="2" Grid.ColumnSpan="2"/>

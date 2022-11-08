@@ -75,6 +75,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _selectedPointName;
         private string? _selectedPointDescription;
         private SortableObservableCollection<MeasureItem> _selectedPointMeasurings;
+        private string _selectedDeviceTypeName;
+        private string _selectedDeviceName;
         private string _originalselectedOrganizationName;
         private string? _originalselectedOrganizationDescription;
         private string? _originalselectedOrganizationAddress;
@@ -111,8 +113,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         public ObservableCollection<MeasSettings> MeasSettings { get; set; }
         public ObservableCollection<DeviceType> DeviceTypes { get; set; }
         public ObservableCollection<Frequency> Frequencies { get; set; }
-        public ObservableCollection<string> DeviceTypeNamesList { get; set; }
-        public ObservableCollection<string> DevicesNamesList { get; set; }
+        public ObservableCollection<string> DeviceTypeNameList { get; set; }
+        public ObservableCollection<string> DeviceNameList { get; set; }
 
         public Organization SelectedOrganization
         {
@@ -270,7 +272,25 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeValue(_originalselectedPointDescription, value);
             }
         }
+        public string SelectedDeviceTypeName
+        {
+            get => _selectedDeviceTypeName;
+            set
+            {
+                Set(ref _selectedDeviceTypeName, value);
 
+                DeviceNameList.Clear();
+                foreach (var device in Devices.Where(d => d.Type.Name == value))
+                {
+                    DeviceNameList.Add(device.Name + " №" + device.Number);
+                }                
+            }
+        }
+        public string SelectedDeviceName
+        {
+            get => _selectedDeviceName;
+            set => Set(ref _selectedDeviceName, value);
+        }
         public SortableObservableCollection<MeasureItem> SelectedPointMeasurings
         {
             get => _selectedPointMeasurings;
@@ -372,6 +392,27 @@ namespace SPOAPAKmmReceiver.ViewModels
                 if (c == 0 || (organizationsInDb.FirstOrDefault(o => o.Name == org.Name) == null))
                     DbOrganizationStore.Add(org);
             }
+
+            foreach (var device in TestData.GetDevices())
+            {
+                if (DbDeviceStore.GetAll().Count() == 0 ||
+                    (DbDeviceStore.GetAll().FirstOrDefault(d => d.Name == device.Name && d.Number == device.Number)) == null)
+                {
+                    if (DbDeviceTypeStore.GetAll().FirstOrDefault(t => t.Name == device.Type.Name) == null)
+                        DbDeviceStore.Add(device);
+                    else
+                        DbDeviceStore.Add(new()
+                        {
+                            Type = DbDeviceTypeStore.GetAll().FirstOrDefault(t => t.Name == device.Type.Name),
+                            Name = device.Name,
+                            Number = device.Number,
+                            Range = device.Range,
+                            VerificationDate = device.VerificationDate,
+                            VerificationInformation = device.VerificationInformation,
+                            VerificationOrganization = device.VerificationOrganization,
+                        });
+                }
+            }
 #endif
             Organizations = new ObservableCollection<Organization>(DbOrganizationStore.GetAll());
             //Organizations = new SortableObservableCollection<Organization>(DbOrganizationStore.GetAll());
@@ -386,20 +427,13 @@ namespace SPOAPAKmmReceiver.ViewModels
             DeviceTypes = new ObservableCollection<DeviceType>(dBDeviceType.GetAll());
             Frequencies = new ObservableCollection<Frequency>(dBFrequency.GetAll());
 
-            DeviceTypeNamesList = new ObservableCollection<string>();
+            DeviceTypeNameList = new ObservableCollection<string>();
             foreach (var deviceType in DeviceTypes)
             {
-                DeviceTypeNamesList.Add(deviceType.Name);
+                DeviceTypeNameList.Add(deviceType.Name);
             }
 
-            DevicesNamesList = new ObservableCollection<string>();
-            foreach (var device in Devices)
-            {
-                DevicesNamesList.Add(device.Name + " №" + device.Number);
-            }
-
-
-            //MSettings = new MeasureSettings();
+            DeviceNameList = new ObservableCollection<string>();
 
             _configuration = configuration;
 

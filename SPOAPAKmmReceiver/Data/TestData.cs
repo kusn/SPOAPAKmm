@@ -20,7 +20,7 @@ namespace SPOAPAKmmReceiver.Data
                     new Room()
                     {
                         Name = "317",
-                        Devices = GetDevices(),
+                        //Devices = GetDevices(),
                         Elements = GetElements(),
                     }
                 },
@@ -35,7 +35,7 @@ namespace SPOAPAKmmReceiver.Data
                     new Room()
                     {
                         Name = "215",
-                        Devices = GetDevices(),
+                        //Devices = GetDevices(),
                         Elements = GetElements(),
                     }
                 },
