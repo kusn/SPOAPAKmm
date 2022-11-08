@@ -155,8 +155,17 @@ namespace SPOAPAKmmReceiver.ViewModels
                 MessageBox.Show("Выберите приёмник из списка");
             else
             {
-                RsInstrument instr = new RsInstrument(ReceiverSettings.InstrAddress, "Simulate = " + _simulation);
-                DescriptionSelectedReceiver = instr.QueryString("*IDN?");
+                try
+                {
+                    RsInstrument instr = new RsInstrument(ReceiverSettings.InstrAddress, "Simulate = " + _simulation);
+                    DescriptionSelectedReceiver = instr.QueryString("*IDN?");
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
         private bool CanTestSelectedReceiverCommandExecute(object p) => true;
@@ -295,7 +304,8 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                     sr.Close();
                     client.Close();                    
-                }                
+                }
+                _listner.Stop();
             }
             if (token.IsCancellationRequested)
             {

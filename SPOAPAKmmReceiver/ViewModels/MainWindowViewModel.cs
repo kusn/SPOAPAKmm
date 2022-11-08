@@ -614,6 +614,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 ObservableCollection<Element> elements = new ObservableCollection<Element>();
                 room.Elements = elements;
                 room.MeasSettings = new MeasSettings();
+                room.MeasSettings = (new MeasureSettings()).MeasSettingsFromMeasureSettings();
                 ((Organization)SelectedValue).Rooms.Add(room);
                 SelectedValue = room;
             }
@@ -674,6 +675,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             org.Rooms = rooms;
             Organizations.Add(org);
             SelectedValue = org;
+            DbOrganizationStore.Add(org);
         }
 
         private bool CanAddOrganizationCommandExecute(object p) => true;
@@ -691,8 +693,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             if (SelectedValue is Organization)
             {
-                Organizations.Remove((Organization)SelectedValue);
                 DbOrganizationStore.Delete(((Organization)SelectedValue).Id);
+                Organizations.Remove((Organization)SelectedValue);
             }
             else if (SelectedValue is Room)
             {
@@ -1405,7 +1407,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             int d = 10;            
             double y = 0.0;
-            int genTiming = 1000;
+            int genTiming = 2000;
             Stopwatch stopwatch = Stopwatch.StartNew();
             List<(double, double)> list = new List<(double, double)>();
 

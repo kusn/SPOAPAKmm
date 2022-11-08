@@ -196,7 +196,7 @@ namespace SPOAPAKmmReceiver.Models
                         break;
 
                     case "Attenuation":
-                        if (Attenuation < 0.0 || Attenuation > 10000.0)
+                        if (Attenuation < 0.0 || Attenuation > 40.0)
                             error = "Аттенюация не может быть отрицательной или больше 40 дБ";
                         break;
                 }
