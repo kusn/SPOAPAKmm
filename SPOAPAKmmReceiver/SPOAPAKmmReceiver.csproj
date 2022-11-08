@@ -33,6 +33,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="RsFsw" Version="5.0.0.80" />
     <PackageReference Include="RsInstrument" Version="1.17.0" />
+    <PackageReference Include="TemplateEngine.Docx" Version="1.1.5" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1159,6 +1159,22 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
+        #region CreateReportCommand - Команда создания отчёта
+
+        private LambdaCommand _createReportCommand;
+
+        public LambdaCommand CreateReportCommand => _createReportCommand
+            ??= new LambdaCommand(OnCreateReportCommandExecuted, CanCreateReportCommandExecute);
+
+        private void OnCreateReportCommandExecuted(object p)
+        {
+
+        }
+
+        private bool CanCreateReportCommandExecute(object p) => SelectedValue is not null;
+
+        #endregion
+
         private string GetNewName(object collection)
         {
             string name = "";
