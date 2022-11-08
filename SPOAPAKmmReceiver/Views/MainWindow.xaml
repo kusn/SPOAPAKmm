@@ -138,6 +138,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="3*"/>
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0">
                                     <Label DockPanel.Dock="Top" Content="Название помещения" HorizontalAlignment="Center"/>
@@ -147,6 +148,34 @@
                                     <Label DockPanel.Dock="Top" Content="Описание помещения" HorizontalAlignment="Center"/>
                                     <TextBox Text="{Binding SelectedRoomDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
                                 </DockPanel>
+                                <Border Grid.Row="2" BorderThickness="1" BorderBrush="Orange">
+                                    <DockPanel Grid.Row="2">
+                                        <Label DockPanel.Dock="Top" Content="Оборудование" HorizontalAlignment="Center"/>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="0.7*"/>
+                                                <RowDefinition Height="0.5*"/>
+                                                <RowDefinition/>
+                                                <RowDefinition Height="0.5*"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <DockPanel Grid.Row="0" Grid.Column="0">
+                                                <Label DockPanel.Dock="Top" Content="Тип" HorizontalAlignment="Center"/>
+                                                <ComboBox ItemsSource="{Binding DeviceTypeNamesList}"/>
+                                            </DockPanel>
+                                            <DockPanel Grid.Row="0" Grid.Column="1">
+                                                <Label DockPanel.Dock="Top" Content="Наименование" HorizontalAlignment="Center"/>
+                                                <ComboBox ItemsSource="{Binding DevicesNamesList}"/>
+                                            </DockPanel>
+                                            <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить"/>
+                                            <ListBox Grid.Row="2" Grid.ColumnSpan="2"/>
+                                            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Удалить"/>
+                                        </Grid>
+                                    </DockPanel>
+                                </Border>
                             </Grid>
                         </TabItem>
                         <TabItem Visibility="Collapsed">

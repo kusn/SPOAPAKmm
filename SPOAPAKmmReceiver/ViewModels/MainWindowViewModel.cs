@@ -111,6 +111,8 @@ namespace SPOAPAKmmReceiver.ViewModels
         public ObservableCollection<MeasSettings> MeasSettings { get; set; }
         public ObservableCollection<DeviceType> DeviceTypes { get; set; }
         public ObservableCollection<Frequency> Frequencies { get; set; }
+        public ObservableCollection<string> DeviceTypeNamesList { get; set; }
+        public ObservableCollection<string> DevicesNamesList { get; set; }
 
         public Organization SelectedOrganization
         {
@@ -383,7 +385,19 @@ namespace SPOAPAKmmReceiver.ViewModels
             MeasSettings = new ObservableCollection<MeasSettings>(dBMeasSettings.GetAll());
             DeviceTypes = new ObservableCollection<DeviceType>(dBDeviceType.GetAll());
             Frequencies = new ObservableCollection<Frequency>(dBFrequency.GetAll());
-            
+
+            DeviceTypeNamesList = new ObservableCollection<string>();
+            foreach (var deviceType in DeviceTypes)
+            {
+                DeviceTypeNamesList.Add(deviceType.Name);
+            }
+
+            DevicesNamesList = new ObservableCollection<string>();
+            foreach (var device in Devices)
+            {
+                DevicesNamesList.Add(device.Name + " №" + device.Number);
+            }
+
 
             //MSettings = new MeasureSettings();
 

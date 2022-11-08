@@ -55,11 +55,11 @@ namespace SPOAPAKmmReceiver.Entities
             set => Set(ref _verificationOrganization, value);
         }
 
-        public Room Room
-        { 
-            get => _room;
-            set => Set(ref _room, value);
+        //public Room Room
+        //{ 
+        //    get => _room;
+        //    set => Set(ref _room, value);
 
-        }
+        //}
     }
 }
