@@ -17,6 +17,7 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Height="25">
             <MenuItem Header="Настройки" Command="{Binding OpenSettingsWindowCommand}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            <MenuItem Header="Оборудование" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Menu>
         <Grid Grid.Row="1">
@@ -170,9 +171,19 @@
                                                 <Label DockPanel.Dock="Top" Content="Наименование" HorizontalAlignment="Center"/>
                                                 <ComboBox ItemsSource="{Binding DeviceNameList}" SelectedItem="{Binding SelectedDeviceName}"/>
                                             </DockPanel>
-                                            <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить"/>
-                                            <ListBox Grid.Row="2" Grid.ColumnSpan="2"/>
-                                            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Удалить"/>
+                                            <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить" Command="{Binding AddDeviceToRoomCommand}"/>
+                                            <ListBox Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding SelectedRoom.Devices, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceFromList}">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Path=Type.Name}"/>
+                                                            <TextBlock Text="{Binding Path=Name, StringFormat={} {0}}"/>
+                                                            <TextBlock Text="{Binding Path=Number, StringFormat={} №{0}}"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Удалить" Command="{Binding RemoveDeviceFromRoomCommand}"/>
                                         </Grid>
                                     </DockPanel>
                                 </Border>

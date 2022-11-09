@@ -291,6 +291,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             get => _selectedDeviceName;
             set => Set(ref _selectedDeviceName, value);
         }
+        public Device SelectedDeviceFromList { get; set; }
+
         public SortableObservableCollection<MeasureItem> SelectedPointMeasurings
         {
             get => _selectedPointMeasurings;
@@ -537,7 +539,10 @@ namespace SPOAPAKmmReceiver.ViewModels
         private bool IsChangeValue(object oldValue, object newValue)
         {
             bool isChange = false;
-            if (oldValue != newValue)
+
+            if (oldValue != null && !oldValue.Equals(newValue))
+                isChange = true;
+            else if (oldValue != newValue)
                 isChange = true;
             return isChange;
         }
@@ -549,13 +554,15 @@ namespace SPOAPAKmmReceiver.ViewModels
             ??= new LambdaCommand(OnSaveChangesCommandExecuted, CanSaveChangesCommandExecute);
         private void OnSaveChangesCommandExecuted(object p)
         {
+            MessageBoxResult messageBoxResult = MessageBoxResult.None;
+
             if (SelectedValue is Organization)
             {
                 if (Organizations.FirstOrDefault(o => o.Name == SelectedOrganizationName) != null)
                 {
-                    MessageBox.Show("Организация с таким названием уже имеется!");
-                    IsChanged = false;
-                    return;
+                    messageBoxResult = MessageBox.Show("Организация с таким названием уже имеется!" + System.Environment.NewLine + " Хотите сохранить изменения?", "Внимание!", MessageBoxButton.YesNo);
+                    if (messageBoxResult == MessageBoxResult.No)
+                        return;
                 }
 
                 var org = SelectedOrganization;
@@ -575,9 +582,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var r = ((Room)SelectedValue).Organization.Rooms.FirstOrDefault(r => r.Name == SelectedRoomName);
                 if (r != null)
                 {
-                    MessageBox.Show("Помещение с данным названием уже имеется!");
-                    IsChanged = false;
-                    return;
+                    messageBoxResult = MessageBox.Show("Помещение с данным названием уже имеется!" + System.Environment.NewLine + " Хотите сохранить изменения?", "Внимание!", MessageBoxButton.YesNo);
+                    if (messageBoxResult == MessageBoxResult.No)
+                        return;
                 }
 
                 Room room = SelectedRoom;
@@ -596,9 +603,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var e = ((Element)SelectedValue).Room.Elements.FirstOrDefault(e => e.Name == SelectedElementName);
                 if (e != null)
                 {
-                    MessageBox.Show("Элемент с данным названием уже имеется!");
-                    IsChanged = false;
-                    return;
+                    messageBoxResult = MessageBox.Show("Элемент с данным названием уже имеется!" + System.Environment.NewLine + " Хотите сохранить изменения?", "Внимание!", MessageBoxButton.YesNo);
+                    if (messageBoxResult == MessageBoxResult.No)
+                        return;
                 }
 
                 Element element = SelectedElement;
@@ -1205,6 +1212,47 @@ namespace SPOAPAKmmReceiver.ViewModels
         }
         private bool CanRunMeasuringCommandExecute(object p) => _isCalibrated;
 
+        #endregion
+
+        #region AddDeviceToRoomCommand - Команда добавления в список оборудования комнаты
+
+        private LambdaCommand _addDeviceToRoomCommand;
+
+        public LambdaCommand AddDeviceToRoomCommand => _addDeviceToRoomCommand
+            ??= new LambdaCommand(OnAddDeviceToRoomCommandExecuted, CanAddDeviceToRoomCommandExecute);
+
+        private void OnAddDeviceToRoomCommandExecuted(object p)
+        {
+            string name = SelectedDeviceName.Split('№')[0].TrimEnd();
+            string number = SelectedDeviceName.Split('№')[1];
+            var device = Devices.FirstOrDefault(d => d.Name == name && d.Number == number);
+            if (SelectedRoom.Devices is null)
+                SelectedRoom.Devices = new ObservableCollection<Device>();
+            SelectedRoom.Devices.Add(device);
+            IsChanged = true;
+        }
+
+        private bool CanAddDeviceToRoomCommandExecute(object p) => SelectedDeviceName is not null;
+
+        #endregion
+
+        #region RemoveDeviceFromRoomCommand
+
+        private LambdaCommand _removeDeviceFromRoomCommand;
+
+        public LambdaCommand RemoveDeviceFromRoomCommand => _removeDeviceFromRoomCommand
+            ??= new LambdaCommand(OnRemoveDeviceFromRoomCommandExecuted, CanRemoveDeviceFromRoomCommandExecute);
+
+        private void OnRemoveDeviceFromRoomCommandExecuted(object p)
+        {
+            var device = SelectedRoom.Devices.FirstOrDefault(d => d.Name == SelectedDeviceFromList.Name && d.Number == SelectedDeviceFromList.Number);
+            var list = new List<Device>(SelectedRoom.Devices);
+            list.Remove(device);
+            SelectedRoom.Devices = new ObservableCollection<Device>(list);
+            IsChanged = true;
+        }
+
+        private bool CanRemoveDeviceFromRoomCommandExecute(object p) => SelectedDeviceFromList is not null;
         #endregion
 
         #region CreateReportCommand - Команда создания отчёта
