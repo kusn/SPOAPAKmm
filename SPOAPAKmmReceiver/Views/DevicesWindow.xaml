@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         DataContext="{Binding DevicesViewModel, Source={StaticResource Locator}}"
         Title="DevicesWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="2*"/>
@@ -23,11 +23,17 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <ListBox Margin="5"></ListBox>
+                <ListBox ItemsSource="{Binding DeviceTypes}" SelectedItem="{Binding Path=SelectedDeviceType}" Margin="5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Button Content="Удалить" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Padding="5,1,5,1"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <TextBox Margin="5,0,0,0"/>
+                <TextBox Text="{Binding NewNameDeviceType}" MinWidth="100" Margin="5,0,0,0"/>
                 <Button Content="Добавить" Padding="5,1,5,1" Margin="5,0,0,0"/>
             </StackPanel>
         </Grid>
@@ -39,17 +45,21 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
                 <RowDefinition Height="10*"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ComboBox Grid.Column="0" Grid.Row="0" Margin="5"/>
-            <ListBox Grid.Column="0" Grid.Row="1" Margin="5"></ListBox>
-            <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Orientation="Horizontal">
-                <TextBox Margin="5,0,0,0"/>
+            <ListBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDeviceInDevicePanel}" Margin="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
+                <TextBox Text="{Binding NewDeviceName}" MinWidth="100" Margin="5,0,0,0"/>
                 <Button Content="Добавить" Padding="5,1,5,1" Margin="5,0,0,0"/>
             </StackPanel>
-            <Grid Grid.Column="1" Grid.Row="1">
+            <Grid DataContext="{Binding Path=SelectedDeviceInDevicePanel}" Grid.Column="1" Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -59,26 +69,26 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition Height="1.3*"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="0.5*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Column="0" Grid.Row="0">
                     <Label Content="Название" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                    <TextBox Padding="0" Margin="5,0,5,0"/>
+                    <TextBox Text="{Binding Path=Name}" Padding="0" Margin="5,0,5,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Grid.Row="0">
                     <Label Content="Номер" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                    <TextBox Padding="0" Margin="5,0,5,0"/>
+                    <TextBox Text="{Binding Number}" Padding="0" Margin="5,0,5,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
                     <Label Content="Рабочий диапазон" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
                     <DockPanel >
                         <StackPanel Orientation="Vertical">
                             <Label Content="Начальное значение, МГц" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                            <TextBox Padding="0" Margin="0,0,5,0"/>
+                            <TextBox Text="{Binding Range.SartFreq}" Padding="0" Margin="0,0,5,0"/>
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
                             <Label Content="Конечное значение, МГц" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                            <TextBox Padding="0" Margin="5,0,5,0"/>
+                            <TextBox Text="{Binding Range.EndFreq}" Padding="0" Margin="5,0,5,0"/>
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
@@ -87,17 +97,17 @@
                     <DockPanel>
                         <StackPanel Orientation="Vertical">
                             <Label Content="Дата поверки" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                            <DatePickerTextBox Padding="0"/>
+                            <DatePickerTextBox Text="{Binding VerificationDate}" Padding="0"/>
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
                             <Label Content="№ Свидетельства" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                            <TextBox Padding="0" Margin="5,0,5,0"/>
+                            <TextBox Text="{Binding VerificationInformation}" Padding="0" Margin="5,0,5,0"/>
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
                 <DockPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
                     <Label Content="Поверяющая организация" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
-                    <TextBox Margin="5"/>
+                    <TextBox Text="{Binding VerificationOrganization}" Margin="5"/>
                 </DockPanel>
                 <Button Content="Сохранить" Grid.Column="0" Grid.Row="4" Margin="5,5,5,5"/>
             </Grid>
