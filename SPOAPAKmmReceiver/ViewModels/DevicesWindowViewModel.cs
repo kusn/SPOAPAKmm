@@ -3,6 +3,7 @@ using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SPOAPAKmmReceiver.Infrastructure.Commands;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -23,10 +24,11 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Set(ref _selectedDeviceType, value);
                 Devices.Clear();
-                foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == value.Name))
-                {
-                    Devices.Add(device);
-                }
+                if(value !=null)
+                    foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == value.Name))
+                    {
+                        Devices.Add(device);
+                    }
             }
         }
 
@@ -62,5 +64,43 @@ namespace SPOAPAKmmReceiver.ViewModels
             DeviceTypes = new ObservableCollection<DeviceType>(dBDeviceType.GetAll());
             Devices = new ObservableCollection<Device>();
         }
+
+        #region AddNewDeviceTypeCommand
+
+        private LambdaCommand _addNewDeviceTypeCommand;
+
+        public LambdaCommand AddNewDeviceTypeCommand => _addNewDeviceTypeCommand
+            ??= new LambdaCommand(OnAddNewDeviceTypeCommandExecuted, CanAddNewDeviceTypeCommandExecute);
+
+        private void OnAddNewDeviceTypeCommandExecuted(object p)
+        {
+            _newDeviceType = new()
+            {
+                Name = NewNameDeviceType,
+            };
+            DbDeviceTypeStore.Add(_newDeviceType);
+            DeviceTypes.Add(_newDeviceType);
+        }
+
+        private bool CanAddNewDeviceTypeCommandExecute(object p) =>
+            NewNameDeviceType is not null || NewNameDeviceType != "";
+
+        #endregion
+
+        #region RemoveDeviceTypeCommand
+
+        private LambdaCommand _removeDeviceTypeCommand;
+
+        public LambdaCommand RemoveDeviceTypeCommand => _removeDeviceTypeCommand
+            ??= new LambdaCommand(OnRemoveDeviceTypeCommandExecuted, CanRemoveDeviceTypeCommandExecute);
+
+        private void OnRemoveDeviceTypeCommandExecuted(object p)
+        {
+            DbDeviceTypeStore.Delete(DeviceTypes.FirstOrDefault(t => t.Name == SelectedDeviceType.Name).Id);
+            DeviceTypes.Remove(SelectedDeviceType);
+        }
+        private bool CanRemoveDeviceTypeCommandExecute(object p) => SelectedDeviceType is not null;
+
+        #endregion
     }
 }
