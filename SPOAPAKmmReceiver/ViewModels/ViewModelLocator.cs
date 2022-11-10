@@ -6,5 +6,6 @@ namespace SPOAPAKmmReceiver.ViewModels
     {
         public MainWindowViewModel MainWindowModel => App.Services.GetRequiredService<MainWindowViewModel>();
         public SettingsWindowViewModel SettingsViewModel => App.Services.GetRequiredService<SettingsWindowViewModel>();
+        public DevicesWindowViewModel DevicesViewModel => App.Services.GetRequiredService<DevicesWindowViewModel>();
     }
 }

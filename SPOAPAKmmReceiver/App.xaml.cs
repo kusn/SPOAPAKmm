@@ -44,6 +44,7 @@ namespace SPOAPAKmmReceiver
 
             services.AddScoped<MainWindowViewModel>();
             services.AddScoped<SettingsWindowViewModel>();
+            services.AddScoped<DevicesWindowViewModel>();
             services.AddSingleton(typeof(INetConnection), typeof(NetConnection));
 
             services.Configure<InstrumentSettings>(InstrumentSettings.Generator, host.Configuration.GetSection("InstrumentSettings:Generator"));

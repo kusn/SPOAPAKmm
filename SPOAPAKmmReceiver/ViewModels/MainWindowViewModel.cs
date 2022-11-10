@@ -970,6 +970,20 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         #endregion
 
+        #region OpenDevicesWindowCommand - Команда открытия окна настроек
+
+        private LambdaCommand _openDevicesWindowCommand;
+        public LambdaCommand OpenDevicesWindowCommand => _openDevicesWindowCommand
+            ??= new LambdaCommand(OnOpenDevicesWindowCommandExecuted, CanOpenDevicesWindowCommandExecute);
+        private void OnOpenDevicesWindowCommandExecuted(object p)
+        {
+            DevicesWindow devicesWindow = new DevicesWindow();
+            devicesWindow.Show();
+        }
+        private bool CanOpenDevicesWindowCommandExecute(object p) => true;
+
+        #endregion
+
         #region RunCalibrationCommand - Команда калибровки
 
         private LambdaCommand _runCalibrationCommand;
