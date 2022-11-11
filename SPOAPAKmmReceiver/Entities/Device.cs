@@ -6,8 +6,8 @@ namespace SPOAPAKmmReceiver.Entities
     {
         private string _name = null!;
         private DeviceType _type;
-        private string _number;
-        private MeasRange _range;
+        private string _number = "";
+        private MeasRange _range = new MeasRange(){StartFreq = 0.1, EndFreq = 0.1};
         private DateTime _verificationDate;
         private string _verificationInformation = "";
         private string _verificationOrganization = "";

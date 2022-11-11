@@ -104,7 +104,7 @@ namespace SPOAPAKmmReceiver.Data
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Анализатор спектра"),
                     Name = "R&S FSV40",
                     Number = "11111111",
-                    Range = new MeasRange() { SartFreq = 0.00001, EndFreq = 40000},
+                    Range = new MeasRange() { StartFreq = 0.00001, EndFreq = 40000},
                     VerificationDate = new DateTime(2001,01,01),
                     
                 },
@@ -113,7 +113,7 @@ namespace SPOAPAKmmReceiver.Data
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Генератор"),
                     Name = "R&S SMB100A",
                     Number = "22222222",
-                    Range = new MeasRange() { SartFreq = 0.1, EndFreq = 40000},
+                    Range = new MeasRange() { StartFreq = 0.1, EndFreq = 40000},
                     VerificationDate = new DateTime(2001,01,01),
                 },
                 new()
@@ -121,7 +121,7 @@ namespace SPOAPAKmmReceiver.Data
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Антенна"),
                     Name = "П6-151",
                     Number = "33333333",
-                    Range = new MeasRange() { SartFreq = 800, EndFreq = 16000},
+                    Range = new MeasRange() { StartFreq = 800, EndFreq = 16000},
                     VerificationDate = new DateTime(2001,01,01),
                 },
                 new()
@@ -129,7 +129,7 @@ namespace SPOAPAKmmReceiver.Data
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Антенна"),
                     Name = "П6-151",
                     Number = "44444444",
-                    Range = new MeasRange() { SartFreq = 800, EndFreq = 16000},
+                    Range = new MeasRange() { StartFreq = 800, EndFreq = 16000},
                     VerificationDate = new DateTime(2001,01,01),
                 },
             };
