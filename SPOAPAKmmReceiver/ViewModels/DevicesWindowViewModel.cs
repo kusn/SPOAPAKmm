@@ -1,8 +1,10 @@
-﻿using SPOAPAKmmReceiver.Entities;
+﻿using System;
+using SPOAPAKmmReceiver.Entities;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 
 namespace SPOAPAKmmReceiver.ViewModels
@@ -16,6 +18,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _newDeviceName;
         private DeviceType _newDeviceType;
         private Device _newDevice;
+        private Device _oldSelectedDevice;
 
         public DeviceType SelectedDeviceType
         {
@@ -38,10 +41,22 @@ namespace SPOAPAKmmReceiver.ViewModels
             set => Set(ref _newNameDeviceType, value);
         }
 
+        public DeviceType SelectedDeviceTypeInDevicePanel
+        {
+            get => _selectedDeviceTypeInDevicePanel;
+            set => Set(ref _selectedDeviceTypeInDevicePanel, value);
+        }
+
         public Device SelectedDeviceInDevicePanel
         {
             get => _selectedDeviceInDevicePanel;
-            set => Set(ref _selectedDeviceInDevicePanel, value);
+            set
+            {
+                _oldSelectedDevice = value;
+                Set(ref _selectedDeviceInDevicePanel, value);
+                if (value != null)
+                    SelectedDeviceTypeInDevicePanel = value.Type;
+            }
         }
 
         public string NewDeviceName
@@ -83,7 +98,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         }
 
         private bool CanAddNewDeviceTypeCommandExecute(object p) =>
-            NewNameDeviceType is not null || NewNameDeviceType != "";
+            NewNameDeviceType is not null || NewNameDeviceType != "" || NewNameDeviceType != String.Empty;
 
         #endregion
 
@@ -96,10 +111,122 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         private void OnRemoveDeviceTypeCommandExecuted(object p)
         {
-            DbDeviceTypeStore.Delete(DeviceTypes.FirstOrDefault(t => t.Name == SelectedDeviceType.Name).Id);
-            DeviceTypes.Remove(SelectedDeviceType);
+            MessageBoxResult result = MessageBoxResult.None;
+
+            if (DbDeviceStore.GetAll().Where(d => d.Type.Name == SelectedDeviceType.Name).Count() > 0)
+            {
+                result = MessageBox.Show(
+                    "Данный тип содержит устройства!\nДействительно хотите удалить данный тип оборудования?",
+                    "Внимание!", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (MessageBox.Show("Удалить также всё оборудование данного типа?", "Внимание!", MessageBoxButton.YesNo) ==
+                        MessageBoxResult.Yes)
+                    {
+                        foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == SelectedDeviceType.Name))
+                        {
+                            DbDeviceStore.Delete(device.Id);
+                        }
+                        DbDeviceTypeStore.Delete(DeviceTypes.FirstOrDefault(t => t.Name == SelectedDeviceType.Name).Id);
+                        DeviceTypes.Remove(SelectedDeviceType);
+                    }
+                    else
+                    {
+                        var type = new DeviceType();
+                        type = DbDeviceTypeStore.GetAll().FirstOrDefault(t => t.Name == SelectedDeviceType.Name);
+                        type.Name = "Не определён";
+                        DbDeviceTypeStore.Update(type);
+                        SelectedDeviceType = type;
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                DbDeviceTypeStore.Delete(SelectedDeviceType.Id);
+                DeviceTypes.Remove(SelectedDeviceType);
+            }
         }
         private bool CanRemoveDeviceTypeCommandExecute(object p) => SelectedDeviceType is not null;
+
+        #endregion
+
+        #region AddNewDeviceCommand
+
+        private LambdaCommand _addNewDeviceCommand;
+
+        public LambdaCommand AddNewDeviceCommand => _addNewDeviceCommand
+            ??= new LambdaCommand(OnAddNewDeviceCommandExecute, CanAddNewDeviceCommandExecuted);
+
+        private void OnAddNewDeviceCommandExecute(object p)
+        {
+            _newDevice = new()
+            {
+                Name = NewDeviceName,
+                Number = "",
+            };
+            if (SelectedDeviceType != null)
+            {
+                _newDevice.Type = SelectedDeviceType;
+                Devices.Add(_newDevice);
+            }
+            else
+            {
+                var type = DeviceTypes.FirstOrDefault(t => t.Name == "Не определён");
+                if (type == null)
+                    type = new DeviceType()
+                    {
+                        Name = "Не определён",
+                    };
+                _newDevice.Type = type;
+                DbDeviceTypeStore.Add(type);
+                DeviceTypes.Add(type);
+            }
+            DbDeviceStore.Add(_newDevice);
+        }
+
+        private bool CanAddNewDeviceCommandExecuted(object p) => NewDeviceName != null || NewDeviceName != " " || NewDeviceName != String.Empty;
+
+        #endregion
+
+        #region SaveChangesSelectedDeviceCommand
+
+        private LambdaCommand _saveChangesSelectedDeviceCommand;
+
+        public LambdaCommand SaveChangesSelectedDeviceCommand => _saveChangesSelectedDeviceCommand
+            ??= new LambdaCommand(OnSaveChangesSelectedDeviceCommandExecute,
+                CanSaveChangesSelectedDeviceCommandExecuted);
+
+        private void OnSaveChangesSelectedDeviceCommandExecute(object p)
+        {
+            SelectedDeviceInDevicePanel.Type = SelectedDeviceTypeInDevicePanel;
+            DbDeviceStore.Update(SelectedDeviceInDevicePanel);
+            //DeviceTypes.Clear();
+            DeviceTypes = new ObservableCollection<DeviceType>(DbDeviceTypeStore.GetAll());
+            Devices.Clear();
+        }
+
+        private bool CanSaveChangesSelectedDeviceCommandExecuted(object p) => true;
+
+        #endregion
+
+        #region RemoveSelectedDeviceCommand
+
+        private LambdaCommand _removeSelectedDeviceCommand;
+
+        public LambdaCommand RemoveSelectedDeviceCommand => _removeSelectedDeviceCommand
+            ??= new LambdaCommand(OnRemoveSelectedDeviceCommandExecuted, CanRemoveSelectedDeviceCommandExecute);
+
+        private void OnRemoveSelectedDeviceCommandExecuted(object p)
+        {
+            DbDeviceStore.Delete(SelectedDeviceInDevicePanel.Id);
+            Devices.Remove(SelectedDeviceInDevicePanel);
+        }
+
+        private bool CanRemoveSelectedDeviceCommandExecute(object p) => SelectedDeviceInDevicePanel != null;
 
         #endregion
     }
