@@ -165,7 +165,13 @@
                                             </Grid.ColumnDefinitions>
                                             <DockPanel Grid.Row="0" Grid.Column="0">
                                                 <Label DockPanel.Dock="Top" Content="Тип" HorizontalAlignment="Center"/>
-                                                <ComboBox ItemsSource="{Binding DeviceTypeNameList}" SelectedItem="{Binding SelectedDeviceTypeName}"/>
+                                                <ComboBox ItemsSource="{Binding DeviceTypes}" SelectedItem="{Binding SelectedDeviceType}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Name}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
                                             </DockPanel>
                                             <DockPanel Grid.Row="0" Grid.Column="1">
                                                 <Label DockPanel.Dock="Top" Content="Наименование" HorizontalAlignment="Center"/>

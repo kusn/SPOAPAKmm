@@ -75,7 +75,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _selectedPointName;
         private string? _selectedPointDescription;
         private SortableObservableCollection<MeasureItem> _selectedPointMeasurings;
-        private string _selectedDeviceTypeName;
+        private DeviceType _selectedDeviceType;
         private string _selectedDeviceName;
         private string _originalselectedOrganizationName;
         private string? _originalselectedOrganizationDescription;
@@ -272,18 +272,19 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeValue(_originalselectedPointDescription, value);
             }
         }
-        public string SelectedDeviceTypeName
+        public DeviceType SelectedDeviceType
         {
-            get => _selectedDeviceTypeName;
+            get => _selectedDeviceType;
             set
             {
-                Set(ref _selectedDeviceTypeName, value);
+                Set(ref _selectedDeviceType, value);
 
                 DeviceNameList.Clear();
-                foreach (var device in Devices.Where(d => d.Type.Name == value))
-                {
-                    DeviceNameList.Add(device.Name + " №" + device.Number);
-                }                
+                if (value != null)
+                    foreach (var device in Devices.Where(d => d.Type.Name == value.Name))
+                    {
+                        DeviceNameList.Add(device.Name + " №" + device.Number);
+                    }                
             }
         }
         public string SelectedDeviceName
@@ -979,6 +980,10 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             DevicesWindow devicesWindow = new DevicesWindow();
             devicesWindow.Show();
+            DeviceTypes.Clear();
+            Devices.Clear();
+            DeviceTypes = new ObservableCollection<DeviceType>(DbDeviceTypeStore.GetAll());
+            Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
         }
         private bool CanOpenDevicesWindowCommandExecute(object p) => true;
 
