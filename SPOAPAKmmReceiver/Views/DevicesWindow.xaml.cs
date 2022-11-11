@@ -19,9 +19,16 @@ namespace SPOAPAKmmReceiver.Views
     /// </summary>
     public partial class DevicesWindow : Window
     {
+        bool? _result;
+
         public DevicesWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.DialogResult = true;            
         }
     }
 }

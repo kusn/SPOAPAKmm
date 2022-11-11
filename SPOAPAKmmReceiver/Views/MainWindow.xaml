@@ -165,12 +165,12 @@
                                             </Grid.ColumnDefinitions>
                                             <DockPanel Grid.Row="0" Grid.Column="0">
                                                 <Label DockPanel.Dock="Top" Content="Тип" HorizontalAlignment="Center"/>
-                                                <ComboBox ItemsSource="{Binding DeviceTypes}" SelectedItem="{Binding SelectedDeviceType}">
-                                                    <ComboBox.ItemTemplate>
+                                                <ComboBox ItemsSource="{Binding DeviceTypeNameList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceType}">
+                                                    <!--<ComboBox.ItemTemplate>
                                                         <DataTemplate>
-                                                            <TextBlock Text="{Binding Name}"/>
+                                                            <TextBlock Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"/>
                                                         </DataTemplate>
-                                                    </ComboBox.ItemTemplate>
+                                                    </ComboBox.ItemTemplate>-->
                                                 </ComboBox>
                                             </DockPanel>
                                             <DockPanel Grid.Row="0" Grid.Column="1">

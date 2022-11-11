@@ -75,7 +75,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private string _selectedPointName;
         private string? _selectedPointDescription;
         private SortableObservableCollection<MeasureItem> _selectedPointMeasurings;
-        private DeviceType _selectedDeviceType;
+        private string _selectedDeviceType;
         private string _selectedDeviceName;
         private string _originalselectedOrganizationName;
         private string? _originalselectedOrganizationDescription;
@@ -272,7 +272,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 IsChanged = IsChangeValue(_originalselectedPointDescription, value);
             }
         }
-        public DeviceType SelectedDeviceType
+        public string SelectedDeviceType
         {
             get => _selectedDeviceType;
             set
@@ -281,7 +281,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                 DeviceNameList.Clear();
                 if (value != null)
-                    foreach (var device in Devices.Where(d => d.Type.Name == value.Name))
+                    foreach (var device in Devices.Where(d => d.Type.Name == value))
                     {
                         DeviceNameList.Add(device.Name + " №" + device.Number);
                     }                
@@ -979,11 +979,18 @@ namespace SPOAPAKmmReceiver.ViewModels
         private void OnOpenDevicesWindowCommandExecuted(object p)
         {
             DevicesWindow devicesWindow = new DevicesWindow();
-            devicesWindow.Show();
-            DeviceTypes.Clear();
-            Devices.Clear();
-            DeviceTypes = new ObservableCollection<DeviceType>(DbDeviceTypeStore.GetAll());
-            Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
+            devicesWindow.ShowDialog();
+            var result = devicesWindow.DialogResult;
+            if (result == true)
+            {
+                DeviceTypeNameList.Clear();
+                DeviceTypes = new ObservableCollection<DeviceType>(DbDeviceTypeStore.GetAll());
+                Devices = new ObservableCollection<Device>(DbDeviceStore.GetAll());
+                foreach (var deviceType in DeviceTypes)
+                {
+                    DeviceTypeNameList.Add(deviceType.Name);
+                }
+            }
         }
         private bool CanOpenDevicesWindowCommandExecute(object p) => true;
 
