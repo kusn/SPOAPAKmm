@@ -1,0 +1,70 @@
+﻿<Window x:Class="SPOAPAKmmReceiver.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SPOAPAKmmReceiver.Views"
+        xmlns:extension="clr-namespace:SPOAPAKmmReceiver.Extensions"
+        mc:Ignorable="d"
+        DataContext="{Binding SettingsViewModel, Source={StaticResource Locator}}"
+        Title="Настройки" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Column="0" Grid.Row="0">
+            <GroupBox.Header >
+                <TextBlock Text="Приёмник" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel x:Name="stPanel1" Orientation="Vertical">
+                    <Label Content="IP Адрес"/>
+                    <TextBlock Text="{Binding ReceiverSettings.IpAddress}"/>
+                    <Label Content="Порт"/>
+                    <TextBox Text="{Binding ReceiverSettings.Port, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="Найти" Command="{Binding SearchReceiversCommand}"/>
+                    <ListBox ItemsSource="{Binding DevicesListReciever, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedItemDeviceListReceiver, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="{Binding DescriptionSelectedReceiver, UpdateSourceTrigger=PropertyChanged}" MaxWidth="200" TextWrapping="Wrap" FontWeight="Normal" LineStackingStrategy="BlockLineHeight"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="Адрес"/>
+                    <TextBox Text="{Binding ReceiverSettings.InstrAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="Тест" Command="{Binding TestSelectedReceiverCommand}"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="Адрес БД"/>
+                    <TextBox Text="{Binding ConnectionString}"/>
+                    <Button Content="Открыть" Command="{Binding OpenConnectionStringCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Column="1" Grid.Row="0">
+            <GroupBox.Header >
+                <TextBlock Text="Генератор" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical">
+                    <Label Content="IP адресс"/>
+                    <TextBox Text="{Binding GeneratorSettings.IpAddress, ValidatesOnExceptions=True, ValidatesOnDataErrors=True}"/>
+                    <Label Content="Порт"/>
+                    <TextBox Text="{Binding GeneratorSettings.Port, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="Найти" Command="{Binding SearchGeneratorsCommand}"/>
+                    <ListBox ItemsSource="{Binding DevicesListTransmitter.Keys}" SelectedItem="{Binding SelectedItemDeviceListTransmitter, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="{Binding DescriptionSelectedGenerator, UpdateSourceTrigger=PropertyChanged}" MaxWidth="200" TextWrapping="Wrap" FontWeight="Normal" LineStackingStrategy="BlockLineHeight"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="Адрес"/>
+                    <TextBox Text="{Binding GeneratorSettings.InstrAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="Тест" Command="{Binding TestSelectedGeneratorCommand}"/>
+                    <TextBlock Text="{Binding RecieveMessage, UpdateSourceTrigger=PropertyChanged}"/>                    
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сохранить" Command="{Binding SaveSettingsCommand}"/>
+    </Grid>
+</Window>

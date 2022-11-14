@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Program.cs~RF1fecba.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RsFsw" Version="5.0.0.80" />
+    <PackageReference Include="RsInstrument" Version="1.17.0" />
+    <PackageReference Include="RsSmw" Version="5.0.44.91" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RSSigGen\RSSigGen.csproj" />
+    <ProjectReference Include="..\SPOAPAKmmReceiver\SPOAPAKmmReceiver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="InstrumentDrivers\Internal\SessionSettings.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
