@@ -29,6 +29,7 @@ using RohdeSchwarz.RsFsw;
 using System.Windows.Documents;
 using System.Runtime;
 using SPOAPAKmmReceiver.Extensions.DTO;
+using TemplateEngine.Docx;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -1290,10 +1291,60 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         private void OnCreateReportCommandExecuted(object p)
         {
+            if (File.Exists("OutputDocument.docx"))
+                File.Delete("OutputDocument.docx");
 
+            if (SelectedValue is Organization)
+            {
+                var organization = (Organization)SelectedValue;
+                var result = MessageBox.Show($"Вывести отчёты по всем помещениям {organization.Name}?", "Внимание!",
+                    MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.No)
+                    return;
+                else
+                {
+                    
+                }
+            }
+
+            if (SelectedValue is Room)
+            {
+                var room = (Room)SelectedValue;
+                var outputFileName = $"Протокол эффективности экранирования помещения {room.Name}.docx";
+                if(File.Exists(outputFileName))
+                    File.Delete(outputFileName);
+                File.Copy("ProtocolTemplate.docx", outputFileName, true);
+
+                List<TableRowContent> devicesRows = new List<TableRowContent>();
+                foreach (var device in room.Devices)
+                {
+                    List<FieldContent> fields = new List<FieldContent>();
+                    fields.Add(new FieldContent("DeviceType", device.Type.Name));
+                    fields.Add(new FieldContent("DeviceNumber", device.Number));
+                    fields.Add(new FieldContent("MeasRange", device.Range.StartFreq + " - " + device.Range.EndFreq));
+                    fields.Add(new FieldContent("VerificationDate", device.VerificationDate.ToString()));
+                    fields.Add(new FieldContent("VerificationInformation", device.VerificationInformation));
+                    fields.Add(new FieldContent("VerificationOrganization", device.VerificationOrganization));
+                    devicesRows.Add(new TableRowContent(fields));
+                }
+
+                var valuesToFill = new Content(
+                    new FieldContent("Room", room.Name),
+                    new FieldContent("Organization", room.Organization.Name),
+                    new FieldContent("Address", room.Organization.Address),
+                    new FieldContent("FrequencyStart", room.MeasSettings.StartFrequency.ToString()),
+                    new FieldContent("FrequencyEnd", room.MeasSettings.EndFrequency.ToString()),
+                    new TableContent("DevicesTable", devicesRows)
+                    );
+                using (var outputDocument = new TemplateProcessor(outputFileName).SetRemoveContentControls(true))
+                {
+                    outputDocument.FillContent(valuesToFill);
+                    outputDocument.SaveChanges();
+                }
+            }
         }
 
-        private bool CanCreateReportCommandExecute(object p) => SelectedValue is not null;
+        private bool CanCreateReportCommandExecute(object p) => SelectedValue is not null && (SelectedValue is Organization || SelectedValue is Room);
 
         #endregion
 
