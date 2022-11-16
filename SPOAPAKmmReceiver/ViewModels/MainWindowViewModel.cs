@@ -16,20 +16,17 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
-using SPOAPAKmmReceiver.Infrastructure.Commands.Base;
 using SPOAPAKmmReceiver.Models;
 using System.Text.Json;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 using SPOAPAKmmReceiver.Views;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using System.Configuration;
 using System.Diagnostics;
 using RohdeSchwarz.RsFsw;
-using System.Windows.Documents;
-using System.Runtime;
 using SPOAPAKmmReceiver.Extensions.DTO;
 using TemplateEngine.Docx;
+//using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -1319,12 +1316,14 @@ namespace SPOAPAKmmReceiver.ViewModels
                 foreach (var device in room.Devices)
                 {
                     List<FieldContent> fields = new List<FieldContent>();
-                    fields.Add(new FieldContent("DeviceType", device.Type.Name));
+                    
+                    fields.Add(new FieldContent("DeviceTypeAndName", device.Type.Name + " " + device.Name));
                     fields.Add(new FieldContent("DeviceNumber", device.Number));
                     fields.Add(new FieldContent("MeasRange", device.Range.StartFreq + " - " + device.Range.EndFreq));
                     fields.Add(new FieldContent("VerificationDate", device.VerificationDate.ToString()));
                     fields.Add(new FieldContent("VerificationInformation", device.VerificationInformation));
                     fields.Add(new FieldContent("VerificationOrganization", device.VerificationOrganization));
+                                        
                     devicesRows.Add(new TableRowContent(fields));
                 }
 
