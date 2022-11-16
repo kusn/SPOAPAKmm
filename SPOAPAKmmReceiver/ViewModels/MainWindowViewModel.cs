@@ -1313,6 +1313,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                 File.Copy("ProtocolTemplate.docx", outputFileName, true);
 
                 List<TableRowContent> devicesRows = new List<TableRowContent>();
+                List<TableRowContent> elementsRows = new List<TableRowContent>();
+
                 foreach (var device in room.Devices)
                 {
                     List<FieldContent> fields = new List<FieldContent>();
@@ -1327,14 +1329,28 @@ namespace SPOAPAKmmReceiver.ViewModels
                     devicesRows.Add(new TableRowContent(fields));
                 }
 
+                int i = 1;
+                foreach (var element in room.Elements)
+                {
+                    List<FieldContent> fields = new List<FieldContent>();
+
+                    fields.Add(new FieldContent("ElementNumber", i.ToString()));
+                    fields.Add(new FieldContent("ElementName", element.Name));
+                    fields.Add(new FieldContent("PointsNumber", element.Points.Count.ToString()));
+
+                    elementsRows.Add(new TableRowContent(fields)); 
+                    i++;
+                }
+
                 var valuesToFill = new Content(
                     new FieldContent("Room", room.Name),
                     new FieldContent("Organization", room.Organization.Name),
                     new FieldContent("Address", room.Organization.Address),
                     new FieldContent("FrequencyStart", room.MeasSettings.StartFrequency.ToString()),
                     new FieldContent("FrequencyEnd", room.MeasSettings.EndFrequency.ToString()),
-                    new TableContent("DevicesTable", devicesRows)
-                    );
+                    new TableContent("DevicesTable", devicesRows),
+                    new TableContent("ElementsTable", elementsRows)
+                    ) ;
                 using (var outputDocument = new TemplateProcessor(outputFileName).SetRemoveContentControls(true))
                 {
                     outputDocument.FillContent(valuesToFill);
