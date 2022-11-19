@@ -1345,10 +1345,57 @@ namespace SPOAPAKmmReceiver.ViewModels
                 }
 
                 //Запоняем поля таблицы результатов измерения для определённой частоты
-                var eachFreqResultTablesList = new List<ListContent>();
-                foreach (var freq in room.MeasSettings.FrequencyList)
+                var eachFreqResultTablesList = new List<ListItemContent>();
+                i = 3;
+                foreach (var mItem in room.Elements.ToList()[0].Points.ToList()[0].MeasureItems)
                 {
-                    
+                    ListItemContent eFTableNumber = new ListItemContent("EFTableNumber", i.ToString());
+                    List<TableRowContent> elementsList = new List<TableRowContent>();
+
+                    int n = 1;
+                    foreach (var element in room.Elements)
+                    {
+                        List<FieldContent> fields = new List<FieldContent>();
+                        fields.Add(new FieldContent("EFElementNumber", n.ToString()));
+                        foreach (var point in element.Points)
+                        {
+                            foreach (var measureItem in point.MeasureItems)
+                            {
+                                
+                            }
+                        }
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
+                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
+                        fields.Add(new FieldContent("AverageE", n.ToString()));
+                        fields.Add(new FieldContent("DX", n.ToString()));
+                        fields.Add(new FieldContent("E", n.ToString()));
+
+                        n++;
+                    }
+
+                    TableContent eachFreqResultTable = new TableContent("EachFreqResultTable", elementsList);
+                    eachFreqResultTable.AddRow(new FieldContent("EFFrequency", mItem.Freq.ToString()));
+                    eFTableNumber.AddTable(eachFreqResultTable);
+                    eachFreqResultTablesList.Add(eFTableNumber);
+                    i++;
                 }
 
                 //Заполняем шаблон содержимым
