@@ -1315,6 +1315,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 List<TableRowContent> devicesRows = new List<TableRowContent>();
                 List<TableRowContent> elementsRows = new List<TableRowContent>();
 
+                //Заполняем поля таблицы оборудования
                 foreach (var device in room.Devices)
                 {
                     List<FieldContent> fields = new List<FieldContent>();
@@ -1329,6 +1330,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     devicesRows.Add(new TableRowContent(fields));
                 }
 
+                //Заполняем поля таблицы элементов
                 int i = 1;
                 foreach (var element in room.Elements)
                 {
@@ -1342,6 +1344,14 @@ namespace SPOAPAKmmReceiver.ViewModels
                     i++;
                 }
 
+                //Запоняем поля таблицы результатов измерения для определённой частоты
+                var eachFreqResultTablesList = new List<ListContent>();
+                foreach (var freq in room.MeasSettings.FrequencyList)
+                {
+                    
+                }
+
+                //Заполняем шаблон содержимым
                 var valuesToFill = new Content(
                     new FieldContent("Room", room.Name),
                     new FieldContent("Organization", room.Organization.Name),
@@ -1350,7 +1360,10 @@ namespace SPOAPAKmmReceiver.ViewModels
                     new FieldContent("FrequencyEnd", room.MeasSettings.EndFrequency.ToString()),
                     new TableContent("DevicesTable", devicesRows),
                     new TableContent("ElementsTable", elementsRows)
-                    ) ;
+                    );
+
+                //valuesToFill.Lists.Add()
+
                 using (var outputDocument = new TemplateProcessor(outputFileName).SetRemoveContentControls(true))
                 {
                     outputDocument.FillContent(valuesToFill);
