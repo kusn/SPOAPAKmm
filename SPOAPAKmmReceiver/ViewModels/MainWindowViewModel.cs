@@ -1357,41 +1357,30 @@ namespace SPOAPAKmmReceiver.ViewModels
                     {
                         List<FieldContent> fields = new List<FieldContent>();
                         fields.Add(new FieldContent("EFElementNumber", n.ToString()));
+                        List<MeasureItem> measureItems = new List<MeasureItem>();
                         foreach (var point in element.Points)
                         {
-                            foreach (var measureItem in point.MeasureItems)
-                            {
-                                
-                            }
+                            var measureItem = point.MeasureItems.FirstOrDefault(i => i.Freq == mItem.Freq);
+                            measureItems.Add(measureItem);
                         }
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP1_1", n.ToString()));
-                        fields.Add(new FieldContent("EFP2_1", n.ToString()));
-                        fields.Add(new FieldContent("AverageE", n.ToString()));
-                        fields.Add(new FieldContent("DX", n.ToString()));
-                        fields.Add(new FieldContent("E", n.ToString()));
+                        var minMeasItem = measureItems.FirstOrDefault(m => m.AverageE == measureItems.Min(i => i.AverageE));
+
+                        for (int j = 1; j <= minMeasItem.Levels.Count; j++)
+                        {
+                            fields.Add(new FieldContent("EFP1_" + j.ToString(), minMeasItem.Levels.ToList()[0].P1.ToString()));
+                            fields.Add(new FieldContent("EFP2_" + j.ToString(), minMeasItem.Levels.ToList()[0].P2.ToString()));
+                        }
+                        fields.Add(new FieldContent("AverageE", minMeasItem.AverageE.ToString()));
+                        fields.Add(new FieldContent("DX", minMeasItem.DX.ToString()));
+                        fields.Add(new FieldContent("E", minMeasItem.E.ToString()));
 
                         n++;
+
+                        elementsList.Add(new TableRowContent(fields));
                     }
 
                     TableContent eachFreqResultTable = new TableContent("EachFreqResultTable", elementsList);
+                    eachFreqResultTable.Rows = elementsList;
                     eachFreqResultTable.AddRow(new FieldContent("EFFrequency", mItem.Freq.ToString()));
                     eFTableNumber.AddTable(eachFreqResultTable);
                     eachFreqResultTablesList.Add(eFTableNumber);
@@ -1406,7 +1395,8 @@ namespace SPOAPAKmmReceiver.ViewModels
                     new FieldContent("FrequencyStart", room.MeasSettings.StartFrequency.ToString()),
                     new FieldContent("FrequencyEnd", room.MeasSettings.EndFrequency.ToString()),
                     new TableContent("DevicesTable", devicesRows),
-                    new TableContent("ElementsTable", elementsRows)
+                    new TableContent("ElementsTable", elementsRows),
+                    new ListContent("EachFreqResultTablesList", eachFreqResultTablesList)
                     );
 
                 //valuesToFill.Lists.Add()
