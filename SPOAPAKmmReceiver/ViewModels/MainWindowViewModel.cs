@@ -539,7 +539,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             bool isChange = false;
 
-            if (oldValue != null && !oldValue.Equals(newValue))
+            if (oldValue != null && oldValue.Equals(newValue))
                 isChange = true;
             else if (oldValue != newValue)
                 isChange = true;
@@ -624,10 +624,26 @@ namespace SPOAPAKmmReceiver.ViewModels
                 var point = ((MeasPoint)SelectedValue).Element.Points.FirstOrDefault(p => p.Name == SelectedPointName);
                 if (point != null)
                 {
-                    result = MessageBox.Show("Точка с данным названием уже имеется!\nСохранить изменения?", "Внимание!", MessageBoxButton.YesNo);                    
-                }
+                    result = MessageBox.Show("Точка с данным названием уже имеется!\nСохранить изменения?", "Внимание!", MessageBoxButton.YesNo);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        MeasPoint measPoint = SelectedPoint;
+                        measPoint.Name = SelectedPointName;
+                        measPoint.Description = SelectedPointDescription;
+                        measPoint.MeasureItems = SelectedPointMeasurings;
+                        measPoint.Element.Room.MeasSettings = MSettings.MeasSettingsFromMeasureSettings();
+                        SelectedValue = measPoint;
 
-                if (result == MessageBoxResult.Yes)
+                        DbPointStore.Update(measPoint);
+                        _originalselectedPointName = SelectedPoint.Name;
+                        _originalselectedPointDescription = SelectedPoint.Description;
+                        _originalselectedPointMeasurings = SelectedPointMeasurings;
+                        IsChanged = false;
+                    }
+                    else
+                        return;
+                }
+                else
                 {
                     MeasPoint measPoint = SelectedPoint;
                     measPoint.Name = SelectedPointName;
@@ -642,8 +658,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                     _originalselectedPointMeasurings = SelectedPointMeasurings;
                     IsChanged = false;
                 }
-                else
-                    return;
             }
         }
         private bool CanSaveChangesCommandExecute(object p) => IsChanged;
@@ -686,6 +700,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is Element)
             {
                 var point = new MeasPoint();
+                if ((SelectedValue as Element).Points is null)
+                    (SelectedValue as Element).Points = new ObservableCollection<MeasPoint>();
                 var collection = new ObservableCollection<MeasPoint>((SelectedValue as Element).Points);
                 point.Name = GetNewName(collection);
                 point.Element = (Element)SelectedValue;
@@ -697,6 +713,8 @@ namespace SPOAPAKmmReceiver.ViewModels
             else if (SelectedValue is MeasPoint)
             {
                 var measure = new MeasureItem();
+                if ((SelectedValue as MeasPoint).MeasureItems is null)
+                    (SelectedValue as MeasPoint).MeasureItems = new ObservableCollection<MeasureItem>();
                 measure.MeasPoint = (MeasPoint)SelectedValue;
                 ((MeasPoint)SelectedValue).MeasureItems.Add(measure);
                 SelectedValue = measure;
@@ -1345,25 +1363,40 @@ namespace SPOAPAKmmReceiver.ViewModels
                 }
 
                 //Запоняем поля таблицы результатов измерения для определённой частоты
-                var eachFreqResultTablesList = new List<ListItemContent>();
+                var listContent = new ListContent("EachFreqResultTablesList");      //Создаеём список таблиц
+
                 i = 3;
                 foreach (var mItem in room.Elements.ToList()[0].Points.ToList()[0].MeasureItems)
                 {
-                    ListItemContent eFTableNumber = new ListItemContent("EFTableNumber", i.ToString());
-                    List<TableRowContent> elementsList = new List<TableRowContent>();
+                    var listItemContent = new ListItemContent("EFTableNumber", i.ToString());       //Создаем единицу листа таблиц
+                    var tableContent = new TableContent("EachFreqResultTable");                         //Создаём таблицу
+                    //tableContent.AddRow(new FieldContent("EFFrequency", mItem.Freq.ToString()));
 
                     int n = 1;
                     foreach (var element in room.Elements)
                     {
-                        List<FieldContent> fields = new List<FieldContent>();
+                        List<IContentItem> fields = new List<IContentItem>();
                         fields.Add(new FieldContent("EFElementNumber", n.ToString()));
+
+                        //Находим измерения с определенной частотой
                         List<MeasureItem> measureItems = new List<MeasureItem>();
                         foreach (var point in element.Points)
                         {
-                            var measureItem = point.MeasureItems.FirstOrDefault(i => i.Freq == mItem.Freq);
+                            var measureItem = point.MeasureItems.FirstOrDefault(mi => mi.Freq == mItem.Freq);
                             measureItems.Add(measureItem);
                         }
-                        var minMeasItem = measureItems.FirstOrDefault(m => m.AverageE == measureItems.Min(i => i.AverageE));
+                        //Находим измерение из этого списка с минимальной Э
+                        double min = 0.0;
+                        MeasureItem minMeasItem  = new MeasureItem();
+                        foreach (var measureItem in measureItems)
+                        {
+                            if (measureItem != null && measureItem.AverageE <= min)
+                            {
+                                min = measureItem.AverageE;
+                                minMeasItem = measureItem;
+                            }
+                        }
+                        //var minMeasItem = measureItems.FirstOrDefault(m => m.AverageE == measureItems.Min(mi => mi.AverageE));
 
                         for (int j = 1; j <= minMeasItem.Levels.Count; j++)
                         {
@@ -1376,14 +1409,12 @@ namespace SPOAPAKmmReceiver.ViewModels
 
                         n++;
 
-                        elementsList.Add(new TableRowContent(fields));
+                        tableContent.AddRow(fields.ToArray());
                     }
 
-                    TableContent eachFreqResultTable = new TableContent("EachFreqResultTable", elementsList);
-                    eachFreqResultTable.Rows = elementsList;
-                    eachFreqResultTable.AddRow(new FieldContent("EFFrequency", mItem.Freq.ToString()));
-                    eFTableNumber.AddTable(eachFreqResultTable);
-                    eachFreqResultTablesList.Add(eFTableNumber);
+                    listItemContent.AddField("EFFrequency", mItem.Freq.ToString());
+                    listItemContent.AddTable(tableContent);
+                    listContent.AddItem(listItemContent);
                     i++;
                 }
 
@@ -1395,11 +1426,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                     new FieldContent("FrequencyStart", room.MeasSettings.StartFrequency.ToString()),
                     new FieldContent("FrequencyEnd", room.MeasSettings.EndFrequency.ToString()),
                     new TableContent("DevicesTable", devicesRows),
-                    new TableContent("ElementsTable", elementsRows),
-                    new ListContent("EachFreqResultTablesList", eachFreqResultTablesList)
+                    new TableContent("ElementsTable", elementsRows)
                     );
-
-                //valuesToFill.Lists.Add()
+                valuesToFill.Lists.Add(listContent); //Добавляем список таблиц результатов по каждой частоте
 
                 using (var outputDocument = new TemplateProcessor(outputFileName).SetRemoveContentControls(true))
                 {
