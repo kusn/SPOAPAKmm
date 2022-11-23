@@ -1,11 +1,11 @@
-﻿using System;
-using SPOAPAKmmReceiver.Entities;
+﻿using SPOAPAKmmReceiver.Entities;
+using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using SPOAPAKmmReceiver.Infrastructure.Commands;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -27,7 +27,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Set(ref _selectedDeviceType, value);
                 Devices.Clear();
-                if(value !=null)
+                if (value != null)
                     foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == value.Name))
                     {
                         Devices.Add(device);
@@ -134,7 +134,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     {
                         var type = new DeviceType();
                         type = DbDeviceTypeStore.GetAll().FirstOrDefault(t => t.Name == SelectedDeviceType.Name);
-                        type.Name = "Не определён";
+                        type.Name = "Неопределён";
                         DbDeviceTypeStore.Update(type);
                         SelectedDeviceType = type;
                     }
@@ -175,11 +175,11 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
             else
             {
-                var type = DeviceTypes.FirstOrDefault(t => t.Name == "Не определён");
+                var type = DeviceTypes.FirstOrDefault(t => t.Name == "Неопределён");
                 if (type == null)
                     type = new DeviceType()
                     {
-                        Name = "Не определён",
+                        Name = "Неопределён",
                     };
                 _newDevice.Type = type;
                 DbDeviceTypeStore.Add(type);
@@ -204,7 +204,6 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             SelectedDeviceInDevicePanel.Type = SelectedDeviceTypeInDevicePanel;
             DbDeviceStore.Update(SelectedDeviceInDevicePanel);
-            //DeviceTypes.Clear();
             DeviceTypes = new ObservableCollection<DeviceType>(DbDeviceTypeStore.GetAll());
             Devices.Clear();
         }

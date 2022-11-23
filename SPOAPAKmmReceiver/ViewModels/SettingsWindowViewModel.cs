@@ -1,25 +1,24 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using RohdeSchwarz.RsInstrument;
+using SPOAPAKmmReceiver.Extensions.DTO;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Models;
 using SPOAPAKmmReceiver.ViewModels.Base;
-using SPOAPAKmmReceiver.Extensions.DTO;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
-using System.Net.Sockets;
-using System.Net;
 using System.IO;
-using System.Windows.Input;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.Extensions.Options;
-using static SPOAPAKmmReceiver.Extensions.DTO.Mapper;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using Microsoft.Win32;
 using System.Windows;
+using System.Windows.Input;
+using static SPOAPAKmmReceiver.Extensions.DTO.Mapper;
+using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -102,9 +101,9 @@ namespace SPOAPAKmmReceiver.ViewModels
             }
         }
         public string SelectedItemDeviceListTransmitter
-        {             
+        {
             get => _selectedItemDeviceListTransmitter;
-            set 
+            set
             {
                 Set(ref _selectedItemDeviceListTransmitter, value);
                 DescriptionSelectedGenerator = DevicesListTransmitter[value];
@@ -133,7 +132,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             _configuration = configuration;
             _namedOptionsAccessor = namedOptionsAccessor;
-            
+
             GetAppSettings();
 
             Send = new LambdaCommand(OnSendExecuted, CanSendMessageExecute);
@@ -195,7 +194,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private void OnTestSelectedGeneratorCommandExecuted(object p)
         {
             CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-           
+
             StartListen();
             var message = new ReceiverMessage(WorkMode.Checking);
             message.InstrAddress = GeneratorSettings.InstrAddress;
@@ -213,10 +212,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             ??= new LambdaCommand(OnSearchGeneratorsCommandExecuted, CanSearchGeneratorsCommandExecute);
         private void OnSearchGeneratorsCommandExecuted(object p)
         {
-            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();           
+            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
             StartListen();
-            var message = new ReceiverMessage(WorkMode.Searching);            
+            var message = new ReceiverMessage(WorkMode.Searching);
             SendMessage = System.Text.Json.JsonSerializer.Serialize(message);
             SendToClient(SendMessage);
         }
@@ -283,7 +282,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         }
 
         private void OnSendExecuted(object p)
-        {            
+        {
             SendToClient(SendMessage);
         }
         private bool CanSendMessageExecute(object arg) => true;
@@ -303,7 +302,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
 
                     sr.Close();
-                    client.Close();                    
+                    client.Close();
                 }
                 _listner.Stop();
             }
@@ -350,7 +349,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                         //_cancelTokenSource.Dispose();
                     }
                     else if (message.Mode == WorkMode.Searching)
-                    { 
+                    {
                         this.DevicesListTransmitter = message.DevicesList;
                         _cancelTokenSource.Cancel();
                         //_cancelTokenSource.Dispose();
@@ -370,9 +369,9 @@ namespace SPOAPAKmmReceiver.ViewModels
                     Thread.Sleep(_timeOut);
                     _cancelTokenSource.Cancel();
                     //_cancelTokenSource.Dispose();
-                    
+
                 }, _cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
-            },_cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
+            }, _cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
             task.Start();
 
             /*Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);
@@ -395,7 +394,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private static JObject UpdateJson(string key, object value, JObject jsonSegment)
         {
             const char keySeparator = ':';
-            
+
             var keyParts = key.Split(keySeparator);
             var isKeyNested = keyParts.Length > 1;
             if (isKeyNested)
