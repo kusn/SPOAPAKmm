@@ -7,20 +7,25 @@
         xmlns:extensions="clr-namespace:SPOAPAKmmReceiver.Extensions"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
-        Title="MainWindow" Height="800" Width="1600">
-    
+        Icon="../Icon.ico"
+        Title="СПОАПАКмм-ПРИЁМНИК" Height="800" Width="1600">
+
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="301*"/>
+            <ColumnDefinition Width="1299*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="15*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Height="25">
+        <Menu Grid.Row="0" Height="25" Grid.ColumnSpan="2" Margin="0,11,0,10">
             <MenuItem Header="Настройки" Command="{Binding OpenSettingsWindowCommand}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             <MenuItem Header="Оборудование" Command="{Binding OpenDevicesWindowCommand}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-            <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+            <!--<MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>-->
         </Menu>
-        <Grid Grid.Row="1">
+        <Grid Grid.ColumnSpan="2" Margin="0,46,0,46" Grid.RowSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
                 <ColumnDefinition Width="4*"></ColumnDefinition>
@@ -231,12 +236,12 @@
                                     <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
                                     <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPointMeasurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Binding="{Binding Freq}" Header="Частота"/>                                            
+                                            <DataGridTextColumn Binding="{Binding Freq}" Header="Частота"/>
                                             <DataGridTextColumn Binding="{Binding P1, StringFormat={}{0:F2}}" Header="P1"/>
                                             <DataGridTextColumn Binding="{Binding P2, StringFormat={}{0:F2}}" Header="P2"/>
                                             <DataGridTextColumn Binding="{Binding AverageE, StringFormat={}{0:F2}}" Header="Среднее"/>
                                             <DataGridTextColumn Binding="{Binding DX, StringFormat={}{0:F2}}" Header="dX"/>
-                                            <DataGridTextColumn Binding="{Binding E}" Header="Э"/>                                            
+                                            <DataGridTextColumn Binding="{Binding E}" Header="Э"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </DockPanel>
@@ -311,7 +316,7 @@
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                
+
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="Установки генератора" FontWeight="ExtraBold">
@@ -416,7 +421,7 @@
                                         <TextBlock TextWrapping="Wrap" Text="Частоты из предпочтительного ряда" Width="202"/>
                                     </Label.Content>
                                 </Label>
-                                <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsPreferredRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>                                
+                                <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsPreferredRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label FontWeight="Normal">
@@ -424,7 +429,7 @@
                                         <TextBlock TextWrapping="Wrap" Text="Частоты из собственного ряда" Width="202"/>
                                     </Label.Content>
                                 </Label>
-                                <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsOwnRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>                                
+                                <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsOwnRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </StackPanel>
                             <Button Content="Авторасчет" Command="{Binding AutoCalculationFrequencyRowCommand}" Height="25"/>
                             <TextBox Text="{Binding ExtraItemToFrequencyList, UpdateSourceTrigger=PropertyChanged}" FontWeight="Normal" Margin="0,5,0,5"/>
@@ -434,12 +439,12 @@
                                 </ListBox>
                             </ScrollViewer>
                         </StackPanel>
-                    </GroupBox>                    
+                    </GroupBox>
                 </StackPanel>
-                
+
             </Grid>
         </Grid>
-        <StatusBar Grid.Row="2" >
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2" >
             <StatusBarItem Content="{Binding RecieveMessage}"></StatusBarItem>
         </StatusBar>
     </Grid>
