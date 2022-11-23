@@ -1,11 +1,11 @@
-﻿using System;
-using SPOAPAKmmReceiver.Entities;
+﻿using SPOAPAKmmReceiver.Entities;
+using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using SPOAPAKmmReceiver.Infrastructure.Commands;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -27,7 +27,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Set(ref _selectedDeviceType, value);
                 Devices.Clear();
-                if(value !=null)
+                if (value != null)
                     foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == value.Name))
                     {
                         Devices.Add(device);

@@ -1,32 +1,31 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using RohdeSchwarz.RsFsw;
 using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Entities;
+using SPOAPAKmmReceiver.Extensions;
+using SPOAPAKmmReceiver.Extensions.DTO;
+using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Interfaces;
+using SPOAPAKmmReceiver.Models;
 using SPOAPAKmmReceiver.ViewModels.Base;
+using SPOAPAKmmReceiver.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using SPOAPAKmmReceiver.Extensions;
-using SPOAPAKmmReceiver.Infrastructure.Commands;
-using SPOAPAKmmReceiver.Models;
-using System.Text.Json;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
-using SPOAPAKmmReceiver.Views;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
-using RohdeSchwarz.RsFsw;
-using SPOAPAKmmReceiver.Extensions.DTO;
 using TemplateEngine.Docx;
-//using DocumentFormat.OpenXml.Spreadsheet;
+using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -132,7 +131,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         public MeasPoint SelectedPoint
         {
             get => _selectedPoint;
-            set => Set(ref _selectedPoint, value);            
+            set => Set(ref _selectedPoint, value);
         }
         public Visibility IsVisibilityOrganization
         {
@@ -282,7 +281,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     foreach (var device in Devices.Where(d => d.Type.Name == value))
                     {
                         DeviceNameList.Add(device.Name + " №" + device.Number);
-                    }                
+                    }
             }
         }
         public string SelectedDeviceName
@@ -295,7 +294,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         public SortableObservableCollection<MeasureItem> SelectedPointMeasurings
         {
             get => _selectedPointMeasurings;
-            set 
+            set
             {
                 Set(ref _selectedPointMeasurings, value);
                 IsChanged = IsChangeValue(_originalselectedPointMeasurings, value);
@@ -927,13 +926,13 @@ namespace SPOAPAKmmReceiver.ViewModels
         }
         private bool CanAddItemToFrequencyListCommandExecute(object p)
         {
-            double f;            
+            double f;
             bool result = false;
 
             if (_extraItemToFrequencyList is not null)
             {
                 if (_extraItemToFrequencyList.Contains('.'))
-                    _extraItemToFrequencyList = _extraItemToFrequencyList.Replace('.', ',');                
+                    _extraItemToFrequencyList = _extraItemToFrequencyList.Replace('.', ',');
 
                 result = Double.TryParse(_extraItemToFrequencyList, out f);
                 if (result)
@@ -941,7 +940,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                         result = true;
                     else result = false;
             }
-            
+
             return result;
         }
 
@@ -967,7 +966,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 MessageBox.Show("Задайте список частот!");
             }
-            
+
         }
         private bool CanApplyMeasurementSettingsCommandExecute(object p) => true;
 
@@ -1015,7 +1014,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         #region RunCalibrationCommand - Команда калибровки
 
         private LambdaCommand _runCalibrationCommand;
-        public LambdaCommand RunCalibrationCommand => _runCalibrationCommand 
+        public LambdaCommand RunCalibrationCommand => _runCalibrationCommand
             ??= new LambdaCommand(OnRunCalibrationCommandExecuted, CanRunCalibrationCommandExecute);
         private void OnRunCalibrationCommandExecuted(object p)
         {
@@ -1024,7 +1023,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
             if (MSettings.FrequencyList.Count >= 5)
             {
-                if(SelectedPointMeasurings is null)
+                if (SelectedPointMeasurings is null)
                     SelectedPointMeasurings = new SortableObservableCollection<MeasureItem>();
 
                 if (SelectedPointMeasurings.Count == 0)
@@ -1041,12 +1040,12 @@ namespace SPOAPAKmmReceiver.ViewModels
                         _isOk = true;
                     else
                         _isOk = false;
-                }                
+                }
             }
             else
             {
                 MessageBox.Show("Задайте список частот!");
-            }            
+            }
 
             if (_isOk == true)
             {
@@ -1057,7 +1056,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 {
                     List<double> freqList;
                     List<(double, double)> measureList = new List<(double, double)>();
-                    
+
                     //if (SelectedPoint.MeasureItems is null)
                     //    SelectedPoint.MeasureItems = new List<MeasureItem>();
 
@@ -1081,23 +1080,23 @@ namespace SPOAPAKmmReceiver.ViewModels
                     Task<List<(double, double)>> task = new Task<List<(double, double)>>(() => Measuring(freqList));
                     task.Start();
                     measureList = task.Result;
-                    
+
                     foreach (var freq in freqList)
-                    {                                               
+                    {
                         var meas = measureList.FindAll(m => m.Item1 == freq / 1.0e+6);
                         List<Levels> levels = new List<Levels>();
-                        meas.ToList().ForEach(m => levels.Add(new Levels { P1 = m.Item2}));
+                        meas.ToList().ForEach(m => levels.Add(new Levels { P1 = m.Item2 }));
                         MeasureItem measureItem = new MeasureItem();
                         measureItem.Levels = new List<Levels>(levels);
-                        
-                        double level = 0.0;                        
-                        foreach(var m in meas)
-                        {                            
-                            level = level + m.Item2;                            
+
+                        double level = 0.0;
+                        foreach (var m in meas)
+                        {
+                            level = level + m.Item2;
                         }
                         measureItem.Freq = freq / 1.0e+6;
                         measureItem.P1 = level / 10.0;
-                        SelectedPointMeasurings.Add(measureItem);                        
+                        SelectedPointMeasurings.Add(measureItem);
                     }
                     _isCalibrated = true;
                     IsChanged = true;
@@ -1147,7 +1146,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 CancellationTokenSource cts = new CancellationTokenSource();
                 GetInstrumentsSettings();
-                
+
                 if (InitializeReciever())
                 {
                     StartListen();
@@ -1174,7 +1173,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private void OnRunMeasuringCommandExecuted(object p)
         {
             Console.WriteLine("---ИЗМЕРЕНЕИЕ---");
-            
+
             CancellationTokenSource cts = new CancellationTokenSource();
             GetInstrumentsSettings();
 
@@ -1314,7 +1313,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 string minE = "";
                 var room = (Room)SelectedValue;
                 var outputFileName = $"Протокол эффективности экранирования помещения {room.Name}.docx";
-                if(File.Exists(outputFileName))
+                if (File.Exists(outputFileName))
                     File.Delete(outputFileName);
                 File.Copy("ProtocolTemplate.docx", outputFileName, true);
 
@@ -1325,14 +1324,14 @@ namespace SPOAPAKmmReceiver.ViewModels
                 foreach (var device in room.Devices)
                 {
                     List<FieldContent> fields = new List<FieldContent>();
-                    
+
                     fields.Add(new FieldContent("DeviceTypeAndName", device.Type.Name + " " + device.Name));
                     fields.Add(new FieldContent("DeviceNumber", device.Number));
                     fields.Add(new FieldContent("MeasRange", device.Range.StartFreq + " - " + device.Range.EndFreq));
                     fields.Add(new FieldContent("VerificationDate", device.VerificationDate.ToString()));
                     fields.Add(new FieldContent("VerificationInformation", device.VerificationInformation));
                     fields.Add(new FieldContent("VerificationOrganization", device.VerificationOrganization));
-                                        
+
                     devicesRows.Add(new TableRowContent(fields));
                 }
 
@@ -1346,7 +1345,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     fields.Add(new FieldContent("ElementName", element.Name));
                     fields.Add(new FieldContent("PointsNumber", element.Points.Count.ToString()));
 
-                    elementsRows.Add(new TableRowContent(fields)); 
+                    elementsRows.Add(new TableRowContent(fields));
                     i++;
                 }
 
@@ -1377,7 +1376,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 {
                     var listItemContent = new ListItemContent("EFTableNumber", i.ToString());       //Создаем единицу листа таблиц
                     var tableContent = new TableContent("EachFreqResultTable");                         //Создаём таблицу
-                    
+
                     int n = 1;
                     foreach (var element in room.Elements)
                     {
@@ -1465,11 +1464,11 @@ namespace SPOAPAKmmReceiver.ViewModels
                     var tableRowContent = new TableRowContent();
                     tableRowContent.Fields.Add(new FieldContent("ElementNumberResultTable", k.ToString()));
                     tableRowContent.Fields.Add(new FieldContent("EMinElResultTable", minMeasureItemsList.FirstOrDefault(mi => mi.MeasPoint.Element == element).E));
-                    
+
                     var listContentItemFreq = new ListContent("FrequencyListResulTable");
                     listContentItemFreq.Items = new List<ListItemContent>(listFreqItemContent);
                     tableRowContent.Lists.Add(listContentItemFreq);
-                    
+
                     var listContentItemE = new ListContent("EListResultTable");
                     listContentItemE.Items = new List<ListItemContent>(listEItemContent);
                     tableRowContent.Lists.Add(listContentItemE);
@@ -1503,7 +1502,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     outputDocument.SaveChanges();
                 }
 
-                System.Diagnostics.Process.Start("explorer",outputFileName);
+                System.Diagnostics.Process.Start("explorer", outputFileName);
             }
         }
 
@@ -1565,7 +1564,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private void OnSendExecuted(object p)
         {
             //SendMessage = JsonSerializer.Serialize(MSettings);
-            SendToClient(SendMessage); 
+            SendToClient(SendMessage);
         }
         private bool CanSendMessageExecute(object arg) => true;
 
@@ -1635,10 +1634,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 this.RecieveMessage = Data;
                 var m = JsonSerializer.Deserialize<TransmitterMessage>(Data);
-                if(m.Mode == WorkMode.Сalibration)
+                if (m.Mode == WorkMode.Сalibration)
                 {
-                    
-                    
+
+
                 }
             }
             ));
@@ -1650,7 +1649,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             Task task = new Task(() =>
             {
                 GetAccessToClientProgram(_cancellationToken);
-                
+
             }, _cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
             task.Start();
 
@@ -1703,7 +1702,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 return true;
             }
             catch (Exception ex)
-            {                
+            {
                 MessageBox.Show(ex.Message);
                 Console.WriteLine("Ошибка: " + ex.Message);
                 return false;
@@ -1757,7 +1756,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         private List<(double, double)> Measuring(List<double> frequencyList)
         {
-            int d = 10;            
+            int d = 10;
             double y = 0.0;
             int genTiming = 2000;
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -1770,7 +1769,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 _specAn.Sense.Frequency.Center.Set(freq);
                 Console.WriteLine("Частота: " + freq + "МГц");
                 _specAn.Calculate.Marker.Trace.Set(1, WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
-                _specAn.Calculate.Marker.X.Set(freq);                
+                _specAn.Calculate.Marker.X.Set(freq);
                 y = 0.0;
                 timing = timing - 20;           //Учёт времени инициализации
                 Thread.Sleep(genTiming);   //Учёт времени перестройки генератора
@@ -1779,7 +1778,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 {
                     y = _specAn.Calculate.Marker.Y.Get(WindowRepCap.Nr1, RohdeSchwarz.RsFsw.MarkerRepCap.Nr1);
                     Console.WriteLine("Измеренное значение: " + y + "дБм");
-                    list.Add(new (freq / 1.0e+6, y));
+                    list.Add(new(freq / 1.0e+6, y));
                 }
                 Thread.Sleep(timing - genTiming - d * 5);      //(d*5) - Учёт времени на иттерацию измерения
             }
@@ -1788,6 +1787,6 @@ namespace SPOAPAKmmReceiver.ViewModels
             Console.WriteLine("Время измерения: " + stopwatch.ElapsedMilliseconds + "мс");
 
             return list;
-        }        
+        }
     }
 }
