@@ -3,11 +3,11 @@ using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Entities
 {
-    public class Element : Base.Entity
+    public class Element : Entity
     {
-        private string _name = null!;
         private string? _description;
         private ICollection<MeasPoint> _measPoints;
+        private string _name = null!;
         private Room _room = null!;
 
         public string Name

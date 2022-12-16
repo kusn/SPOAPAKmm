@@ -3,123 +3,142 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SPOAPAKmmReceiver.Views"
         mc:Ignorable="d"
         DataContext="{Binding DevicesViewModel, Source={StaticResource Locator}}"
-        Title="Оборудование" Height="450" Width="800" Closing="Window_Closing" >
+        Title="Оборудование" Height="450" Width="800" Closing="Window_Closing">
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="14*"/>
+            <RowDefinition />
+            <RowDefinition Height="14*" />
         </Grid.RowDefinitions>
-        <Label Grid.Column="0" Grid.Row="0" Content="Тип" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+        <Label Grid.Column="0" Grid.Row="0" Content="Тип" HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center" FontWeight="Bold" />
         <Grid Grid.Column="0" Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="15*"/>
-                <RowDefinition/>
+                <RowDefinition Height="15*" />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <ListBox ItemsSource="{Binding DeviceTypes}" SelectedItem="{Binding Path=SelectedDeviceType}" Margin="5">
+                <ListBox ItemsSource="{Binding DeviceTypes}" SelectedItem="{Binding Path=SelectedDeviceType}"
+                         Margin="5">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Path=Name}"/>
+                            <TextBlock Text="{Binding Path=Name}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Button Content="Удалить" Command="{Binding RemoveDeviceTypeCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Padding="5,1,5,1"/>
+                <Button Content="Удалить" Command="{Binding RemoveDeviceTypeCommand}" HorizontalAlignment="Center"
+                        VerticalAlignment="Center" Margin="5" Padding="5,1,5,1" />
             </StackPanel>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <TextBox Text="{Binding NewNameDeviceType}" MinWidth="100" Margin="5,0,0,0"/>
-                <Button Content="Добавить" Command="{Binding AddNewDeviceTypeCommand}" Padding="5,1,5,1" Margin="5,0,0,0"/>
+                <TextBox Text="{Binding NewNameDeviceType}" MinWidth="100" Margin="5,0,0,0" />
+                <Button Content="Добавить" Command="{Binding AddNewDeviceTypeCommand}" Padding="5,1,5,1"
+                        Margin="5,0,0,0" />
             </StackPanel>
         </Grid>
 
-        <Label Grid.Column="1" Grid.Row="0" Content="Наименование" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+        <Label Grid.Column="1" Grid.Row="0" Content="Наименование" HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center" FontWeight="Bold" />
         <Grid Grid.Column="1" Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="15*"/>
-                <RowDefinition/>
+                <RowDefinition Height="15*" />
+                <RowDefinition />
             </Grid.RowDefinitions>
-            <ListBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDeviceInDevicePanel}" Margin="5">
+            <ListBox Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Devices}"
+                     SelectedItem="{Binding SelectedDeviceInDevicePanel}" Margin="5">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Path=Name}"/>
+                        <TextBlock Text="{Binding Path=Name}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
-                <TextBox Text="{Binding NewDeviceName}" MinWidth="100" Margin="5,0,0,0"/>
-                <Button Content="Добавить" Command="{Binding AddNewDeviceCommand}" Padding="5,1,5,1" Margin="5,0,0,0"/>
+                <TextBox Text="{Binding NewDeviceName}" MinWidth="100" Margin="5,0,0,0" />
+                <Button Content="Добавить" Command="{Binding AddNewDeviceCommand}" Padding="5,1,5,1" Margin="5,0,0,0" />
             </StackPanel>
             <Grid DataContext="{Binding Path=SelectedDeviceInDevicePanel}" Grid.Column="1" Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition Height="1.3*"/>
-                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition Height="1.3*" />
+                    <RowDefinition Height="0.5*" />
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Column="0" Grid.Row="0">
-                    <Label Content="Название" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                    <TextBox Text="{Binding Path=Name}" Padding="0" Margin="5,0,5,0"/>
-                    <Label Content="Тип" Padding="0" VerticalContentAlignment="Center" HorizontalAlignment="Center"/>
-                    <ComboBox DataContext="{Binding DevicesViewModel, Source={StaticResource Locator}}" ItemsSource="{Binding DeviceTypes}" SelectedItem="{Binding SelectedDeviceTypeInDevicePanel}" Margin="5,0,5,5">
+                    <Label Content="Название" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                           Padding="0" />
+                    <TextBox Text="{Binding Path=Name}" Padding="0" Margin="5,0,5,0" />
+                    <Label Content="Тип" Padding="0" VerticalContentAlignment="Center" HorizontalAlignment="Center" />
+                    <ComboBox DataContext="{Binding DevicesViewModel, Source={StaticResource Locator}}"
+                              ItemsSource="{Binding DeviceTypes}"
+                              SelectedItem="{Binding SelectedDeviceTypeInDevicePanel}" Margin="5,0,5,5">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=Name}"/>
+                                <TextBlock Text="{Binding Path=Name}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Grid.Row="0">
-                    <Label Content="Номер" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                    <TextBox Text="{Binding Number}" Padding="0" Margin="5,0,5,0"/>
+                    <Label Content="Номер" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                           Padding="0" />
+                    <TextBox Text="{Binding Number}" Padding="0" Margin="5,0,5,0" />
                 </StackPanel>
                 <StackPanel Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
-                    <Label Content="Рабочий диапазон" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                    <DockPanel >
+                    <Label Content="Рабочий диапазон" HorizontalContentAlignment="Center"
+                           VerticalContentAlignment="Center" Padding="0" />
+                    <DockPanel>
                         <StackPanel Orientation="Vertical">
-                            <Label Content="Начальное значение, МГц" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="5,0,0,0"/>
-                            <TextBox Text="{Binding Range.StartFreq}" Padding="0" Margin="5,0,5,0"/>
+                            <Label Content="Начальное значение, МГц" HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center" Padding="0" Margin="5,0,0,0" />
+                            <TextBox Text="{Binding Range.StartFreq}" Padding="0" Margin="5,0,5,0" />
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
-                            <Label Content="Конечное значение, МГц" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                            <TextBox Text="{Binding Range.EndFreq}" Padding="0" Margin="5,0,5,0"/>
+                            <Label Content="Конечное значение, МГц" HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center" Padding="0" />
+                            <TextBox Text="{Binding Range.EndFreq}" Padding="0" Margin="5,0,5,0" />
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
                 <StackPanel Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2">
-                    <Label Content="Поверка/Калибровка" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="20" Padding="0"/>
+                    <Label Content="Поверка/Калибровка" HorizontalContentAlignment="Center"
+                           VerticalContentAlignment="Center" Height="20" Padding="0" />
                     <DockPanel>
                         <StackPanel Orientation="Vertical">
-                            <Label Content="Дата поверки" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Margin="5,0,0,0"/>
-                            <DatePickerTextBox Text="{Binding VerificationDate}" Padding="0" Margin="5,0,0,0"/>
+                            <Label Content="Дата поверки" HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center" Padding="0" Margin="5,0,0,0" />
+                            <DatePickerTextBox Text="{Binding VerificationDate}" Padding="0" Margin="5,0,0,0" />
                         </StackPanel>
                         <StackPanel Orientation="Vertical">
-                            <Label Content="№ Свидетельства" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"/>
-                            <TextBox Text="{Binding VerificationInformation}" Padding="0" Margin="5,0,5,0"/>
+                            <Label Content="№ Свидетельства" HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center" Padding="0" />
+                            <TextBox Text="{Binding VerificationInformation}" Padding="0" Margin="5,0,5,0" />
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
                 <DockPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
-                    <Label Content="Поверяющая организация" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
-                    <TextBox Text="{Binding VerificationOrganization}" Margin="5"/>
+                    <Label Content="Поверяющая организация" HorizontalContentAlignment="Center"
+                           VerticalContentAlignment="Center" Margin="5" />
+                    <TextBox Text="{Binding VerificationOrganization}" Margin="5" />
                 </DockPanel>
-                <Button Content="Сохранить" Command="{Binding SaveChangesSelectedDeviceCommand}" DataContext="{Binding DevicesViewModel, Source={StaticResource Locator}}" Grid.Column="0" Grid.Row="4" Margin="5,5,5,5"/>
+                <Button Content="Сохранить" Command="{Binding SaveChangesSelectedDeviceCommand}"
+                        DataContext="{Binding DevicesViewModel, Source={StaticResource Locator}}" Grid.Column="0"
+                        Grid.Row="4" Margin="5,5,5,5" />
             </Grid>
-            <Button Content="Удалить" Command="{Binding RemoveSelectedDeviceCommand}" Grid.Column="1" Grid.Row="2" Margin="5,0,5,0" HorizontalAlignment="Right" Padding="5,1,5,1"/>
+            <Button Content="Удалить" Command="{Binding RemoveSelectedDeviceCommand}" Grid.Column="1" Grid.Row="2"
+                    Margin="5,0,5,0" HorizontalAlignment="Right" Padding="5,1,5,1" />
         </Grid>
     </Grid>
 </Window>

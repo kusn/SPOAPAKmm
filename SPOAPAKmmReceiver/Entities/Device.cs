@@ -1,15 +1,17 @@
 ﻿using System;
+using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Entities
 {
-    public class Device : Base.Entity
+    public class Device : Entity
     {
         private string _name = null!;
-        private DeviceType _type;
         private string _number = "";
-        private MeasRange _range = new MeasRange(){StartFreq = 0.1, EndFreq = 0.1};
+        private MeasRange _range = new() { StartFreq = 0.1, EndFreq = 0.1 };
+        private DeviceType _type;
         private DateTime _verificationDate;
         private string _verificationInformation = "";
+
         private string _verificationOrganization = "";
         //private Room _room = null!;
 

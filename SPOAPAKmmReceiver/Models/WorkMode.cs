@@ -9,7 +9,7 @@
             Сalibration,
             Checking,
             Measuring,
-            Searching,
+            Searching
         }
     }
 }

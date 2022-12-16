@@ -1,25 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SPOAPAKmmReceiver.Entities.Base;
-using SPOAPAKmmReceiver.Extensions;
 
 namespace SPOAPAKmmReceiver.Entities
 {
     public class MeasSettings : Entity
     {
-        private ICollection<Frequency> _frequencyList;
-        private double _startFrequency;
-        private double _endFrequency;
-        private double _step;
-        private double _offset;
-        private double _power;
-        private int _timeOfEmission;
-        private double _span;
-        private double _rbw;
         private int _attenuation;
-        private bool _isPreferredRow;
+        private double _endFrequency;
+        private ICollection<Frequency> _frequencyList;
         private bool _isOwnRow;
         private bool _isPreamp;
+        private bool _isPreferredRow;
+        private double _offset;
+        private double _power;
+        private double _rbw;
+        private double _span;
+        private double _startFrequency;
+        private double _step;
+        private int _timeOfEmission;
 
         public ICollection<Frequency> FrequencyList
         {
@@ -98,6 +96,5 @@ namespace SPOAPAKmmReceiver.Entities
             get => _isPreamp;
             set => Set(ref _isPreamp, value);
         }
-
     }
 }

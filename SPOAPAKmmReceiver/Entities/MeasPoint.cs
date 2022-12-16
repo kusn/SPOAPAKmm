@@ -5,10 +5,10 @@ namespace SPOAPAKmmReceiver.Entities
 {
     public class MeasPoint : Entity
     {
-        private string _name = null!;
-        private string? _description;        
-        private ICollection<MeasureItem> _measureItems;
+        private string? _description;
         private Element _element = null!;
+        private ICollection<MeasureItem> _measureItems;
+        private string _name = null!;
 
         public string Name
         {

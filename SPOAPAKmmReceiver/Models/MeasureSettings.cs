@@ -1,33 +1,41 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Models.Base;
 
 namespace SPOAPAKmmReceiver.Models
 {
     [MeasureSettingsValidation]
-    [Serializable()]
+    [Serializable]
     public class MeasureSettings : Model, IDataErrorInfo
     {
-        private SortableObservableCollection<double> _frequencyList = new SortableObservableCollection<double>();
-        private double _startFrequency = 0.01;
-        private double _endFrequency = 0.01;
-        private double _step = 0.0;
-        private double _offset = 0.0;
-        private double _power = -30.0;
-        private int _timeOfEmission = 5;
-        private double _span = 10.0;
-        private double _rbw = 1.0;
         private int _attenuation = 40;
-        private bool _isPreferredRow = false;
+        private double _endFrequency = 0.01;
+
+        private double[] _freqGost =
+        {
+            0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.25, 1.6, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0,
+            8.0, 10.0, 12.5,
+            16.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0, 125.0, 160.0, 200.0, 300.0, 400.0, 500.0, 600.0,
+            800.0, 1000.0, 1250.0,
+            1600.0, 2000.0, 2500.0, 3000.0, 4000.0, 5000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0, 16000.0, 18000.0,
+            20000.0, 24000.0,
+            26000.0, 28000.0, 30000.0, 32000.0, 35000.0, 37500.0
+        };
+
+        private SortableObservableCollection<double> _frequencyList = new();
         private bool _isOwnRow = true;
-        private bool _isPreamp = false;
-        private double[] _freqGost = {0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.25, 1.6, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.5,
-            16.0, 20.0, 25.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0, 125.0, 160.0, 200.0, 300.0, 400.0, 500.0, 600.0, 800.0, 1000.0, 1250.0,
-            1600.0, 2000.0, 2500.0, 3000.0, 4000.0, 5000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0, 16000.0, 18000.0, 20000.0, 24000.0,
-            26000.0, 28000.0, 30000.0, 32000.0, 35000.0, 37500.0};
-                
+        private bool _isPreamp;
+        private bool _isPreferredRow;
+        private double _offset;
+        private double _power = -30.0;
+        private double _rbw = 1.0;
+        private double _span = 10.0;
+        private double _startFrequency = 0.01;
+        private double _step;
+        private int _timeOfEmission = 5;
+
         [MinLength(5, ErrorMessage = "Минимальное количество частот равно 5")]
         public SortableObservableCollection<double> FrequencyList
         {
@@ -43,7 +51,7 @@ namespace SPOAPAKmmReceiver.Models
             {
                 if (value > _endFrequency)
                     EndFrequency = value;
-                Set(ref _startFrequency, value);                
+                Set(ref _startFrequency, value);
             }
         }
 
@@ -51,11 +59,11 @@ namespace SPOAPAKmmReceiver.Models
         public double EndFrequency
         {
             get => _endFrequency;
-            set 
+            set
             {
                 if (value < _startFrequency)
                     value = _startFrequency;
-                Set(ref _endFrequency, value);                
+                Set(ref _endFrequency, value);
             }
         }
 
@@ -76,7 +84,7 @@ namespace SPOAPAKmmReceiver.Models
         public bool IsPreferredRow
         {
             get => _isPreferredRow;
-            set 
+            set
             {
                 Set(ref _isPreferredRow, value);
                 if (value)
@@ -106,7 +114,7 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _power, value);
         }
 
-        [Range(0, Int32.MaxValue)]
+        [Range(0, int.MaxValue)]
         public int TimeOfEmission
         {
             get => _timeOfEmission;
@@ -140,16 +148,15 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _isPreamp, value);
         }
 
-        [field: NonSerialized()]
-        public string Error => String.Empty;
+        [field: NonSerialized()] public string Error => string.Empty;
 
         [field: NonSerialized()]
         public string this[string columnName]
         {
             get
             {
-                string error = String.Empty;
-                switch(columnName)
+                var error = string.Empty;
+                switch (columnName)
                 {
                     case "StartFrequency":
                         if (StartFrequency < 0.0 || StartFrequency > 110000.0)
@@ -181,7 +188,7 @@ namespace SPOAPAKmmReceiver.Models
                         break;
 
                     case "TimeOfEmission":
-                        if (TimeOfEmission < 0.0 || TimeOfEmission > Int32.MaxValue)
+                        if (TimeOfEmission < 0.0 || TimeOfEmission > int.MaxValue)
                             error = "Велична времени излучения не может быть отрицательной";
                         break;
 
@@ -205,6 +212,49 @@ namespace SPOAPAKmmReceiver.Models
             }
         }
 
+        public void GetFrequencyList()
+        {
+            if (_isPreferredRow)
+            {
+                _frequencyList.Clear();
+
+                if (_startFrequency <= _freqGost[_freqGost.Length - 5])
+                    for (var i = 0; i < _freqGost.Length; i++)
+                        if (_freqGost[i] == _startFrequency)
+                            for (var j = i; j < _freqGost.Length && _freqGost[j] <= _endFrequency; j++)
+                                _frequencyList.Add(_freqGost[j] + _offset);
+                        else if (_freqGost[i] < _startFrequency && _freqGost[i + 1] > _startFrequency)
+                            for (var j = i; j < _freqGost.Length && _freqGost[j] <= _endFrequency; j++)
+                                _frequencyList.Add(_freqGost[j] + _offset);
+            }
+            else
+            {
+                if (_frequencyList is not null)
+                    _frequencyList.Clear();
+                else
+                    _frequencyList = new SortableObservableCollection<double>();
+
+                var f = _startFrequency;
+                if (_step != 0.0)
+                {
+                    while (f < _endFrequency)
+                    {
+                        _frequencyList.Add(f + Offset);
+                        f = f + _step;
+                    }
+                }
+                else
+                {
+                    var s = (_endFrequency - _startFrequency) / 4.0;
+                    for (var i = 0; i < 5; i++)
+                    {
+                        _frequencyList.Add(f + _offset);
+                        f = f + s;
+                    }
+                }
+            }
+        }
+
         public class MeasureSettingsValidationAttribute : ValidationAttribute
         {
             public override bool IsValid(object? value)
@@ -216,33 +266,36 @@ namespace SPOAPAKmmReceiver.Models
                         ErrorMessage = "Начальная частота не должна быть отрицательной или больше 110ГГц";
                         return false;
                     }
+
                     if (measureSettings.EndFrequency < 0.0 || measureSettings.EndFrequency > 110000.0)
                     {
                         ErrorMessage = "Конечная частота не должна быть отрицательной или больше 110ГГц";
                         return false;
                     }
+
                     if (measureSettings.EndFrequency < measureSettings.StartFrequency)
                     {
                         ErrorMessage = "Конечная частота не может быть начальной";
                         return false;
                     }
+
                     if (measureSettings.StartFrequency >= 37500)
                     {
                         measureSettings.IsPreferredRow = false;
                         measureSettings.IsOwnRow = true;
                     }
-                    else if (measureSettings.StartFrequency > measureSettings._freqGost[measureSettings._freqGost.Length - 5])
+                    else if (measureSettings.StartFrequency >
+                             measureSettings._freqGost[measureSettings._freqGost.Length - 5])
                     {
                         measureSettings.IsPreferredRow = false;
                         measureSettings.IsOwnRow = true;
                     }
-                    else if (measureSettings.StartFrequency <= measureSettings._freqGost[measureSettings._freqGost.Length - 5])
+                    else if (measureSettings.StartFrequency <=
+                             measureSettings._freqGost[measureSettings._freqGost.Length - 5])
                     {
-                        int i = 0;
-                        while (!(measureSettings._freqGost[i] <= measureSettings.StartFrequency && measureSettings._freqGost[i + 1] > measureSettings.StartFrequency))
-                        {
-                            i++;
-                        }
+                        var i = 0;
+                        while (!(measureSettings._freqGost[i] <= measureSettings.StartFrequency &&
+                                 measureSettings._freqGost[i + 1] > measureSettings.StartFrequency)) i++;
 
                         if (measureSettings._freqGost[i + 4] > measureSettings.EndFrequency)
                         {
@@ -255,63 +308,11 @@ namespace SPOAPAKmmReceiver.Models
                             measureSettings.IsOwnRow = false;
                         }
                     }
+
                     return true;
                 }
+
                 return false;
-            }
-        }
-        
-        public void GetFrequencyList()
-        {
-            if (_isPreferredRow)
-            {
-                _frequencyList.Clear();
-
-                if (_startFrequency <= _freqGost[_freqGost.Length - 5])
-                {
-                    for (int i = 0; i < _freqGost.Length; i++)
-                    {
-                        if (_freqGost[i] == _startFrequency)
-                        {
-                            for(int j = i; j < _freqGost.Length && _freqGost[j] <= _endFrequency; j++)
-                            {
-                                _frequencyList.Add(_freqGost[j] + _offset);
-                            }
-                        }
-                        else if (_freqGost[i] < _startFrequency && _freqGost[i + 1] > _startFrequency)
-                        {
-                            for (int j = i; j < _freqGost.Length && _freqGost[j] <= _endFrequency; j++)
-                            {
-                                _frequencyList.Add(_freqGost[j] + _offset);
-                            }
-                        }
-                    }
-
-                }
-            }
-            else
-            {
-                if (_frequencyList is not null)
-                    _frequencyList.Clear();
-                else
-                    _frequencyList = new SortableObservableCollection<double>();
-                
-                double f = _startFrequency;
-                if (_step != 0.0)
-                    while (f < _endFrequency)
-                    {
-                        _frequencyList.Add(f + Offset);
-                        f = f + _step;
-                    }
-                else
-                {
-                    var s = (_endFrequency - _startFrequency) / 4.0;
-                    for(int i = 0; i < 5; i++)
-                    {
-                        _frequencyList.Add(f + _offset);
-                        f = f + s;
-                    }
-                }
             }
         }
     }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SPOAPAKmmReceiver.Entities;
 
 namespace SPOAPAKmmReceiver.Data
@@ -17,14 +15,14 @@ namespace SPOAPAKmmReceiver.Data
                 Address = "г. Н.Н.",
                 Rooms = new List<Room>
                 {
-                    new Room()
+                    new()
                     {
                         Name = "317",
                         //Devices = GetDevices(),
-                        Elements = GetElements(),
+                        Elements = GetElements()
                     }
                 },
-                Description = "",
+                Description = ""
             },
             new()
             {
@@ -32,15 +30,15 @@ namespace SPOAPAKmmReceiver.Data
                 Address = "г. Москва",
                 Rooms = new List<Room>
                 {
-                    new Room()
+                    new()
                     {
                         Name = "215",
                         //Devices = GetDevices(),
-                        Elements = GetElements(),
+                        Elements = GetElements()
                     }
                 },
-                Description = "",
-            },
+                Description = ""
+            }
         };
 
         public static ICollection<Element> GetElements()
@@ -50,8 +48,8 @@ namespace SPOAPAKmmReceiver.Data
                 new()
                 {
                     Name = "Дверь",
-                    Points = GetMeasPoints(),
-                },
+                    Points = GetMeasPoints()
+                }
             };
 
             return elements;
@@ -62,10 +60,10 @@ namespace SPOAPAKmmReceiver.Data
             ICollection<MeasPoint> measPoints = new List<MeasPoint>
             {
                 new()
-                {                    
+                {
                     Name = "Верх",
-                    MeasureItems = GetMeasurings(),
-                },
+                    MeasureItems = GetMeasurings()
+                }
             };
 
             return measPoints;
@@ -73,20 +71,20 @@ namespace SPOAPAKmmReceiver.Data
 
         public static ICollection<MeasureItem> GetMeasurings()
         {
-            Random rnd = new Random();
+            var rnd = new Random();
             ICollection<MeasureItem> measurings = new List<MeasureItem>();
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 double freq = rnd.Next(1000, 5000);
                 double _P1 = rnd.Next(-60, -50);
                 double _P2 = rnd.Next(-130, -120);
-                string _E = "";
-                MeasureItem meas = new MeasureItem()
+                var _E = "";
+                var meas = new MeasureItem
                 {
                     Freq = freq,
                     P1 = _P1,
                     P2 = _P2,
-                    E = _E,
+                    E = _E
                 };
                 measurings.Add(meas);
             }
@@ -104,34 +102,33 @@ namespace SPOAPAKmmReceiver.Data
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Анализатор спектра"),
                     Name = "R&S FSV40",
                     Number = "11111111",
-                    Range = new MeasRange() { StartFreq = 0.00001, EndFreq = 40000},
-                    VerificationDate = new DateTime(2001,01,01),
-                    
+                    Range = new MeasRange { StartFreq = 0.00001, EndFreq = 40000 },
+                    VerificationDate = new DateTime(2001, 01, 01)
                 },
                 new()
                 {
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Генератор"),
                     Name = "R&S SMB100A",
                     Number = "22222222",
-                    Range = new MeasRange() { StartFreq = 0.1, EndFreq = 40000},
-                    VerificationDate = new DateTime(2001,01,01),
+                    Range = new MeasRange { StartFreq = 0.1, EndFreq = 40000 },
+                    VerificationDate = new DateTime(2001, 01, 01)
                 },
                 new()
                 {
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Антенна"),
                     Name = "П6-151",
                     Number = "33333333",
-                    Range = new MeasRange() { StartFreq = 800, EndFreq = 16000},
-                    VerificationDate = new DateTime(2001,01,01),
+                    Range = new MeasRange { StartFreq = 800, EndFreq = 16000 },
+                    VerificationDate = new DateTime(2001, 01, 01)
                 },
                 new()
                 {
                     Type = GeDeviceTypes().FirstOrDefault(t => t.Name == "Антенна"),
                     Name = "П6-151",
                     Number = "44444444",
-                    Range = new MeasRange() { StartFreq = 800, EndFreq = 16000},
-                    VerificationDate = new DateTime(2001,01,01),
-                },
+                    Range = new MeasRange { StartFreq = 800, EndFreq = 16000 },
+                    VerificationDate = new DateTime(2001, 01, 01)
+                }
             };
             return devices;
         }
@@ -139,9 +136,9 @@ namespace SPOAPAKmmReceiver.Data
         public static ICollection<DeviceType> GeDeviceTypes()
         {
             ICollection<DeviceType> deviceTypes = new List<DeviceType>();
-            deviceTypes.Add(new DeviceType() { Name = "Анализатор спектра" });
-            deviceTypes.Add(new DeviceType() { Name = "Генератор" });
-            deviceTypes.Add(new DeviceType() { Name = "Антенна" });
+            deviceTypes.Add(new DeviceType { Name = "Анализатор спектра" });
+            deviceTypes.Add(new DeviceType { Name = "Генератор" });
+            deviceTypes.Add(new DeviceType { Name = "Антенна" });
             return deviceTypes;
         }
     }
