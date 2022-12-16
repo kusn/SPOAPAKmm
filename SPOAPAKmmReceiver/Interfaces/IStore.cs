@@ -1,12 +1,12 @@
-﻿using SPOAPAKmmReceiver.Entities.Base;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Interfaces
 {
-    public interface IStore<T> where T : Entities.Base.Entity
+    public interface IStore<T> where T : Entity
     {
         IEnumerable<T> GetAll();
-        
+
         T GetById(int id);
 
         T Add(T item);

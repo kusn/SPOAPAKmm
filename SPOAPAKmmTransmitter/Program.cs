@@ -12,12 +12,14 @@ using System.Threading;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 using RSSigGen;
 using RSSigGen.RS;
+using System.Linq;
 
 namespace SPOAPAKmmTransmitter
 {
     internal class Program
     {
         static private string _ipAddress = "127.0.0.1";
+        static private string _ipAddressTransmitter = "127.0.0.1";
         static private int _listenerPort = 11000;
         static private int _sendPort = 11001;
         static private List<string> _devicesList = new List<string>();
@@ -28,7 +30,7 @@ namespace SPOAPAKmmTransmitter
         {
             while (true)
             {
-                TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_ipAddress), _listenerPort));
+                TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_ipAddressTransmitter), _listenerPort));
                 listner.Start();
 
                 TcpClient client = listner.AcceptTcpClient();
@@ -39,7 +41,8 @@ namespace SPOAPAKmmTransmitter
 
                 if (m != null)
                 {
-                    //_ipAddress = m.InstrAddress;
+                    _ipAddress = m.ReceiverIp;
+                    _sendPort = m.ReceiverPort;
                     Console.WriteLine("Получен запрос: " + s);
 
                     if (m.Mode == WorkMode.Searching)
@@ -240,6 +243,14 @@ namespace SPOAPAKmmTransmitter
 
         static void Main(string[] args)
         {
+            string host = Dns.GetHostName();
+            Console.WriteLine($"Имя компьютера: {host}");
+            _ipAddressTransmitter = Dns.GetHostAddresses(host).First<IPAddress>(f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+            if (_ipAddressTransmitter != null)
+            {
+                Console.WriteLine($"Адрес: {_ipAddressTransmitter}");
+            }
+
             Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);            
             AccessToClientProgram.Start();
         }
