@@ -47,34 +47,42 @@ namespace SPOAPAKmmTransmitter
 
                     if (m.Mode == WorkMode.Searching)
                     {
-                        Console.WriteLine("Режим поиска подключённых устройств.");
-                        _devicesList = new List<string>(RsInstrument.FindResources("?*"));
-                        Dictionary<string, string> data = new Dictionary<string, string>();
+                        try
+                        {
+                            Console.WriteLine("Режим поиска подключённых устройств.");
+                            _devicesList = new List<string>(RsInstrument.FindResources("?*"));
+                            Dictionary<string, string> data = new Dictionary<string, string>();
 
-                        foreach (string device in _devicesList)
-                        {                            
-                            string descr;
-                            try
+                            foreach (string device in _devicesList)
                             {
-                                RsInstrument instrument = new RsInstrument(device);
-                                descr = instrument.QueryString("*IDN?");
-                                Console.WriteLine("Найдено устройство - " + descr);
-                                instrument.Dispose();
+                                string descr;
+                                try
+                                {
+                                    RsInstrument instrument = new RsInstrument(device);
+                                    descr = instrument.QueryString("*IDN?");
+                                    Console.WriteLine("Найдено устройство - " + descr);
+                                    instrument.Dispose();
+                                }
+                                catch (Exception ex)
+                                {
+                                    descr = ex.Message;
+                                    Console.WriteLine("Ошибка: " + ex.Message);
+                                }
+
+                                data.Add(device, descr);
                             }
-                            catch (Exception ex)
-                            {
-                                descr = ex.Message;
-                                Console.WriteLine("Ошибка: " + ex.Message);
-                            }
-                            data.Add(device, descr);
+
+                            TransmitterMessage transmitterMessage = new TransmitterMessage();
+                            transmitterMessage.Mode = m.Mode;
+                            transmitterMessage.DevicesList = data;
+                            var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                            SendToClient(message);
+                            Console.WriteLine("Отправлено сообщение: " + message);
                         }
-                        TransmitterMessage transmitterMessage = new TransmitterMessage();
-                        transmitterMessage.Mode = m.Mode;
-                        transmitterMessage.DevicesList = data;
-                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
-                        SendToClient(message);
-                        Console.WriteLine("Отправлено сообщение: " + message);
-                        
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine(ex.Message);
+                        }
                     }
                     else if (m.Mode == WorkMode.ApplyInstrumentSettings)
                     {
