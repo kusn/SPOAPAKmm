@@ -12,15 +12,15 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="301*" />
-            <ColumnDefinition Width="1299*" />
+            <ColumnDefinition Width="300*" />
+            <ColumnDefinition Width="700*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" />
             <RowDefinition Height="15*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Height="25" Grid.ColumnSpan="2" Margin="0,11,0,10">
+        <Menu Grid.Row="0" Height="25" Grid.ColumnSpan="2">
             <MenuItem Header="Настройки" Command="{Binding OpenSettingsWindowCommand}"
                       HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
             <MenuItem Header="Оборудование" Command="{Binding OpenDevicesWindowCommand}"
