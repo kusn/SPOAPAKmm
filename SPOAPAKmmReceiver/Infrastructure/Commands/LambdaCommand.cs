@@ -5,8 +5,8 @@ namespace SPOAPAKmmReceiver.Infrastructure.Commands
 {
     public class LambdaCommand : Command
     {
-        private readonly Action<object> _Execute;
         private readonly Func<object, bool> _CanExecute;
+        private readonly Action<object> _Execute;
 
         public LambdaCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
@@ -20,6 +20,9 @@ namespace SPOAPAKmmReceiver.Infrastructure.Commands
                 _Execute(parameter);
         }
 
-        public override bool CanExecute(object parameter) => _CanExecute?.Invoke(parameter) ?? true;
+        public override bool CanExecute(object parameter)
+        {
+            return _CanExecute?.Invoke(parameter) ?? true;
+        }
     }
 }

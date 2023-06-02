@@ -1,27 +1,27 @@
-﻿using SPOAPAKmmReceiver.Models.Base;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Net;
+using SPOAPAKmmReceiver.Models.Base;
 
 namespace SPOAPAKmmReceiver.Models
 {
-    [Serializable()]
+    [Serializable]
     public class InstrumentSettings : Model, IDataErrorInfo
     {
+        [field: NonSerialized] public const string Generator = "Generator";
+
+        [field: NonSerialized] public const string Receiver = "Receiver";
+
+        private string _instrAddress;
         private string _ipAddress;
         private int _port;
-        private string _instrAddress;
-
-        [field: NonSerialized()]
-        public const string Generator = "Generator";
-        [field: NonSerialized()]
-        public const string Receiver = "Receiver";
 
         public string IpAddress
-        { 
+        {
             get => _ipAddress;
             set => Set(ref _ipAddress, value);
         }
+
         public string InstrAddress
         {
             get => _instrAddress;
@@ -34,15 +34,14 @@ namespace SPOAPAKmmReceiver.Models
             set => Set(ref _port, value);
         }
 
-        [field: NonSerialized()]
-        public string Error => String.Empty;
-        
+        [field: NonSerialized()] public string Error => string.Empty;
+
         [field: NonSerialized()]
         public string this[string columnName]
         {
             get
             {
-                string error = String.Empty;
+                var error = string.Empty;
                 switch (columnName)
                 {
                     case "IpAddress":
@@ -59,6 +58,7 @@ namespace SPOAPAKmmReceiver.Models
                             error = "Неверное значение порта";
                         break;
                 }
+
                 return error;
             }
         }

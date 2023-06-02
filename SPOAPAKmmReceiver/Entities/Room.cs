@@ -3,13 +3,13 @@ using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Entities
 {
-    public class Room : Base.Entity
+    public class Room : Entity
     {
-        private string _name = null!;
         private string? _description;
-        private ICollection<Element> _elements;
         private ICollection<Device> _devices;
+        private ICollection<Element> _elements;
         private MeasSettings _measSettings;
+        private string _name = null!;
         private Organization _organization = null!;
 
         public string Name

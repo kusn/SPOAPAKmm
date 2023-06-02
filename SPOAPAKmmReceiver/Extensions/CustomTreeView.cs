@@ -6,12 +6,24 @@ namespace SPOAPAKmmReceiver.Extensions
 {
     public class CustomTreeView : TreeView
     {
+        public static DependencyProperty SelectedNode_Property =
+            DependencyProperty.Register(
+                "SelectedCustomThing",
+                typeof(Entity),
+                typeof(CustomTreeView),
+                new FrameworkPropertyMetadata(
+                    null,
+                    FrameworkPropertyMetadataOptions.None,
+                    SelectedNodeChanged));
+
+        public CustomTreeView()
+        {
+            SelectedItemChanged += SelectedItemChanged_CustomHandler;
+        }
+
         public Entity SelectedCustomThing
         {
-            get
-            {
-                return (Entity)GetValue(SelectedNode_Property);
-            }
+            get => (Entity)GetValue(SelectedNode_Property);
             set
             {
                 SetValue(SelectedNode_Property, value);
@@ -23,22 +35,7 @@ namespace SPOAPAKmmReceiver.Extensions
             }
         }
 
-        public static DependencyProperty SelectedNode_Property =
-            DependencyProperty.Register(
-                "SelectedCustomThing",
-                typeof(Entity),
-                typeof(CustomTreeView),
-                new FrameworkPropertyMetadata(
-                    null,
-                    FrameworkPropertyMetadataOptions.None,
-                    SelectedNodeChanged));
-
-        public CustomTreeView() : base()
-        {
-            this.SelectedItemChanged += new RoutedPropertyChangedEventHandler<object>(SelectedItemChanged_CustomHandler);
-        }
-
-        void SelectedItemChanged_CustomHandler(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void SelectedItemChanged_CustomHandler(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             SetValue(SelectedNode_Property, SelectedItem);
         }

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Entities
-{    
-    public class DeviceType : Base.Entity
+{
+    public class DeviceType : Entity
     {
         private string _name = null!;
 

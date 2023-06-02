@@ -1,13 +1,14 @@
-﻿using SPOAPAKmmReceiver.Entities.Base;
+﻿using System;
 using System.Collections.Generic;
+using SPOAPAKmmReceiver.Entities.Base;
 
 namespace SPOAPAKmmReceiver.Entities
 {
-    public class Organization : Base.Entity
+    public class Organization : Entity
     {
+        private string? _address = String.Empty;
+        private string? _description = String.Empty;
         private string _name = null!;
-        private string? _address;
-        private string? _description;
         private ICollection<Room> _rooms;
 
         public string Name

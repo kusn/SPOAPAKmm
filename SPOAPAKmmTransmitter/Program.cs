@@ -1,23 +1,22 @@
 ﻿using RohdeSchwarz.RsInstrument;
-using SPOAPAKmmReceiver.Entities;
-using SPOAPAKmmReceiver.Models;
+using RSSigGen.RS;
+using SPOAPAKmm.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
-using RSSigGen;
-using RSSigGen.RS;
 
 namespace SPOAPAKmmTransmitter
 {
     internal class Program
     {
         static private string _ipAddress = "127.0.0.1";
+        static private string _ipAddressTransmitter = "127.0.0.1";
         static private int _listenerPort = 11000;
         static private int _sendPort = 11001;
         static private List<string> _devicesList = new List<string>();
@@ -28,7 +27,7 @@ namespace SPOAPAKmmTransmitter
         {
             while (true)
             {
-                TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_ipAddress), _listenerPort));
+                TcpListener listner = new TcpListener(new IPEndPoint(IPAddress.Parse(_ipAddressTransmitter), _listenerPort));
                 listner.Start();
 
                 TcpClient client = listner.AcceptTcpClient();
@@ -39,45 +38,54 @@ namespace SPOAPAKmmTransmitter
 
                 if (m != null)
                 {
-                    //_ipAddress = m.InstrAddress;
+                    _ipAddress = m.ReceiverIp;
+                    _sendPort = m.ReceiverPort;
                     Console.WriteLine("Получен запрос: " + s);
 
-                    if (m.Mode == WorkMode.Searching)
+                    if (m.Mode == ReceiverMessage.WorkMode.Searching)
                     {
-                        Console.WriteLine("Режим поиска подключённых устройств.");
-                        _devicesList = new List<string>(RsInstrument.FindResources("?*"));
-                        Dictionary<string, string> data = new Dictionary<string, string>();
+                        try
+                        {
+                            Console.WriteLine("Режим поиска подключённых устройств.");
+                            _devicesList = new List<string>(RsInstrument.FindResources("?*"));
+                            Dictionary<string, string> data = new Dictionary<string, string>();
 
-                        foreach (string device in _devicesList)
-                        {                            
-                            string descr;
-                            try
+                            foreach (string device in _devicesList)
                             {
-                                RsInstrument instrument = new RsInstrument(device);
-                                descr = instrument.QueryString("*IDN?");
-                                Console.WriteLine("Найдено устройство - " + descr);
-                                instrument.Dispose();
+                                string descr;
+                                try
+                                {
+                                    RsInstrument instrument = new RsInstrument(device);
+                                    descr = instrument.QueryString("*IDN?");
+                                    Console.WriteLine("Найдено устройство - " + descr);
+                                    instrument.Dispose();
+                                }
+                                catch (Exception ex)
+                                {
+                                    descr = ex.Message;
+                                    Console.WriteLine("Ошибка: " + ex.Message);
+                                }
+
+                                data.Add(device, descr);
                             }
-                            catch (Exception ex)
-                            {
-                                descr = ex.Message;
-                                Console.WriteLine("Ошибка: " + ex.Message);
-                            }
-                            data.Add(device, descr);
+
+                            TransmitterMessage transmitterMessage = new TransmitterMessage();
+                            transmitterMessage.Mode = m.Mode;
+                            transmitterMessage.DevicesList = data;
+                            var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
+                            SendToClient(message);
+                            Console.WriteLine("Отправлено сообщение: " + message);
                         }
-                        TransmitterMessage transmitterMessage = new TransmitterMessage();
-                        transmitterMessage.Mode = m.Mode;
-                        transmitterMessage.DevicesList = data;
-                        var message = JsonSerializer.Serialize<TransmitterMessage>(transmitterMessage);
-                        SendToClient(message);
-                        Console.WriteLine("Отправлено сообщение: " + message);
-                        
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine(ex.Message);
+                        }
                     }
-                    else if (m.Mode == WorkMode.ApplyInstrumentSettings)
+                    else if (m.Mode == ReceiverMessage.WorkMode.ApplyInstrumentSettings)
                     {
 
                     }
-                    else if (m.Mode == WorkMode.ApplyMeasureSettings)
+                    else if (m.Mode == ReceiverMessage.WorkMode.ApplyMeasureSettings)
                     {
                         Console.WriteLine("Режим получения настроек");
                         Console.WriteLine("Получены настройки: " + s);
@@ -88,7 +96,7 @@ namespace SPOAPAKmmTransmitter
                         SendToClient(message);
                         Console.WriteLine("Отправлено сообщение: " + message);
                     }
-                    else if (m.Mode == WorkMode.Сalibration)
+                    else if (m.Mode == ReceiverMessage.WorkMode.Сalibration)
                     {
                         Console.WriteLine("Режим калибровки");
 
@@ -133,7 +141,7 @@ namespace SPOAPAKmmTransmitter
                         SendToClient(message);
                         Console.WriteLine("Отправлено сообщение: " + message);
                     }
-                    else if (m.Mode == WorkMode.Checking)
+                    else if (m.Mode == ReceiverMessage.WorkMode.Checking)
                     {
                         Console.WriteLine("Режим проверки");
 
@@ -161,7 +169,7 @@ namespace SPOAPAKmmTransmitter
                         Console.WriteLine("Отправлено сообщение: " + message);
                         
                     }
-                    else if (m.Mode == WorkMode.Measuring)
+                    else if (m.Mode == ReceiverMessage.WorkMode.Measuring)
                     {
                         Console.WriteLine("Режим измерения");
 
@@ -240,6 +248,14 @@ namespace SPOAPAKmmTransmitter
 
         static void Main(string[] args)
         {
+            string host = Dns.GetHostName();
+            Console.WriteLine($"Имя компьютера: {host}");
+            _ipAddressTransmitter = Dns.GetHostAddresses(host).First<IPAddress>(f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+            if (_ipAddressTransmitter != null)
+            {
+                Console.WriteLine($"Адрес: {_ipAddressTransmitter}");
+            }
+
             Thread AccessToClientProgram = new Thread(GetAccessToClientProgram);            
             AccessToClientProgram.Start();
         }

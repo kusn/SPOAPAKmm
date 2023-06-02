@@ -1,24 +1,32 @@
-﻿using SPOAPAKmmReceiver.Entities;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using SPOAPAKmmReceiver.Entities;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.ViewModels.Base;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
     public class DevicesWindowViewModel : ViewModel
     {
-        private DeviceType _selectedDeviceType;
-        private string _newNameDeviceType;
-        private DeviceType _selectedDeviceTypeInDevicePanel;
-        private Device _selectedDeviceInDevicePanel;
+        private Device _newDevice;
         private string _newDeviceName;
         private DeviceType _newDeviceType;
-        private Device _newDevice;
+        private string _newNameDeviceType;
         private Device _oldSelectedDevice;
+        private Device _selectedDeviceInDevicePanel;
+        private DeviceType _selectedDeviceType;
+        private DeviceType _selectedDeviceTypeInDevicePanel;
+
+        public DevicesWindowViewModel(IStore<DeviceType> dBDeviceType, IStore<Device> dBDevice)
+        {
+            DbDeviceStore = dBDevice;
+            DbDeviceTypeStore = dBDeviceType;
+
+            DeviceTypes = new ObservableCollection<DeviceType>(dBDeviceType.GetAll());
+            Devices = new ObservableCollection<Device>();
+        }
 
         public DeviceType SelectedDeviceType
         {
@@ -29,9 +37,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 Devices.Clear();
                 if (value != null)
                     foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == value.Name))
-                    {
                         Devices.Add(device);
-                    }
             }
         }
 
@@ -71,15 +77,6 @@ namespace SPOAPAKmmReceiver.ViewModels
         public IStore<Device> DbDeviceStore { get; set; }
         public IStore<DeviceType> DbDeviceTypeStore { get; set; }
 
-        public DevicesWindowViewModel(IStore<DeviceType> dBDeviceType, IStore<Device> dBDevice)
-        {
-            DbDeviceStore = dBDevice;
-            DbDeviceTypeStore = dBDeviceType;
-
-            DeviceTypes = new ObservableCollection<DeviceType>(dBDeviceType.GetAll());
-            Devices = new ObservableCollection<Device>();
-        }
-
         #region AddNewDeviceTypeCommand
 
         private LambdaCommand _addNewDeviceTypeCommand;
@@ -89,16 +86,18 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         private void OnAddNewDeviceTypeCommandExecuted(object p)
         {
-            _newDeviceType = new()
+            _newDeviceType = new DeviceType
             {
-                Name = NewNameDeviceType,
+                Name = NewNameDeviceType
             };
             DbDeviceTypeStore.Add(_newDeviceType);
             DeviceTypes.Add(_newDeviceType);
         }
 
-        private bool CanAddNewDeviceTypeCommandExecute(object p) =>
-            NewNameDeviceType is not null || NewNameDeviceType != "" || NewNameDeviceType != String.Empty;
+        private bool CanAddNewDeviceTypeCommandExecute(object p)
+        {
+            return NewNameDeviceType is not null || NewNameDeviceType != "" || NewNameDeviceType != string.Empty;
+        }
 
         #endregion
 
@@ -111,7 +110,7 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         private void OnRemoveDeviceTypeCommandExecuted(object p)
         {
-            MessageBoxResult result = MessageBoxResult.None;
+            var result = MessageBoxResult.None;
 
             if (DbDeviceStore.GetAll().Where(d => d.Type.Name == SelectedDeviceType.Name).Count() > 0)
             {
@@ -120,13 +119,13 @@ namespace SPOAPAKmmReceiver.ViewModels
                     "Внимание!", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
-                    if (MessageBox.Show("Удалить также всё оборудование данного типа?", "Внимание!", MessageBoxButton.YesNo) ==
+                    if (MessageBox.Show("Удалить также всё оборудование данного типа?", "Внимание!",
+                            MessageBoxButton.YesNo) ==
                         MessageBoxResult.Yes)
                     {
-                        foreach (var device in DbDeviceStore.GetAll().Where(d => d.Type.Name == SelectedDeviceType.Name))
-                        {
+                        foreach (var device in
+                                 DbDeviceStore.GetAll().Where(d => d.Type.Name == SelectedDeviceType.Name))
                             DbDeviceStore.Delete(device.Id);
-                        }
                         DbDeviceTypeStore.Delete(DeviceTypes.FirstOrDefault(t => t.Name == SelectedDeviceType.Name).Id);
                         DeviceTypes.Remove(SelectedDeviceType);
                     }
@@ -141,7 +140,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                 }
                 else
                 {
-                    return;
                 }
             }
             else
@@ -150,7 +148,11 @@ namespace SPOAPAKmmReceiver.ViewModels
                 DeviceTypes.Remove(SelectedDeviceType);
             }
         }
-        private bool CanRemoveDeviceTypeCommandExecute(object p) => SelectedDeviceType is not null;
+
+        private bool CanRemoveDeviceTypeCommandExecute(object p)
+        {
+            return SelectedDeviceType is not null;
+        }
 
         #endregion
 
@@ -163,10 +165,10 @@ namespace SPOAPAKmmReceiver.ViewModels
 
         private void OnAddNewDeviceCommandExecute(object p)
         {
-            _newDevice = new()
+            _newDevice = new Device
             {
                 Name = NewDeviceName,
-                Number = "",
+                Number = ""
             };
             if (SelectedDeviceType != null)
             {
@@ -177,18 +179,22 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 var type = DeviceTypes.FirstOrDefault(t => t.Name == "Неопределён");
                 if (type == null)
-                    type = new DeviceType()
+                    type = new DeviceType
                     {
-                        Name = "Неопределён",
+                        Name = "Неопределён"
                     };
                 _newDevice.Type = type;
                 DbDeviceTypeStore.Add(type);
                 DeviceTypes.Add(type);
             }
+
             DbDeviceStore.Add(_newDevice);
         }
 
-        private bool CanAddNewDeviceCommandExecuted(object p) => NewDeviceName != null || NewDeviceName != " " || NewDeviceName != String.Empty;
+        private bool CanAddNewDeviceCommandExecuted(object p)
+        {
+            return NewDeviceName != null || NewDeviceName != " " || NewDeviceName != string.Empty;
+        }
 
         #endregion
 
@@ -208,7 +214,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             Devices.Clear();
         }
 
-        private bool CanSaveChangesSelectedDeviceCommandExecuted(object p) => true;
+        private bool CanSaveChangesSelectedDeviceCommandExecuted(object p)
+        {
+            return true;
+        }
 
         #endregion
 
@@ -225,7 +234,10 @@ namespace SPOAPAKmmReceiver.ViewModels
             Devices.Remove(SelectedDeviceInDevicePanel);
         }
 
-        private bool CanRemoveSelectedDeviceCommandExecute(object p) => SelectedDeviceInDevicePanel != null;
+        private bool CanRemoveSelectedDeviceCommandExecute(object p)
+        {
+            return SelectedDeviceInDevicePanel != null;
+        }
 
         #endregion
     }

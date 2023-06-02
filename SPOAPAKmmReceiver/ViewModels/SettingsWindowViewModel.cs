@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using RohdeSchwarz.RsInstrument;
+using SPOAPAKmm.Extensions;
 using SPOAPAKmmReceiver.Extensions.DTO;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Models;
@@ -13,122 +14,41 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static SPOAPAKmmReceiver.Extensions.DTO.Mapper;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
     public class SettingsWindowViewModel : ViewModel
     {
-        private static bool _simulation = false;
-        private static int _timeOut = 500;
-        private Window _window = null;
+        private static readonly bool _simulation = false;
+        private static readonly int _timeOut = 500;
 
         private readonly IConfiguration _configuration;
-        private IOptionsSnapshot<InstrumentSettings> _namedOptionsAccessor;
-
-        private InstrumentSettings _receiverSettings;
-        private InstrumentSettings _generatorSettings;
-        private string _descriptionSelectedReceiver;
+        private CancellationToken _cancellationToken;
+        private CancellationTokenSource _cancelTokenSource;
+        private string _connectionString;
         private string _descriptionSelectedGenerator;
+        private string _descriptionSelectedReceiver;
         private ObservableCollection<string> _devicesListReciever;
         private Dictionary<string, string> _devicesListTransmitter;
+        private InstrumentSettings _generatorSettings;
+        private TcpListener _listner;
+        private readonly IOptionsSnapshot<InstrumentSettings> _namedOptionsAccessor;
+
+        private InstrumentSettings _receiverSettings;
+        private string _recieveMessage;
         private string _selectedItemDeviceListReceiver;
         private string _selectedItemDeviceListTransmitter;
         private string _sendMessage;
-        private string _recieveMessage;
         private int _time;
-        private CancellationToken _cancellationToken;
-        private CancellationTokenSource _cancelTokenSource;
-        private TcpListener _listner;
-        private string _connectionString;
+        private Window _window;
 
-        public InstrumentSettings ReceiverSettings
-        {
-            get => _receiverSettings;
-            set => Set(ref _receiverSettings, value);
-        }
-        public InstrumentSettings GeneratorSettings
-        {
-            get => _generatorSettings;
-            set => Set(ref _generatorSettings, value);
-        }
-        public string DescriptionSelectedReceiver
-        {
-            get => _descriptionSelectedReceiver;
-            set => Set(ref _descriptionSelectedReceiver, value);
-        }
-        public string DescriptionSelectedGenerator
-        {
-            get => _descriptionSelectedGenerator;
-            set => Set(ref _descriptionSelectedGenerator, value);
-        }
-        public ObservableCollection<string> DevicesListReciever
-        {
-            get => _devicesListReciever;
-            set => Set(ref _devicesListReciever, value);
-        }
-        public Dictionary<string, string> DevicesListTransmitter
-        {
-            get => _devicesListTransmitter;
-            set => Set(ref _devicesListTransmitter, value);
-        }
-        public string SelectedItemDeviceListReceiver
-        {
-            get => _selectedItemDeviceListReceiver;
-            set
-            {
-                Set(ref _selectedItemDeviceListReceiver, value);
-                try
-                {
-                    RsInstrument instr = new RsInstrument(value, "Simulate = " + _simulation);
-                    DescriptionSelectedReceiver = instr.QueryString("*IDN?") + Environment.NewLine;
-                    DescriptionSelectedReceiver += "RsInstrument Driver Version: " + instr.Identification.DriverVersion + Environment.NewLine;
-                    DescriptionSelectedReceiver += "Visa Manufacturer: " + instr.Identification.VisaManufacturer + Environment.NewLine;
-                    DescriptionSelectedReceiver += "Instrument Full Name: " + instr.Identification.InstrumentFullName + Environment.NewLine;
-                    DescriptionSelectedReceiver += "Installed Options: " + string.Join(",", instr.Identification.InstrumentOptions);
-
-                    ReceiverSettings.InstrAddress = value;
-                }
-                catch (Exception ex)
-                {
-                    DescriptionSelectedReceiver = ex.Message;
-                }
-            }
-        }
-        public string SelectedItemDeviceListTransmitter
-        {
-            get => _selectedItemDeviceListTransmitter;
-            set
-            {
-                Set(ref _selectedItemDeviceListTransmitter, value);
-                DescriptionSelectedGenerator = DevicesListTransmitter[value];
-                GeneratorSettings.InstrAddress = value;
-            }
-        }
-        public string SendMessage
-        {
-            get => _sendMessage;
-            set => Set(ref _sendMessage, value);
-        }
-        public string RecieveMessage
-        {
-            get => _recieveMessage;
-            set => Set(ref _recieveMessage, value);
-        }
-        public string ConnectionString
-        {
-            get => _connectionString;
-            set => Set(ref _connectionString, value);
-        }
-
-        public ICommand Send { get; set; }
-
-        public SettingsWindowViewModel(IOptionsSnapshot<InstrumentSettings> namedOptionsAccessor, IConfiguration configuration)
+        public SettingsWindowViewModel(IOptionsSnapshot<InstrumentSettings> namedOptionsAccessor,
+            IConfiguration configuration)
         {
             _configuration = configuration;
             _namedOptionsAccessor = namedOptionsAccessor;
@@ -141,134 +61,106 @@ namespace SPOAPAKmmReceiver.ViewModels
             AccessToClientProgram.IsBackground = true;
             AccessToClientProgram.Start();*/
             //StartListen();
+
+            string host = Dns.GetHostName();
+            _receiverSettings.IpAddress = Dns.GetHostAddresses(host).First<IPAddress>(f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToString();
+
         }
 
-        #region TestSelectedReceiverCommand - Команда тестирования выбранного приёмника
-
-        private LambdaCommand _testSelectedReceiverCommand;
-        public LambdaCommand TestSelectedReceiverCommand => _testSelectedReceiverCommand
-            ??= new LambdaCommand(OnTestSelectedReceiverCommandExecuted, CanTestSelectedReceiverCommandExecute);
-        private void OnTestSelectedReceiverCommandExecuted(object p)
+        public InstrumentSettings ReceiverSettings
         {
-            if (ReceiverSettings.InstrAddress is null)
-                MessageBox.Show("Выберите приёмник из списка");
-            else
+            get => _receiverSettings;
+            set => Set(ref _receiverSettings, value);
+        }
+
+        public InstrumentSettings GeneratorSettings
+        {
+            get => _generatorSettings;
+            set => Set(ref _generatorSettings, value);
+        }
+
+        public string DescriptionSelectedReceiver
+        {
+            get => _descriptionSelectedReceiver;
+            set => Set(ref _descriptionSelectedReceiver, value);
+        }
+
+        public string DescriptionSelectedGenerator
+        {
+            get => _descriptionSelectedGenerator;
+            set => Set(ref _descriptionSelectedGenerator, value);
+        }
+
+        public ObservableCollection<string> DevicesListReciever
+        {
+            get => _devicesListReciever;
+            set => Set(ref _devicesListReciever, value);
+        }
+
+        public Dictionary<string, string> DevicesListTransmitter
+        {
+            get => _devicesListTransmitter;
+            set => Set(ref _devicesListTransmitter, value);
+        }
+
+        public string SelectedItemDeviceListReceiver
+        {
+            get => _selectedItemDeviceListReceiver;
+            set
             {
+                Set(ref _selectedItemDeviceListReceiver, value);
                 try
                 {
-                    RsInstrument instr = new RsInstrument(ReceiverSettings.InstrAddress, "Simulate = " + _simulation);
-                    DescriptionSelectedReceiver = instr.QueryString("*IDN?");
+                    var instr = new RsInstrument(value, "Simulate = " + _simulation);
+                    DescriptionSelectedReceiver = instr.QueryString("*IDN?") + Environment.NewLine;
+                    DescriptionSelectedReceiver += "RsInstrument Driver Version: " +
+                                                   instr.Identification.DriverVersion + Environment.NewLine;
+                    DescriptionSelectedReceiver += "Visa Manufacturer: " + instr.Identification.VisaManufacturer +
+                                                   Environment.NewLine;
+                    DescriptionSelectedReceiver += "Instrument Full Name: " + instr.Identification.InstrumentFullName +
+                                                   Environment.NewLine;
+                    DescriptionSelectedReceiver +=
+                        "Installed Options: " + string.Join(",", instr.Identification.InstrumentOptions);
+
+                    ReceiverSettings.InstrAddress = value;
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(e.Message);
-                    Console.WriteLine(e);
-                    throw;
+                    DescriptionSelectedReceiver = ex.Message;
                 }
             }
         }
-        private bool CanTestSelectedReceiverCommandExecute(object p) => true;
 
-        #endregion
-
-        #region SearchReceiversCommand - Команда поиска приёмников
-
-        private LambdaCommand _searchReceiversCommand;
-        public LambdaCommand SearchReceiversCommand => _searchReceiversCommand
-            ??= new LambdaCommand(OnSearchReceiversCommandExecuted, CanSearchReceiversCommandExecute);
-        private void OnSearchReceiversCommandExecuted(object p)
+        public string SelectedItemDeviceListTransmitter
         {
-            if (DevicesListReciever is not null)
-                DevicesListReciever.Clear();
-            DevicesListReciever = new ObservableCollection<string>(RsInstrument.FindResources("?*"));
-        }
-        private bool CanSearchReceiversCommandExecute(object p) => true;
-
-        #endregion
-
-        #region TestSelectedGeneratorCommand - Команда тестирования выбранного генератора
-
-        private LambdaCommand _testSelectedGeneratorCommand;
-        public LambdaCommand TestSelectedGeneratorCommand => _testSelectedGeneratorCommand
-            ??= new LambdaCommand(OnTestSelectedGeneratorCommandExecuted, CanTestSelectedGeneratorCommandExecute);
-        private void OnTestSelectedGeneratorCommandExecuted(object p)
-        {
-            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-
-            StartListen();
-            var message = new ReceiverMessage(WorkMode.Checking);
-            message.InstrAddress = GeneratorSettings.InstrAddress;
-            SendMessage = System.Text.Json.JsonSerializer.Serialize(message);
-            SendToClient(SendMessage);
-        }
-        private bool CanTestSelectedGeneratorCommandExecute(object p) => true;
-
-        #endregion
-
-        #region SearchGeneratorsCommand - Команда поиска генераторов
-
-        private LambdaCommand _searchGeneratorsCommand;
-        public LambdaCommand SearchGeneratorsCommand => _searchGeneratorsCommand
-            ??= new LambdaCommand(OnSearchGeneratorsCommandExecuted, CanSearchGeneratorsCommandExecute);
-        private void OnSearchGeneratorsCommandExecuted(object p)
-        {
-            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
-
-            StartListen();
-            var message = new ReceiverMessage(WorkMode.Searching);
-            SendMessage = System.Text.Json.JsonSerializer.Serialize(message);
-            SendToClient(SendMessage);
-        }
-        private bool CanSearchGeneratorsCommandExecute(object p) => true;
-
-        #endregion
-
-        #region SaveSettingsCommand
-
-        private LambdaCommand _saveSettingsCommand;
-        public LambdaCommand SaveSettingsCommand => _saveSettingsCommand
-            ??= new LambdaCommand(OnSaveSettingsCommandExecuted, CanSaveSettingsCommandExecute);
-        private void OnSaveSettingsCommandExecuted(object p)
-        {
-            var v = System.Text.Json.JsonSerializer.Serialize<InstrumentSettingsConfig>(ReceiverSettings.InstrumentSettingsToConfigSection());
-            SetAppSettingValue("InstrumentSettings:Receiver", v);
-            v = System.Text.Json.JsonSerializer.Serialize<InstrumentSettingsConfig>(GeneratorSettings.InstrumentSettingsToConfigSection());
-            SetAppSettingValue("InstrumentSettings:Generator", v);
-            //v = System.Text.Json.JsonSerializer.Serialize("Filename=.\\" + ConnectionString);
-            //SetAppSettingValue("ConnectionStrings:Default", v);
-
-            _window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.Title.Contains("Настройки"));
-            _window.Close();
-            //Application.Current.Shutdown();
-        }
-        private bool CanSaveSettingsCommandExecute(object p) => true;
-
-        #endregion
-
-        #region OpenConnectionStringCommand
-
-        private LambdaCommand _openConnectionStringCommand;
-        public LambdaCommand OpenConnectionStringCommand => _openConnectionStringCommand
-            ??= new LambdaCommand(OnOpenConnectionStringCommandExecuted, CanOpenConnectionStringCommandExecute);
-        private void OnOpenConnectionStringCommandExecuted(object p)
-        {
-            /*SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = System.AppContext.BaseDirectory;
-            saveFileDialog.FileName = ConnectionString;
-            if(saveFileDialog.ShowDialog() != null)
+            get => _selectedItemDeviceListTransmitter;
+            set
             {
-                var v = saveFileDialog.FileName;
-                //FileInfo fileInfo = new FileInfo(v);
-                //var dir = fileInfo.DirectoryName;
-                if (v.Contains(System.AppContext.BaseDirectory))
-                    ConnectionString = v.Remove(0, System.AppContext.BaseDirectory.Length);
-                else
-                    ConnectionString = v;
-            }*/
+                Set(ref _selectedItemDeviceListTransmitter, value);
+                DescriptionSelectedGenerator = DevicesListTransmitter[value];
+                GeneratorSettings.InstrAddress = value;
+            }
         }
-        private bool CanOpenConnectionStringCommandExecute(object p) => true;
 
-        #endregion
+        public string SendMessage
+        {
+            get => _sendMessage;
+            set => Set(ref _sendMessage, value);
+        }
+
+        public string RecieveMessage
+        {
+            get => _recieveMessage;
+            set => Set(ref _recieveMessage, value);
+        }
+
+        public string ConnectionString
+        {
+            get => _connectionString;
+            set => Set(ref _connectionString, value);
+        }
+
+        public ICommand Send { get; set; }
 
         private void GetAppSettings()
         {
@@ -278,51 +170,55 @@ namespace SPOAPAKmmReceiver.ViewModels
             ReceiverSettings = _namedOptionsAccessor.Get(InstrumentSettings.Receiver);
             GeneratorSettings = _namedOptionsAccessor.Get(InstrumentSettings.Generator);
             //ConnectionString = _configuration.GetSection("ConnectionStrings:Default").Get<string>();
-            ConnectionString = _configuration.GetConnectionString("Default").Remove(0, ("Filename=.\\").Length);
+            ConnectionString = _configuration.GetConnectionString("Default").Remove(0, "Filename=.\\".Length);
         }
 
         private void OnSendExecuted(object p)
         {
             SendToClient(SendMessage);
         }
-        private bool CanSendMessageExecute(object arg) => true;
+
+        private bool CanSendMessageExecute(object arg)
+        {
+            return true;
+        }
 
         private void GetAccessToClientProgram(CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
                 if (_listner is null)
-                    _listner = new TcpListener(new IPEndPoint(IPAddress.Parse(ReceiverSettings.IpAddress), ReceiverSettings.Port));
+                    _listner = new TcpListener(new IPEndPoint(IPAddress.Parse(ReceiverSettings.IpAddress),
+                        ReceiverSettings.Port));
                 _listner.Start();
                 while (true)
                 {
-                    TcpClient client = _listner.AcceptTcpClient();
-                    StreamReader sr = new StreamReader(client.GetStream());
+                    var client = _listner.AcceptTcpClient();
+                    var sr = new StreamReader(client.GetStream());
 
-                    Execute(sr.ReadLine());   //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
+                    Execute(sr.ReadLine()); //<---------- самописная функция Execute, что-то выполняет с пришедшими данными
 
                     sr.Close();
                     client.Close();
                 }
+
                 _listner.Stop();
             }
-            if (token.IsCancellationRequested)
-            {
-                _listner.Stop();
-            }
+
+            if (token.IsCancellationRequested) _listner.Stop();
         }
 
         /// <summary>
-        /// Посылает сообщение приложению-клиенту
+        ///     Посылает сообщение приложению-клиенту
         /// </summary>
         /// <param name="Massage">Передаваемое сообщение</param>
         private void SendToClient(string Massage)
         {
-            TcpClient client = new TcpClient();
+            var client = new TcpClient();
             try
             {
                 client.Connect(new IPEndPoint(IPAddress.Parse(GeneratorSettings.IpAddress), GeneratorSettings.Port));
-                StreamWriter sw = new StreamWriter(client.GetStream());
+                var sw = new StreamWriter(client.GetStream());
                 sw.AutoFlush = true;
                 sw.WriteLine(Massage);
             }
@@ -330,6 +226,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 Console.WriteLine("Ошибка при подключении к Server.exe");
             }
+
             client.Close();
         }
 
@@ -337,31 +234,30 @@ namespace SPOAPAKmmReceiver.ViewModels
         {
             //Выводим принятое сообщение на экран
             //App.Current.Dispatcher.Invoke((Action)(() => this.RecieveMessage = Data));
-            App.Current.Dispatcher.Invoke((Action)(() =>
+            Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                var message = System.Text.Json.JsonSerializer.Deserialize<TransmitterMessage>(data);
+                var message = JsonSerializer.Deserialize<TransmitterMessage>(data);
                 if (message != null)
-                    if (message.Mode == WorkMode.Checking)
+                    if (message.Mode == ReceiverMessage.WorkMode.Checking)
                     {
-                        this.RecieveMessage = message.IsOk.ToString();
-                        this.DescriptionSelectedGenerator = message.Message;
+                        RecieveMessage = message.IsOk.ToString();
+                        DescriptionSelectedGenerator = message.Message;
                         _cancelTokenSource.Cancel();
                         //_cancelTokenSource.Dispose();
                     }
-                    else if (message.Mode == WorkMode.Searching)
+                    else if (message.Mode == ReceiverMessage.WorkMode.Searching)
                     {
-                        this.DevicesListTransmitter = message.DevicesList;
+                        DevicesListTransmitter = message.DevicesList;
                         _cancelTokenSource.Cancel();
                         //_cancelTokenSource.Dispose();
                     }
-
             }));
         }
 
         private void StartListen()
         {
             _cancelTokenSource = new CancellationTokenSource();
-            Task task = new Task(() =>
+            var task = new Task(() =>
             {
                 GetAccessToClientProgram(_cancellationToken);
                 var timeOutTask = new Task(() =>
@@ -369,7 +265,6 @@ namespace SPOAPAKmmReceiver.ViewModels
                     Thread.Sleep(_timeOut);
                     _cancelTokenSource.Cancel();
                     //_cancelTokenSource.Dispose();
-
                 }, _cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
             }, _cancelTokenSource.Token, TaskCreationOptions.AttachedToParent);
             task.Start();
@@ -382,9 +277,7 @@ namespace SPOAPAKmmReceiver.ViewModels
         private static void SetAppSettingValue(string key, string value, string appSettingsJsonFilePath = null)
         {
             if (appSettingsJsonFilePath == null)
-            {
-                appSettingsJsonFilePath = System.IO.Path.Combine(System.AppContext.BaseDirectory, "appsettings.json");
-            }
+                appSettingsJsonFilePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
             var config = File.ReadAllText(appSettingsJsonFilePath);
             var json = JObject.Parse(config);
             var updatedConfigDict = UpdateJson(key, value, json);
@@ -409,7 +302,173 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 jsonSegment[key] = JObject.Parse(value.ToString());
             }
+
             return jsonSegment;
         }
+
+        #region TestSelectedReceiverCommand - Команда тестирования выбранного приёмника
+
+        private LambdaCommand _testSelectedReceiverCommand;
+
+        public LambdaCommand TestSelectedReceiverCommand => _testSelectedReceiverCommand
+            ??= new LambdaCommand(OnTestSelectedReceiverCommandExecuted, CanTestSelectedReceiverCommandExecute);
+
+        private void OnTestSelectedReceiverCommandExecuted(object p)
+        {
+            if (ReceiverSettings.InstrAddress is null)
+                MessageBox.Show("Выберите приёмник из списка");
+            else
+                try
+                {
+                    var instr = new RsInstrument(ReceiverSettings.InstrAddress, "Simulate = " + _simulation);
+                    DescriptionSelectedReceiver = instr.QueryString("*IDN?");
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    Console.WriteLine(e);
+                    throw;
+                }
+        }
+
+        private bool CanTestSelectedReceiverCommandExecute(object p)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region SearchReceiversCommand - Команда поиска приёмников
+
+        private LambdaCommand _searchReceiversCommand;
+
+        public LambdaCommand SearchReceiversCommand => _searchReceiversCommand
+            ??= new LambdaCommand(OnSearchReceiversCommandExecuted, CanSearchReceiversCommandExecute);
+
+        private void OnSearchReceiversCommandExecuted(object p)
+        {
+            if (DevicesListReciever is not null)
+                DevicesListReciever.Clear();
+            DevicesListReciever = new ObservableCollection<string>(RsInstrument.FindResources("?*"));
+        }
+
+        private bool CanSearchReceiversCommandExecute(object p)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region TestSelectedGeneratorCommand - Команда тестирования выбранного генератора
+
+        private LambdaCommand _testSelectedGeneratorCommand;
+
+        public LambdaCommand TestSelectedGeneratorCommand => _testSelectedGeneratorCommand
+            ??= new LambdaCommand(OnTestSelectedGeneratorCommandExecuted, CanTestSelectedGeneratorCommandExecute);
+
+        private void OnTestSelectedGeneratorCommandExecuted(object p)
+        {
+            var cancelTokenSource = new CancellationTokenSource();
+
+            StartListen();
+            var message = new ReceiverMessage(ReceiverMessage.WorkMode.Checking);
+            message.ReceiverIp = _receiverSettings.IpAddress;
+            message.ReceiverPort = _receiverSettings.Port;
+            message.InstrAddress = GeneratorSettings.InstrAddress;
+            SendMessage = JsonSerializer.Serialize(message);
+            SendToClient(SendMessage);
+        }
+
+        private bool CanTestSelectedGeneratorCommandExecute(object p)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region SearchGeneratorsCommand - Команда поиска генераторов
+
+        private LambdaCommand _searchGeneratorsCommand;
+
+        public LambdaCommand SearchGeneratorsCommand => _searchGeneratorsCommand
+            ??= new LambdaCommand(OnSearchGeneratorsCommandExecuted, CanSearchGeneratorsCommandExecute);
+
+        private void OnSearchGeneratorsCommandExecuted(object p)
+        {
+            var cancelTokenSource = new CancellationTokenSource();
+
+            StartListen();
+            var message = new ReceiverMessage(ReceiverMessage.WorkMode.Searching);
+            message.ReceiverIp = _receiverSettings.IpAddress;
+            message.ReceiverPort = _receiverSettings.Port;
+            SendMessage = JsonSerializer.Serialize(message);
+            SendToClient(SendMessage);
+        }
+
+        private bool CanSearchGeneratorsCommandExecute(object p)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region SaveSettingsCommand
+
+        private LambdaCommand _saveSettingsCommand;
+
+        public LambdaCommand SaveSettingsCommand => _saveSettingsCommand
+            ??= new LambdaCommand(OnSaveSettingsCommandExecuted, CanSaveSettingsCommandExecute);
+
+        private void OnSaveSettingsCommandExecuted(object p)
+        {
+            var v = JsonSerializer.Serialize(ReceiverSettings.InstrumentSettingsToConfigSection());
+            SetAppSettingValue("InstrumentSettings:Receiver", v);
+            v = JsonSerializer.Serialize(GeneratorSettings.InstrumentSettingsToConfigSection());
+            SetAppSettingValue("InstrumentSettings:Generator", v);
+            //v = System.Text.Json.JsonSerializer.Serialize("Filename=.\\" + ConnectionString);
+            //SetAppSettingValue("ConnectionStrings:Default", v);
+
+            _window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => w.Title.Contains("Настройки"));
+            _window.Close();
+            //Application.Current.Shutdown();
+        }
+
+        private bool CanSaveSettingsCommandExecute(object p)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region OpenConnectionStringCommand
+
+        private LambdaCommand _openConnectionStringCommand;
+
+        public LambdaCommand OpenConnectionStringCommand => _openConnectionStringCommand
+            ??= new LambdaCommand(OnOpenConnectionStringCommandExecuted, CanOpenConnectionStringCommandExecute);
+
+        private void OnOpenConnectionStringCommandExecuted(object p)
+        {
+            /*SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = System.AppContext.BaseDirectory;
+            saveFileDialog.FileName = ConnectionString;
+            if(saveFileDialog.ShowDialog() != null)
+            {
+                var v = saveFileDialog.FileName;
+                //FileInfo fileInfo = new FileInfo(v);
+                //var dir = fileInfo.DirectoryName;
+                if (v.Contains(System.AppContext.BaseDirectory))
+                    ConnectionString = v.Remove(0, System.AppContext.BaseDirectory.Length);
+                else
+                    ConnectionString = v;
+            }*/
+        }
+
+        private bool CanOpenConnectionStringCommandExecute(object p)
+        {
+            return true;
+        }
+
+        #endregion
     }
 }

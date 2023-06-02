@@ -3,8 +3,12 @@ using SPOAPAKmmReceiver.Entities;
 
 namespace SPOAPAKmmReceiver.Data
 {
-    class SPOAPAKmmDB : DbContext
+    internal class SPOAPAKmmDB : DbContext
     {
+        public SPOAPAKmmDB(DbContextOptions<SPOAPAKmmDB> opt) : base(opt)
+        {
+        }
+
         public DbSet<Organization> Organizations { get; set; }
 
         public DbSet<Room> Rooms { get; set; }
@@ -22,10 +26,8 @@ namespace SPOAPAKmmReceiver.Data
         public DbSet<DeviceType> DeviceTypes { get; set; }
 
         public DbSet<MeasSettings> MeasSettings { get; set; }
-        
-        public DbSet<Frequency> Frequencies { get; set; }
 
-        public SPOAPAKmmDB(DbContextOptions<SPOAPAKmmDB> opt) : base(opt) { }
+        public DbSet<Frequency> Frequencies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

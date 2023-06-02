@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 
 namespace SPOAPAKmmReceiver.Entities.Base
 {
     public abstract class Entity : INotifyPropertyChanged
     {
         private int _id;
-        private bool _isSelected;
         private bool _isExpanded;
+        private bool _isSelected;
 
         public int Id
         {

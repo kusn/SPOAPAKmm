@@ -7,44 +7,54 @@
         xmlns:extensions="clr-namespace:SPOAPAKmmReceiver.Extensions"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
-        Title="MainWindow" Height="800" Width="1600">
-    
+        Icon="../Icon.ico"
+        Title="СПОАПАКмм-ПРИЁМНИК" Height="800" Width="1600">
+
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300*" />
+            <ColumnDefinition Width="700*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="15*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="15*" />
+            <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" Height="25">
-            <MenuItem Header="Настройки" Command="{Binding OpenSettingsWindowCommand}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-            <MenuItem Header="Оборудование" Command="{Binding OpenDevicesWindowCommand}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-            <MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+        <Menu Grid.Row="0" Height="25" Grid.ColumnSpan="2">
+            <MenuItem Header="Настройки" Command="{Binding OpenSettingsWindowCommand}"
+                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+            <MenuItem Header="Оборудование" Command="{Binding OpenDevicesWindowCommand}"
+                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+            <!--<MenuItem Header="Выход" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>-->
         </Menu>
-        <Grid Grid.Row="1">
+        <Grid Grid.ColumnSpan="2" Margin="0,46,0,46" Grid.RowSpan="3">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="4*"></ColumnDefinition>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" Margin="5,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20*"/>
-                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="2*" />
                 </Grid.RowDefinitions>
                 <!--<WrapPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0,2,0">
                     <Button Content="Add" Command="{Binding AddItemCommand}"/>
                     <Button Content="Remove" Command="{Binding RemoveItemCommand}"/>
                     <Button Content="Copy" Command="{Binding CopyItemCommand}"/>
                 </WrapPanel>-->
-                <extensions:CustomTreeView x:Name="MyTreeView" ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedCustomThing="{Binding SelectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Margin="5,0,5,5">
+                <extensions:CustomTreeView x:Name="MyTreeView"
+                                           ItemsSource="{Binding Organizations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                           SelectedCustomThing="{Binding SelectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                           Grid.Row="0" Margin="5,0,5,5">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="TreeViewItem">
-                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Добавить организацию" Command="{Binding AddOrganizationCommand}"/>
+                            <MenuItem Header="Добавить организацию" Command="{Binding AddOrganizationCommand}" />
                             <!--<MenuItem Header="Копировать организацию" Command="{Binding CopyItemCommand}"/>
                             <MenuItem Header="Удалить организацию" Command="{Binding RemoveItemCommand}"/>-->
                         </ContextMenu>
@@ -54,24 +64,28 @@
                             <Setter Property="IsExpanded" Value="False" />
                             <Setter Property="IsSelected" Value="False" />
                         </Style>
-                        <HierarchicalDataTemplate DataType="{x:Type entities:Organization}" ItemsSource="{Binding Rooms, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Organization}"
+                                                  ItemsSource="{Binding Rooms, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
-                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить помещение" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать организацию" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить организацию" Command="{Binding RemoveItemCommand}"/>
+                                    <ContextMenu
+                                        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить помещение" Command="{Binding AddItemCommand}" />
+                                        <MenuItem Header="Копировать организацию" Command="{Binding CopyItemCommand}" />
+                                        <MenuItem Header="Удалить организацию" Command="{Binding RemoveItemCommand}" />
                                     </ContextMenu>
                                 </TreeViewItem.ContextMenu>
                             </TreeViewItem>
                         </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type entities:Room}" ItemsSource="{Binding Elements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <HierarchicalDataTemplate DataType="{x:Type entities:Room}"
+                                                  ItemsSource="{Binding Elements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
-                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить элемент" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать помещение" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить помещение" Command="{Binding RemoveItemCommand}"/>
+                                    <ContextMenu
+                                        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить элемент" Command="{Binding AddItemCommand}" />
+                                        <MenuItem Header="Копировать помещение" Command="{Binding CopyItemCommand}" />
+                                        <MenuItem Header="Удалить помещение" Command="{Binding RemoveItemCommand}" />
                                     </ContextMenu>
                                 </TreeViewItem.ContextMenu>
                             </TreeViewItem>
@@ -79,10 +93,11 @@
                         <HierarchicalDataTemplate DataType="{x:Type entities:Element}" ItemsSource="{Binding Points}">
                             <TreeViewItem Header="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TreeViewItem.ContextMenu>
-                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
-                                        <MenuItem Header="Добавить точку" Command="{Binding AddItemCommand}"/>
-                                        <MenuItem Header="Копировать элемент" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить элемент" Command="{Binding RemoveItemCommand}"/>
+                                    <ContextMenu
+                                        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                        <MenuItem Header="Добавить точку" Command="{Binding AddItemCommand}" />
+                                        <MenuItem Header="Копировать элемент" Command="{Binding CopyItemCommand}" />
+                                        <MenuItem Header="Удалить элемент" Command="{Binding RemoveItemCommand}" />
                                     </ContextMenu>
                                 </TreeViewItem.ContextMenu>
                             </TreeViewItem>
@@ -90,82 +105,108 @@
                         <HierarchicalDataTemplate DataType="{x:Type entities:MeasPoint}">
                             <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <TextBlock.ContextMenu>
-                                    <ContextMenu DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
+                                    <ContextMenu
+                                        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}">
                                         <!--<MenuItem Header="Добавить измерение" Command="{Binding AddItemCommand}"/>-->
-                                        <MenuItem Header="Копировать точку" Command="{Binding CopyItemCommand}"/>
-                                        <MenuItem Header="Удалить точку" Command="{Binding RemoveItemCommand}"/>
+                                        <MenuItem Header="Копировать точку" Command="{Binding CopyItemCommand}" />
+                                        <MenuItem Header="Удалить точку" Command="{Binding RemoveItemCommand}" />
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
                             </TextBlock>
                         </HierarchicalDataTemplate>
                     </TreeView.Resources>
                 </extensions:CustomTreeView>
-                <Button Content="Создать отчёт" Grid.Row="1" Command="{Binding CreateReportCommand}" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,5,5" FontWeight="Bold" Height="25"/>
+                <Button Content="Создать отчёт" Grid.Row="1" Command="{Binding CreateReportCommand}"
+                        VerticalAlignment="Bottom" HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center" Margin="5,0,5,5" FontWeight="Bold" Height="25" />
             </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20*"/>
-                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="2*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3.4*"/>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3.4*" />
+                    <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
-                <Border Grid.Row="0" BorderThickness="1,1,1,1" BorderBrush="Gray" Margin="5,0,5,5" >
-                    <TabControl Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="0,5,0,0">
+                <Border Grid.Row="0" BorderThickness="1,1,1,1" BorderBrush="Gray" Margin="5,0,5,5">
+                    <TabControl Visibility="{Binding IsVisibilityTabControl, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedIndex="{Binding SelectedTab}" VerticalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                Margin="0,5,0,0">
                         <TabItem Visibility="Collapsed">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0">
-                                    <Label DockPanel.Dock="Top" Content="Название организации" HorizontalAlignment="Center"/>
-                                    <TextBox Name="txtBoxOrgName" Text="{Binding SelectedOrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                                    <Label DockPanel.Dock="Top" Content="Название организации"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox Name="txtBoxOrgName"
+                                             Text="{Binding SelectedOrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch"
+                                             VerticalContentAlignment="Stretch" />
                                 </DockPanel>
                                 <DockPanel Grid.Row="1">
-                                    <Label DockPanel.Dock="Top" Content="Адрес организации" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedOrganizationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                                    <Label DockPanel.Dock="Top" Content="Адрес организации"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedOrganizationAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch" />
                                 </DockPanel>
                                 <DockPanel Grid.Row="2">
-                                    <Label DockPanel.Dock="Top" Content="Описание организации" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedOrganizationDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                                    <Label DockPanel.Dock="Top" Content="Описание организации"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedOrganizationDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch" />
                                 </DockPanel>
                             </Grid>
                         </TabItem>
                         <TabItem Visibility="Collapsed">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="2*" />
+                                    <RowDefinition Height="3*" />
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0">
-                                    <Label DockPanel.Dock="Top" Content="Название помещения" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                    <Label DockPanel.Dock="Top" Content="Название помещения"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedRoomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" />
                                 </DockPanel>
                                 <DockPanel Grid.Row="1">
-                                    <Label DockPanel.Dock="Top" Content="Описание помещения" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedRoomDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                    <Label DockPanel.Dock="Top" Content="Описание помещения"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedRoomDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" />
                                 </DockPanel>
                                 <Border Grid.Row="2" BorderThickness="1" BorderBrush="Orange">
-                                    <DockPanel Grid.Row="2">
-                                        <Label DockPanel.Dock="Top" Content="Оборудование" HorizontalAlignment="Center"/>
+                                    <DockPanel>
+                                        <Label DockPanel.Dock="Top" Content="Оборудование" HorizontalAlignment="Center" />
                                         <Grid>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="0.5*"/>
-                                                <RowDefinition Height="0.3*"/>
-                                                <RowDefinition/>
-                                                <RowDefinition Height="0.3*"/>
+                                                <RowDefinition Height="0.5*" />
+                                                <RowDefinition Height="0.3*" />
+                                                <RowDefinition />
+                                                <RowDefinition Height="0.3*" />
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition/>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
                                             </Grid.ColumnDefinitions>
                                             <DockPanel Grid.Row="0" Grid.Column="0">
-                                                <Label DockPanel.Dock="Top" Content="Тип" HorizontalAlignment="Center"/>
-                                                <ComboBox ItemsSource="{Binding DeviceTypeNameList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceType}">
+                                                <Label DockPanel.Dock="Top" Content="Тип" HorizontalAlignment="Center" />
+                                                <ComboBox
+                                                    ItemsSource="{Binding DeviceTypeNameList, UpdateSourceTrigger=PropertyChanged}"
+                                                    SelectedItem="{Binding SelectedDeviceType}">
                                                     <!--<ComboBox.ItemTemplate>
                                                         <DataTemplate>
                                                             <TextBlock Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}"/>
@@ -174,22 +215,29 @@
                                                 </ComboBox>
                                             </DockPanel>
                                             <DockPanel Grid.Row="0" Grid.Column="1">
-                                                <Label DockPanel.Dock="Top" Content="Наименование" HorizontalAlignment="Center"/>
-                                                <ComboBox ItemsSource="{Binding DeviceNameList}" SelectedItem="{Binding SelectedDeviceName}"/>
+                                                <Label DockPanel.Dock="Top" Content="Наименование"
+                                                       HorizontalAlignment="Center" />
+                                                <ComboBox ItemsSource="{Binding DeviceNameList}"
+                                                          SelectedItem="{Binding SelectedDeviceName}" />
                                             </DockPanel>
-                                            <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить" Command="{Binding AddDeviceToRoomCommand}"/>
-                                            <ListBox Grid.Row="2" Grid.ColumnSpan="2" ItemsSource="{Binding SelectedRoom.Devices, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeviceFromList}">
+                                            <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить"
+                                                    Command="{Binding AddDeviceToRoomCommand}" />
+                                            <ListBox Grid.Row="2" Grid.ColumnSpan="2"
+                                                     ItemsSource="{Binding SelectedRoom.Devices, UpdateSourceTrigger=PropertyChanged}"
+                                                     SelectedItem="{Binding SelectedDeviceFromList}">
                                                 <ListBox.ItemTemplate>
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="{Binding Path=Type.Name}"/>
-                                                            <TextBlock Text="{Binding Path=Name, StringFormat={} {0}}"/>
-                                                            <TextBlock Text="{Binding Path=Number, StringFormat={} №{0}}"/>
+                                                            <TextBlock Text="{Binding Path=Type.Name}" />
+                                                            <TextBlock Text="{Binding Path=Name, StringFormat={} {0}}" />
+                                                            <TextBlock
+                                                                Text="{Binding Path=Number, StringFormat={} №{0}}" />
                                                         </StackPanel>
                                                     </DataTemplate>
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
-                                            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Удалить" Command="{Binding RemoveDeviceFromRoomCommand}"/>
+                                            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Удалить"
+                                                    Command="{Binding RemoveDeviceFromRoomCommand}" />
                                         </Grid>
                                     </DockPanel>
                                 </Border>
@@ -198,151 +246,176 @@
                         <TabItem Visibility="Collapsed">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="2*" />
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0">
-                                    <Label DockPanel.Dock="Top" Content="Название элемента" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedElementName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                    <Label DockPanel.Dock="Top" Content="Название элемента"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedElementName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" />
                                 </DockPanel>
                                 <DockPanel Grid.Row="1">
-                                    <Label DockPanel.Dock="Top" Content="Описание элемента" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedElementDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                    <Label DockPanel.Dock="Top" Content="Описание элемента"
+                                           HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedElementDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" />
                                 </DockPanel>
                             </Grid>
                         </TabItem>
                         <TabItem Visibility="Collapsed">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="5*"/>
-                                    <RowDefinition Height="0.5*"/>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="5*" />
+                                    <RowDefinition Height="0.5*" />
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0">
-                                    <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                    <Label DockPanel.Dock="Top" Content="Название точки" HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" />
                                 </DockPanel>
                                 <DockPanel Grid.Row="1">
-                                    <Label DockPanel.Dock="Top" Content="Описание точки" HorizontalAlignment="Center"/>
-                                    <TextBox Text="{Binding SelectedPointDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Bottom"/>
+                                    <Label DockPanel.Dock="Top" Content="Описание точки" HorizontalAlignment="Center" />
+                                    <TextBox
+                                        Text="{Binding SelectedPointDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        DockPanel.Dock="Bottom" />
                                 </DockPanel>
                                 <DockPanel Grid.Row="2">
-                                    <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center"/>
-                                    <DataGrid x:Name="DG" ItemsSource="{Binding  SelectedPointMeasurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ColumnWidth="*">
+                                    <Label DockPanel.Dock="Top" Content="Измерение" HorizontalAlignment="Center" />
+                                    <DataGrid x:Name="DG"
+                                              ItemsSource="{Binding  SelectedPointMeasurings, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              AutoGenerateColumns="False" ColumnWidth="*">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Binding="{Binding Freq}" Header="Частота"/>                                            
-                                            <DataGridTextColumn Binding="{Binding P1, StringFormat={}{0:F2}}" Header="P1"/>
-                                            <DataGridTextColumn Binding="{Binding P2, StringFormat={}{0:F2}}" Header="P2"/>
-                                            <DataGridTextColumn Binding="{Binding AverageE, StringFormat={}{0:F2}}" Header="Среднее"/>
-                                            <DataGridTextColumn Binding="{Binding DX, StringFormat={}{0:F2}}" Header="dX"/>
-                                            <DataGridTextColumn Binding="{Binding E}" Header="Э"/>                                            
+                                            <DataGridTextColumn Binding="{Binding Freq}" Header="Частота" />
+                                            <DataGridTextColumn Binding="{Binding P1, StringFormat={}{0:F2}}"
+                                                                Header="P1" />
+                                            <DataGridTextColumn Binding="{Binding P2, StringFormat={}{0:F2}}"
+                                                                Header="P2" />
+                                            <DataGridTextColumn Binding="{Binding AverageE, StringFormat={}{0:F2}}"
+                                                                Header="Среднее" />
+                                            <DataGridTextColumn Binding="{Binding DX, StringFormat={}{0:F2}}"
+                                                                Header="dX" />
+                                            <DataGridTextColumn Binding="{Binding E}" Header="Э" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </DockPanel>
                                 <DockPanel Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Command="{Binding RunFrequencyCalibrationCommand}" Content="Калибровка частоты" IsEnabled="{Binding IsChangedFrequencyList}" DockPanel.Dock="Left" Margin="0,2,2,0" Height="25" Width="120"/>
-                                    <Button Command="{Binding RunCalibrationCommand}" Content="Калибровка" DockPanel.Dock="Left" Margin="0,2,2,0" Width="120"/>
-                                    <Button Command="{Binding RunMeasuringCommand}" Content="Измерения" DockPanel.Dock="Right" Margin="2,2,0,0" Width="120"/>
+                                    <Button Command="{Binding RunFrequencyCalibrationCommand}"
+                                            Content="Калибровка частоты" IsEnabled="{Binding IsChangedFrequencyList}"
+                                            DockPanel.Dock="Left" Margin="0,2,2,0" Height="25" Width="120" />
+                                    <Button Command="{Binding RunCalibrationCommand}" Content="Калибровка"
+                                            DockPanel.Dock="Left" Margin="0,2,2,0" Width="120" />
+                                    <Button Command="{Binding RunMeasuringCommand}" Content="Измерения"
+                                            DockPanel.Dock="Right" Margin="2,2,0,0" Width="120" />
                                 </DockPanel>
                             </Grid>
                         </TabItem>
                     </TabControl>
                 </Border>
-                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveChangesCommand}" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,5,5" FontWeight="Bold" Height="25"/>
-                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.RowSpan="2" IsEnabled="{Binding IsEnabledMSettingsPanel}">
+                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveChangesCommand}"
+                        VerticalAlignment="Bottom" HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center" Margin="5,0,5,5" FontWeight="Bold" Height="25" />
+                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.RowSpan="2"
+                            IsEnabled="{Binding IsEnabledMSettingsPanel}">
                     <StackPanel>
                         <GroupBox Header="Параметры измерений" FontWeight="ExtraBold">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2.3*"/>
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="2.3*" />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Row="0" Content="Параметр" FontWeight="Bold"/>
-                                <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
-                                <Label Grid.Row="1" Grid.Column="0" Content="Частота начальная, МГц" FontWeight="Normal"/>
+                                <Label Grid.Row="0" Content="Параметр" FontWeight="Bold" />
+                                <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="Частота начальная, МГц"
+                                       FontWeight="Normal" />
                                 <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.StartFrequency">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
-                                                <ExceptionValidationRule/>
-                                                <NotifyDataErrorValidationRule/>
+                                                <DataErrorValidationRule />
+                                                <ExceptionValidationRule />
+                                                <NotifyDataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="2" Grid.Column="0" Content="Частота конечная, МГц" FontWeight="Normal"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="Частота конечная, МГц" FontWeight="Normal" />
                                 <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.EndFrequency">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="3" Grid.Column="0" Content="Шаг перестройки, МГц" FontWeight="Normal"/>
+                                <Label Grid.Row="3" Grid.Column="0" Content="Шаг перестройки, МГц" FontWeight="Normal" />
                                 <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.Step">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="4" Grid.Column="0" Content="Отстройка частоты, МГц" FontWeight="Normal"/>
+                                <Label Grid.Row="4" Grid.Column="0" Content="Отстройка частоты, МГц"
+                                       FontWeight="Normal" />
                                 <TextBox Grid.Row="4" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.Offset">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                
+
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="Установки генератора" FontWeight="ExtraBold">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2.3*"/>
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="2.3*" />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold"/>
-                                <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
-                                <Label Grid.Row="1" Grid.Column="0" Content="Мощность, дБм" FontWeight="Normal"/>
+                                <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold" />
+                                <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="Мощность, дБм" FontWeight="Normal" />
                                 <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.Power" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="2" Grid.Column="0" Content="Время излучения, с" FontWeight="Normal"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="Время излучения, с" FontWeight="Normal" />
                                 <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.TimeOfEmission" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
@@ -352,95 +425,105 @@
                         <GroupBox Header="Установки анализатора" FontWeight="ExtraBold">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2.3*"/>
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="2.3*" />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold"/>
-                                <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold"/>
-                                <Label Grid.Row="1" Grid.Column="0" Content="Полоса обзора, кГц" FontWeight="Normal"/>
+                                <Label Grid.Row="0" Grid.Column="0" Content="Параметр" FontWeight="Bold" />
+                                <Label Grid.Row="0" Grid.Column="1" Content="Значение" FontWeight="Bold" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="Полоса обзора, кГц" FontWeight="Normal" />
                                 <TextBox Grid.Row="1" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.Span" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="2" Grid.Column="0" Content="Полоса пропускания, кГц" FontWeight="Normal"/>
+                                <Label Grid.Row="2" Grid.Column="0" Content="Полоса пропускания, кГц"
+                                       FontWeight="Normal" />
                                 <TextBox Grid.Row="2" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.Rbw" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="3" Grid.Column="0" Content="Аттенюатор, дБ" FontWeight="Normal"/>
+                                <Label Grid.Row="3" Grid.Column="0" Content="Аттенюатор, дБ" FontWeight="Normal" />
                                 <TextBox Grid.Row="3" Grid.Column="1" FontWeight="Normal">
                                     <TextBox.Text>
                                         <Binding Path="MSettings.Attenuation" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </TextBox.Text>
                                 </TextBox>
-                                <Label Grid.Row="4" Grid.Column="0" Content="Предусилитель" FontWeight="Normal"/>
-                                <CheckBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Label Grid.Row="4" Grid.Column="0" Content="Предусилитель" FontWeight="Normal" />
+                                <CheckBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center"
+                                          VerticalAlignment="Center">
                                     <CheckBox.IsChecked>
                                         <Binding Path="MSettings.IsPreamp" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <DataErrorValidationRule/>
+                                                <DataErrorValidationRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </CheckBox.IsChecked>
                                 </CheckBox>
                             </Grid>
                         </GroupBox>
-                        <Button Content="Применить" Command="{Binding ApplyMeasurementSettingsCommand}" FontWeight="Bold" Margin="5,5,5,5" Height="25"/>
+                        <Button Content="Применить" Command="{Binding ApplyMeasurementSettingsCommand}"
+                                FontWeight="Bold" Margin="5,5,5,5" Height="25" />
                     </StackPanel>
-                    <GroupBox Header="Список частот"  FontWeight="ExtraBold">
+                    <GroupBox Header="Список частот" FontWeight="ExtraBold">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
                                 <Label FontWeight="Normal">
                                     <Label.Content>
-                                        <TextBlock TextWrapping="Wrap" Text="Частоты из предпочтительного ряда" Width="202"/>
+                                        <TextBlock TextWrapping="Wrap" Text="Частоты из предпочтительного ряда"
+                                                   Width="202" />
                                     </Label.Content>
                                 </Label>
-                                <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsPreferredRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>                                
+                                <RadioButton GroupName="Row"
+                                             IsChecked="{Binding MSettings.IsPreferredRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label FontWeight="Normal">
                                     <Label.Content>
-                                        <TextBlock TextWrapping="Wrap" Text="Частоты из собственного ряда" Width="202"/>
+                                        <TextBlock TextWrapping="Wrap" Text="Частоты из собственного ряда" Width="202" />
                                     </Label.Content>
                                 </Label>
-                                <RadioButton GroupName="Row" IsChecked="{Binding MSettings.IsOwnRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>                                
+                                <RadioButton GroupName="Row"
+                                             IsChecked="{Binding MSettings.IsOwnRow, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
-                            <Button Content="Авторасчет" Command="{Binding AutoCalculationFrequencyRowCommand}" Height="25"/>
-                            <TextBox Text="{Binding ExtraItemToFrequencyList, UpdateSourceTrigger=PropertyChanged}" FontWeight="Normal" Margin="0,5,0,5"/>
-                            <Button Content="Добавить" Command="{Binding AddItemToFrequencyListCommand}" Height="25"/>
-                            <ScrollViewer CanContentScroll="True"  MaxHeight="350">
-                                <ListBox ItemsSource="{Binding MSettings.FrequencyList}" ScrollViewer.CanContentScroll="True" FontWeight="Normal">
-                                </ListBox>
+                            <Button Content="Авторасчет" Command="{Binding AutoCalculationFrequencyRowCommand}"
+                                    Height="25" />
+                            <TextBox Text="{Binding ExtraItemToFrequencyList, UpdateSourceTrigger=PropertyChanged}"
+                                     FontWeight="Normal" Margin="0,5,0,5" />
+                            <Button Content="Добавить" Command="{Binding AddItemToFrequencyListCommand}" Height="25" />
+                            <ScrollViewer CanContentScroll="True" MaxHeight="350">
+                                <ListBox ItemsSource="{Binding MSettings.FrequencyList}"
+                                         ScrollViewer.CanContentScroll="True" FontWeight="Normal" />
                             </ScrollViewer>
                         </StackPanel>
-                    </GroupBox>                    
+                    </GroupBox>
                 </StackPanel>
-                
+
             </Grid>
         </Grid>
-        <StatusBar Grid.Row="2" >
-            <StatusBarItem Content="{Binding RecieveMessage}"></StatusBarItem>
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
+            <StatusBarItem Content="{Binding RecieveMessage}" />
         </StatusBar>
     </Grid>
 </Window>

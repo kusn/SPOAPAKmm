@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.Entities.Base;
+using SPOAPAKmmReceiver.Interfaces;
 
 namespace SPOAPAKmmReceiver.Data.Stores.InDb
 {
     internal class DbStore<T> : IStore<T> where T : Entity
     {
         private readonly SPOAPAKmmDB _db;
-        private DbSet<T> Set { get; }
 
         public DbStore(SPOAPAKmmDB db)
         {
@@ -20,9 +15,17 @@ namespace SPOAPAKmmReceiver.Data.Stores.InDb
             Set = db.Set<T>();
         }
 
-        public IEnumerable<T> GetAll() => Set;
+        private DbSet<T> Set { get; }
 
-        public T GetById(int id) => Set.Find(id);
+        public IEnumerable<T> GetAll()
+        {
+            return Set;
+        }
+
+        public T GetById(int id)
+        {
+            return Set.Find(id);
+        }
 
         public T Add(T item)
         {

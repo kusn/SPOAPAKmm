@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Data.Stores.InDb;
-using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Interfaces;
 using SPOAPAKmmReceiver.Models;
 using SPOAPAKmmReceiver.Services;
@@ -20,7 +14,7 @@ using SPOAPAKmmReceiver.ViewModels;
 namespace SPOAPAKmmReceiver
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
@@ -31,11 +25,13 @@ namespace SPOAPAKmmReceiver
         public static IHost Hosting => _hosting
             ??= CreateHostBuilder(Environment.GetCommandLineArgs()).Build();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)                
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(opt => opt.AddJsonFile("appsettings.json", false, true))
                 .ConfigureServices(ConfigureServices);
-        
+        }
+
         private static void ConfigureServices(HostBuilderContext host, IServiceCollection services)
         {
             services.AddDbContext<SPOAPAKmmDB>(opt => opt.UseSqlite(host.Configuration.GetConnectionString("Default")));
@@ -47,8 +43,10 @@ namespace SPOAPAKmmReceiver
             services.AddScoped<DevicesWindowViewModel>();
             services.AddSingleton(typeof(INetConnection), typeof(NetConnection));
 
-            services.Configure<InstrumentSettings>(InstrumentSettings.Generator, host.Configuration.GetSection("InstrumentSettings:Generator"));
-            services.Configure<InstrumentSettings>(InstrumentSettings.Receiver, host.Configuration.GetSection("InstrumentSettings:Receiver"));            
+            services.Configure<InstrumentSettings>(InstrumentSettings.Generator,
+                host.Configuration.GetSection("InstrumentSettings:Generator"));
+            services.Configure<InstrumentSettings>(InstrumentSettings.Receiver,
+                host.Configuration.GetSection("InstrumentSettings:Receiver"));
         }
 
         protected override void OnStartup(StartupEventArgs e)

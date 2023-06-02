@@ -1,9 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <PlatformTarget>x86</PlatformTarget>
+    <Platforms>AnyCPU;x86;x64</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
@@ -15,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RSSigGen\RSSigGen.csproj" />
-    <ProjectReference Include="..\SPOAPAKmmReceiver\SPOAPAKmmReceiver.csproj" />
+    <ProjectReference Include="..\SPOAPAKmm.Extensions\SPOAPAKmm.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

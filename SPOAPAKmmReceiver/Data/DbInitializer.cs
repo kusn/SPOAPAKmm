@@ -76,7 +76,6 @@ namespace SPOAPAKmmReceiver.Data
                 await _db.SaveChangesAsync();
             }
 #endif
-
         }
     }
 }
