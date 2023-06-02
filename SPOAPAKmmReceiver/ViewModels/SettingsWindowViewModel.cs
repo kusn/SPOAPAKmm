@@ -1,4 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using RohdeSchwarz.RsInstrument;
+using SPOAPAKmm.Extensions;
+using SPOAPAKmmReceiver.Extensions.DTO;
+using SPOAPAKmmReceiver.Infrastructure.Commands;
+using SPOAPAKmmReceiver.Models;
+using SPOAPAKmmReceiver.ViewModels.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -10,15 +19,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using RohdeSchwarz.RsInstrument;
-using SPOAPAKmmReceiver.Extensions.DTO;
-using SPOAPAKmmReceiver.Infrastructure.Commands;
-using SPOAPAKmmReceiver.Models;
-using SPOAPAKmmReceiver.ViewModels.Base;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -238,14 +238,14 @@ namespace SPOAPAKmmReceiver.ViewModels
             {
                 var message = JsonSerializer.Deserialize<TransmitterMessage>(data);
                 if (message != null)
-                    if (message.Mode == WorkMode.Checking)
+                    if (message.Mode == ReceiverMessage.WorkMode.Checking)
                     {
                         RecieveMessage = message.IsOk.ToString();
                         DescriptionSelectedGenerator = message.Message;
                         _cancelTokenSource.Cancel();
                         //_cancelTokenSource.Dispose();
                     }
-                    else if (message.Mode == WorkMode.Searching)
+                    else if (message.Mode == ReceiverMessage.WorkMode.Searching)
                     {
                         DevicesListTransmitter = message.DevicesList;
                         _cancelTokenSource.Cancel();
@@ -371,7 +371,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             var cancelTokenSource = new CancellationTokenSource();
 
             StartListen();
-            var message = new ReceiverMessage(WorkMode.Checking);
+            var message = new ReceiverMessage(ReceiverMessage.WorkMode.Checking);
             message.ReceiverIp = _receiverSettings.IpAddress;
             message.ReceiverPort = _receiverSettings.Port;
             message.InstrAddress = GeneratorSettings.InstrAddress;
@@ -398,7 +398,7 @@ namespace SPOAPAKmmReceiver.ViewModels
             var cancelTokenSource = new CancellationTokenSource();
 
             StartListen();
-            var message = new ReceiverMessage(WorkMode.Searching);
+            var message = new ReceiverMessage(ReceiverMessage.WorkMode.Searching);
             message.ReceiverIp = _receiverSettings.IpAddress;
             message.ReceiverPort = _receiverSettings.Port;
             SendMessage = JsonSerializer.Serialize(message);

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmm.Extensions
 {
     public class TransmitterMessage
     {
-        public WorkMode Mode { get; set; }
+        public ReceiverMessage.WorkMode Mode { get; set; }
         public bool IsOk { get; set; }
 
         public Dictionary<string, string> DevicesList { get; set; }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmm.Extensions
 {
     [Serializable]
     public partial class ReceiverMessage

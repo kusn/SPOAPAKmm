@@ -1,10 +1,9 @@
-﻿using System;
+﻿using SPOAPAKmm.Extensions.Base;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using SPOAPAKmmReceiver.Extensions;
-using SPOAPAKmmReceiver.Models.Base;
 
-namespace SPOAPAKmmReceiver.Models
+namespace SPOAPAKmm.Extensions
 {
     [MeasureSettingsValidation]
     [Serializable]

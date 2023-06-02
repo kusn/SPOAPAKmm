@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace SPOAPAKmmReceiver.Extensions
+namespace SPOAPAKmm.Extensions
 {
     public class SortableObservableCollection<T> : ObservableCollection<T>
     {

@@ -1,4 +1,4 @@
-﻿namespace SPOAPAKmmReceiver.Models
+﻿namespace SPOAPAKmm.Extensions
 {
     public partial class ReceiverMessage
     {

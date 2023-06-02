@@ -2,7 +2,6 @@
 using RohdeSchwarz.RsFsw;
 using SPOAPAKmmReceiver.Data;
 using SPOAPAKmmReceiver.Entities;
-using SPOAPAKmmReceiver.Extensions;
 using SPOAPAKmmReceiver.Extensions.DTO;
 using SPOAPAKmmReceiver.Infrastructure.Commands;
 using SPOAPAKmmReceiver.Interfaces;
@@ -23,8 +22,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SPOAPAKmm.Extensions;
 using TemplateEngine.Docx;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
 namespace SPOAPAKmmReceiver.ViewModels
 {
@@ -704,7 +703,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     {
                         RecieveMessage = Data;
                         var m = JsonSerializer.Deserialize<TransmitterMessage>(Data);
-                        if (m.Mode == WorkMode.Сalibration)
+                        if (m.Mode == ReceiverMessage.WorkMode.Сalibration)
                         {
                         }
                     }
@@ -1322,7 +1321,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 {
                     StartListen();
 
-                    var message = new ReceiverMessage(WorkMode.ApplyMeasureSettings);
+                    var message = new ReceiverMessage(ReceiverMessage.WorkMode.ApplyMeasureSettings);
                     message.FromMeasureSettings(MSettings);
                     message.ReceiverIp = _receiverSettings.IpAddress;
                     message.ReceiverPort = _receiverSettings.Port;
@@ -1466,7 +1465,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                     }
 
                     StartListen();
-                    var message = new ReceiverMessage(WorkMode.Сalibration);
+                    var message = new ReceiverMessage(ReceiverMessage.WorkMode.Сalibration);
                     message.FromMeasureSettings(MSettings);
                     message.ReceiverIp = _receiverSettings.IpAddress;
                     message.ReceiverPort = _receiverSettings.Port;
@@ -1559,7 +1558,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 if (InitializeReciever())
                 {
                     StartListen();
-                    var message = new ReceiverMessage(WorkMode.Сalibration);
+                    var message = new ReceiverMessage(ReceiverMessage.WorkMode.Сalibration);
                     message.FromMeasureSettings(MSettings);
                     message.ReceiverIp = _receiverSettings.IpAddress;
                     message.ReceiverPort = _receiverSettings.Port;
@@ -1610,7 +1609,7 @@ namespace SPOAPAKmmReceiver.ViewModels
                 messageTask.Start();
                 Console.WriteLine("Закройте дверь!");
 
-                var message = new ReceiverMessage(WorkMode.Measuring);
+                var message = new ReceiverMessage(ReceiverMessage.WorkMode.Measuring);
                 message.FromMeasureSettings(MSettings);
                 message.ReceiverIp = _receiverSettings.IpAddress;
                 message.ReceiverPort = _receiverSettings.Port;

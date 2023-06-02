@@ -1,18 +1,15 @@
 ﻿using RohdeSchwarz.RsInstrument;
-using SPOAPAKmmReceiver.Entities;
-using SPOAPAKmmReceiver.Models;
+using RSSigGen.RS;
+using SPOAPAKmm.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
-using static SPOAPAKmmReceiver.Models.ReceiverMessage;
-using RSSigGen;
-using RSSigGen.RS;
-using System.Linq;
 
 namespace SPOAPAKmmTransmitter
 {
@@ -45,7 +42,7 @@ namespace SPOAPAKmmTransmitter
                     _sendPort = m.ReceiverPort;
                     Console.WriteLine("Получен запрос: " + s);
 
-                    if (m.Mode == WorkMode.Searching)
+                    if (m.Mode == ReceiverMessage.WorkMode.Searching)
                     {
                         try
                         {
@@ -84,11 +81,11 @@ namespace SPOAPAKmmTransmitter
                             Console.Error.WriteLine(ex.Message);
                         }
                     }
-                    else if (m.Mode == WorkMode.ApplyInstrumentSettings)
+                    else if (m.Mode == ReceiverMessage.WorkMode.ApplyInstrumentSettings)
                     {
 
                     }
-                    else if (m.Mode == WorkMode.ApplyMeasureSettings)
+                    else if (m.Mode == ReceiverMessage.WorkMode.ApplyMeasureSettings)
                     {
                         Console.WriteLine("Режим получения настроек");
                         Console.WriteLine("Получены настройки: " + s);
@@ -99,7 +96,7 @@ namespace SPOAPAKmmTransmitter
                         SendToClient(message);
                         Console.WriteLine("Отправлено сообщение: " + message);
                     }
-                    else if (m.Mode == WorkMode.Сalibration)
+                    else if (m.Mode == ReceiverMessage.WorkMode.Сalibration)
                     {
                         Console.WriteLine("Режим калибровки");
 
@@ -144,7 +141,7 @@ namespace SPOAPAKmmTransmitter
                         SendToClient(message);
                         Console.WriteLine("Отправлено сообщение: " + message);
                     }
-                    else if (m.Mode == WorkMode.Checking)
+                    else if (m.Mode == ReceiverMessage.WorkMode.Checking)
                     {
                         Console.WriteLine("Режим проверки");
 
@@ -172,7 +169,7 @@ namespace SPOAPAKmmTransmitter
                         Console.WriteLine("Отправлено сообщение: " + message);
                         
                     }
-                    else if (m.Mode == WorkMode.Measuring)
+                    else if (m.Mode == ReceiverMessage.WorkMode.Measuring)
                     {
                         Console.WriteLine("Режим измерения");
 
