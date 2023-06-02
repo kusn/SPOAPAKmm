@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RSSigGen\RSSigGen.csproj" />
-    <ProjectReference Include="..\SPOAPAKmmReceiver\SPOAPAKmmReceiver.csproj" />
+    <ProjectReference Include="..\SPOAPAKmm.Extensions\SPOAPAKmm.Extensions.csproj" />
   </ItemGroup>
 
 </Project>
