@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
+    <Platforms>AnyCPU;x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using RohdeSchwarz.RsFsw;
+using SPOAPAKmmReceiver.Data;
+using SPOAPAKmmReceiver.Entities;
+using SPOAPAKmmReceiver.Extensions;
+using SPOAPAKmmReceiver.Extensions.DTO;
+using SPOAPAKmmReceiver.Infrastructure.Commands;
+using SPOAPAKmmReceiver.Interfaces;
+using SPOAPAKmmReceiver.Models;
+using SPOAPAKmmReceiver.ViewModels.Base;
+using SPOAPAKmmReceiver.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,18 +23,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.Extensions.Configuration;
-using RohdeSchwarz.RsFsw;
-using SPOAPAKmmReceiver.Data;
-using SPOAPAKmmReceiver.Entities;
-using SPOAPAKmmReceiver.Extensions;
-using SPOAPAKmmReceiver.Extensions.DTO;
-using SPOAPAKmmReceiver.Infrastructure.Commands;
-using SPOAPAKmmReceiver.Interfaces;
-using SPOAPAKmmReceiver.Models;
-using SPOAPAKmmReceiver.ViewModels.Base;
-using SPOAPAKmmReceiver.Views;
 using TemplateEngine.Docx;
 using static SPOAPAKmmReceiver.Models.ReceiverMessage;
 
@@ -1741,246 +1740,255 @@ namespace SPOAPAKmmReceiver.ViewModels
         private void OnCreateReportCommandExecuted(object p)
         {
 
-            if (File.Exists("OutputDocument.docx"))
-                File.Delete("OutputDocument.docx");
+            //if (File.Exists("OutputDocument.docx"))
+            //    File.Delete("OutputDocument.docx");
 
-            if (SelectedValue is Room)
+            var minE = "";
+            Room room = (Room)SelectedValue;
+            string outputFileName = $"Протокол эффективности экранирования помещения {room.Name}.docx";
+            if (File.Exists(outputFileName))
+                File.Delete(outputFileName);
+            File.Copy("ProtocolTemplate.docx", outputFileName);
+
+            List<TableRowContent> devicesRows = new List<TableRowContent>();
+            List<TableRowContent> elementsRows = new List<TableRowContent>();
+
+            //Заполняем поля таблицы оборудования
+            if (room.Devices != null)
             {
-                var minE = "";
-                Room room = (Room)SelectedValue;
-                string outputFileName = $"Протокол эффективности экранирования помещения {room.Name}.docx";
-                if (File.Exists(outputFileName))
-                    File.Delete(outputFileName);
-                File.Copy("ProtocolTemplate.docx", outputFileName, true);
-
-                List<TableRowContent> devicesRows = new List<TableRowContent>();
-                List<TableRowContent> elementsRows = new List<TableRowContent>();
-
-                //Заполняем поля таблицы оборудования
-                if (room.Devices != null)
-                {
-                    foreach (var device in room.Devices)
-                    {
-                        var fields = new List<FieldContent>();
-
-                        fields.Add(new FieldContent("DeviceTypeAndName", device.Type.Name + " " + device.Name));
-                        fields.Add(new FieldContent("DeviceNumber", device.Number));
-                        fields.Add(new FieldContent("MeasRange", device.Range.StartFreq + " - " + device.Range.EndFreq));
-                        fields.Add(new FieldContent("VerificationDate", device.VerificationDate.ToString()));
-                        fields.Add(new FieldContent("VerificationInformation", device.VerificationInformation));
-                        fields.Add(new FieldContent("VerificationOrganization", device.VerificationOrganization));
-
-                        devicesRows.Add(new TableRowContent(fields));
-                    }
-                }
-                else
+                foreach (var device in room.Devices)
                 {
                     var fields = new List<FieldContent>();
 
-                    fields.Add(new FieldContent("DeviceTypeAndName", "Не указано"));
-                    fields.Add(new FieldContent("DeviceNumber", "Не указано"));
-                    fields.Add(new FieldContent("MeasRange", "Не указано"));
-                    fields.Add(new FieldContent("VerificationDate", "Не указано"));
-                    fields.Add(new FieldContent("VerificationInformation", "Не указано"));
-                    fields.Add(new FieldContent("VerificationOrganization", "Не указано"));
+                    fields.Add(new FieldContent("DeviceTypeAndName", device.Type.Name + " " + device.Name));
+                    fields.Add(new FieldContent("DeviceNumber", device.Number));
+                    fields.Add(new FieldContent("MeasRange", device.Range.StartFreq + " - " + device.Range.EndFreq));
+                    fields.Add(new FieldContent("VerificationDate", device.VerificationDate.ToString()));
+                    fields.Add(new FieldContent("VerificationInformation", device.VerificationInformation));
+                    fields.Add(new FieldContent("VerificationOrganization", device.VerificationOrganization));
 
                     devicesRows.Add(new TableRowContent(fields));
                 }
+            }
+            else
+            {
+                var fields = new List<FieldContent>();
 
-                ListContent listContent;
-                List<double> unicFreqList;
-                List<MeasureItem> minMeasureItemsList;
-                if (room.Elements != null)
+                fields.Add(new FieldContent("DeviceTypeAndName", "Не указано"));
+                fields.Add(new FieldContent("DeviceNumber", "Не указано"));
+                fields.Add(new FieldContent("MeasRange", "Не указано"));
+                fields.Add(new FieldContent("VerificationDate", "Не указано"));
+                fields.Add(new FieldContent("VerificationInformation", "Не указано"));
+                fields.Add(new FieldContent("VerificationOrganization", "Не указано"));
+
+                devicesRows.Add(new TableRowContent(fields));
+            }
+
+
+            //Заполняем поля таблицы элементов
+            int i = 1;
+            foreach (var element in room.Elements)
+            {
+                var fields = new List<FieldContent>();
+
+                fields.Add(new FieldContent("ElementNumber", i.ToString()));
+                fields.Add(new FieldContent("ElementName", element.Name));
+                fields.Add(new FieldContent("PointsNumber", element.Points.Count.ToString()));
+
+                elementsRows.Add(new TableRowContent(fields));
+                i++;
+            }
+
+            //Запоняем поля таблицы результатов измерения для определённой частоты
+            ListContent listContent = new ListContent("EachFreqResultTablesList"); //Создаеём список таблиц
+
+            List<double> unicFreqList = new List<double>();
+            foreach (var element in room.Elements)
+                foreach (var point in element.Points)
+                    foreach (var item in point.MeasureItems)
+                        if (unicFreqList.Count == 0)
+                            unicFreqList.Add(item.Freq);
+                        else if (!unicFreqList.Contains(item.Freq)) unicFreqList.Add(item.Freq);
+            unicFreqList.Sort();
+
+            List<MeasureItem> minMeasureItemsList = new List<MeasureItem>();
+            i = 3;
+            foreach (var freq in unicFreqList)
+            {
+                var listItemContent =
+                    new ListItemContent("EFTableNumber", i.ToString()); //Создаем единицу листа таблиц
+                var tableContent = new TableContent("EachFreqResultTable"); //Создаём таблицу
+
+                var n = 1;
+                foreach (var element in room.Elements)
                 {
-                    //Заполняем поля таблицы элементов
-                    int i = 1;
-                    foreach (var element in room.Elements)
+                    var fields = new List<IContentItem>();
+                    fields.Add(new FieldContent("EFElementNumber", n.ToString()));
+
+                    //Находим измерения с определенной частотой
+                    var measureItems = new List<MeasureItem>();
+                    foreach (var point in element.Points)
                     {
-                        var fields = new List<FieldContent>();
-
-                        fields.Add(new FieldContent("ElementNumber", i.ToString()));
-                        fields.Add(new FieldContent("ElementName", element.Name));
-                        fields.Add(new FieldContent("PointsNumber", element.Points.Count.ToString()));
-
-                        elementsRows.Add(new TableRowContent(fields));
-                        i++;
+                        var measureItem = point.MeasureItems.FirstOrDefault(mi => mi.Freq == freq);
+                        if (measureItem != null)
+                            measureItems.Add(measureItem);
                     }
 
-                    //Запоняем поля таблицы результатов измерения для определённой частоты
-                    listContent = new ListContent("EachFreqResultTablesList"); //Создаеём список таблиц
-
-                    unicFreqList = new List<double>();
-                    foreach (var element in room.Elements)
-                        foreach (var point in element.Points)
-                            foreach (var item in point.MeasureItems)
-                                if (unicFreqList.Count == 0)
-                                    unicFreqList.Add(item.Freq);
-                                else if (!unicFreqList.Contains(item.Freq)) unicFreqList.Add(item.Freq);
-                    unicFreqList.Sort();
-
-                    minMeasureItemsList = new List<MeasureItem>();
-                    i = 3;
-                    foreach (var freq in unicFreqList)
-                    {
-                        var listItemContent =
-                            new ListItemContent("EFTableNumber", i.ToString()); //Создаем единицу листа таблиц
-                        var tableContent = new TableContent("EachFreqResultTable"); //Создаём таблицу
-
-                        var n = 1;
-                        foreach (var element in room.Elements)
+                    //Находим измерение из этого списка с минимальной Э
+                    var min = double.MaxValue;
+                    var minMeasItem = new MeasureItem();
+                    foreach (var measureItem in measureItems)
+                        if (measureItem != null && measureItem.AverageE <= min)
                         {
-                            var fields = new List<IContentItem>();
-                            fields.Add(new FieldContent("EFElementNumber", n.ToString()));
+                            min = measureItem.AverageE;
+                            minMeasItem = measureItem;
+                        }
 
-                            //Находим измерения с определенной частотой
-                            var measureItems = new List<MeasureItem>();
-                            foreach (var point in element.Points)
+                    if (measureItems.Count != 0)
+                    {
+                        if (minMeasItem.Levels != null)
+                        {
+                            for (var j = 1; j <= minMeasItem.Levels.Count; j++)
                             {
-                                var measureItem = point.MeasureItems.FirstOrDefault(mi => mi.Freq == freq);
-                                if (measureItem != null)
-                                    measureItems.Add(measureItem);
+                                fields.Add(new FieldContent("EFP1_" + j,
+                                    minMeasItem.Levels.ToList()[0].P1.ToString("F")));
+                                fields.Add(new FieldContent("EFP2_" + j,
+                                    minMeasItem.Levels.ToList()[0].P2.ToString("F")));
                             }
-
-                            //Находим измерение из этого списка с минимальной Э
-                            var min = double.MaxValue;
-                            var minMeasItem = new MeasureItem();
-                            foreach (var measureItem in measureItems)
-                                if (measureItem != null && measureItem.AverageE <= min)
-                                {
-                                    min = measureItem.AverageE;
-                                    minMeasItem = measureItem;
-                                }
-
-                            if (measureItems.Count != 0)
+                        }
+                        else
+                        {
+                            for (var j = 1; j <= 10; j++)
                             {
-                                if (minMeasItem.Levels != null)
-                                {
-                                    for (var j = 1; j <= minMeasItem.Levels.Count; j++)
-                                    {
-                                        fields.Add(new FieldContent("EFP1_" + j,
-                                            minMeasItem.Levels.ToList()[0].P1.ToString("F")));
-                                        fields.Add(new FieldContent("EFP2_" + j,
-                                            minMeasItem.Levels.ToList()[0].P2.ToString("F")));
-                                    }
-                                }
-                                else
-                                {
-                                    for (var j = 1; j <= 10; j++)
-                                    {
-                                        fields.Add(new FieldContent("EFP1_" + j, "---"));
-                                        fields.Add(new FieldContent("EFP2_" + j, "---"));
-                                    }
-                                }
-
-                                fields.Add(new FieldContent("AverageE", minMeasItem.AverageE.ToString("F")));
-                                fields.Add(new FieldContent("DX", minMeasItem.DX.ToString("F")));
-                                fields.Add(new FieldContent("E", minMeasItem.E));
-
-                                n++;
-
-                                tableContent.AddRow(fields.ToArray());
-                                minMeasureItemsList.Add(minMeasItem);
+                                fields.Add(new FieldContent("EFP1_" + j, "---"));
+                                fields.Add(new FieldContent("EFP2_" + j, "---"));
                             }
                         }
 
-                        listItemContent.AddField("EFFrequency", freq.ToString());
-                        listItemContent.AddTable(tableContent);
-                        listContent.AddItem(listItemContent);
-                        i++;
+                        fields.Add(new FieldContent("AverageE", minMeasItem.AverageE.ToString("F")));
+                        fields.Add(new FieldContent("DX", minMeasItem.DX.ToString("F")));
+                        fields.Add(new FieldContent("E", minMeasItem.E));
+
+                        n++;
+
+                        tableContent.AddRow(fields.ToArray());
+                        minMeasureItemsList.Add(minMeasItem);
                     }
-
-                    //Заполняем итоговую таблицу эффективности экранирования
-                    var resultETableContent = new TableContent("ResultTable");
-                    resultETableContent.Rows = new List<TableRowContent>();
-                    var k = 1;
-                    foreach (var element in room.Elements)
-                    {
-                        var listFreqItemContent = new List<ListItemContent>();
-                        var listEItemContent = new List<ListItemContent>();
-                        var min = double.MaxValue;
-                        var minMesureItem = new MeasureItem();
-                        foreach (var measureItem in minMeasureItemsList)
-                        {
-                            foreach (var point in element.Points)
-                                if (point.MeasureItems.Contains(measureItem))
-                                {
-                                    var freqItemContent = new ListItemContent("RFrequency", measureItem.Freq.ToString());
-                                    listFreqItemContent.Add(freqItemContent);
-                                    var eItemContent = new ListItemContent("RE", measureItem.E);
-                                    listEItemContent.Add(eItemContent);
-                                }
-
-                            if (measureItem.AverageE <= min)
-                            {
-                                min = measureItem.AverageE;
-                                minMesureItem = measureItem;
-                            }
-                        }
-
-                        minE = minMesureItem.E;
-
-                        var tableRowContent = new TableRowContent();
-                        tableRowContent.Fields.Add(new FieldContent("ElementNumberResultTable", k.ToString()));
-                        tableRowContent.Fields.Add(new FieldContent("EMinElResultTable",
-                            minMeasureItemsList.FirstOrDefault(mi => mi.MeasPoint.Element == element).E));
-
-                        var listContentItemFreq = new ListContent("FrequencyListResulTable");
-                        listContentItemFreq.Items = new List<ListItemContent>(listFreqItemContent);
-                        tableRowContent.Lists.Add(listContentItemFreq);
-
-                        var listContentItemE = new ListContent("EListResultTable");
-                        listContentItemE.Items = new List<ListItemContent>(listEItemContent);
-                        tableRowContent.Lists.Add(listContentItemE);
-
-                        resultETableContent.Rows.Add(tableRowContent);
-                        k++;
-                    }
-
-                    string startFrequency = string.Empty;
-                    string endFrequency = string.Empty;
-                    if (room.MeasSettings is not null)
-                    {
-                        startFrequency = room.MeasSettings.StartFrequency.ToString();
-                        endFrequency = room.MeasSettings.EndFrequency.ToString();
-                    }
-
-                    //Заполняем шаблон содержимым
-                    var valuesToFill = new Content(
-                        new FieldContent("Room", room.Name),
-                        new FieldContent("Organization", room.Organization.Name),
-                        new FieldContent("Address", room.Organization.Address),
-                        new FieldContent("FrequencyStart", startFrequency),
-                        new FieldContent("FrequencyEnd", endFrequency),
-                        new TableContent("DevicesTable", devicesRows),
-                        new TableContent("ElementsTable", elementsRows),
-                        new FieldContent("TableCount", (i - 1).ToString()),
-                        new FieldContent("TableNumber", i.ToString()),
-                        new FieldContent("ResultMinE", minE)
-                    );
-                    valuesToFill.Lists.Add(listContent); //Добавляем список таблиц результатов по каждой частоте
-                    valuesToFill.Tables.Add(resultETableContent); //Добавляем результирующую таблицу
-                    resultETableContent = new TableContent("ResultTable");
-                    resultETableContent.AddRow(new FieldContent("MinE", minE));
-                    valuesToFill.Tables.Add(resultETableContent);
-
-                    using (var outputDocument = new TemplateProcessor(outputFileName).SetRemoveContentControls(true))
-                    {
-                        outputDocument.FillContent(valuesToFill);
-                        outputDocument.SaveChanges();
-                    }
-
-                    Process.Start("explorer", outputFileName);
                 }
-                else
+
+                listItemContent.AddField("EFFrequency", freq.ToString());
+                listItemContent.AddTable(tableContent);
+                listContent.AddItem(listItemContent);
+                i++;
+            }
+
+            //Заполняем итоговую таблицу эффективности экранирования
+            var resultETableContent = new TableContent("ResultTable");
+            resultETableContent.Rows = new List<TableRowContent>();
+            var k = 1;
+            foreach (var element in room.Elements)
+            {
+                var listFreqItemContent = new List<ListItemContent>();
+                var listEItemContent = new List<ListItemContent>();
+                var min = double.MaxValue;
+                var minMesureItem = new MeasureItem();
+                foreach (var measureItem in minMeasureItemsList)
                 {
-                    MessageBox.Show("В выбраном помещении отсутствуют исследуемые элементы");
+                    foreach (var point in element.Points)
+                        if (point.MeasureItems.Contains(measureItem))
+                        {
+                            var freqItemContent = new ListItemContent("RFrequency", measureItem.Freq.ToString());
+                            listFreqItemContent.Add(freqItemContent);
+                            var eItemContent = new ListItemContent("RE", measureItem.E);
+                            listEItemContent.Add(eItemContent);
+                        }
+
+                    if (measureItem.AverageE <= min)
+                    {
+                        min = measureItem.AverageE;
+                        minMesureItem = measureItem;
+                    }
+                }
+
+                minE = minMesureItem.E;
+
+                var tableRowContent = new TableRowContent();
+                tableRowContent.Fields.Add(new FieldContent("ElementNumberResultTable", k.ToString()));
+                tableRowContent.Fields.Add(new FieldContent("EMinElResultTable",
+                    minMeasureItemsList.FirstOrDefault(mi => mi.MeasPoint.Element == element).E));
+
+                var listContentItemFreq = new ListContent("FrequencyListResulTable");
+                listContentItemFreq.Items = new List<ListItemContent>(listFreqItemContent);
+                tableRowContent.Lists.Add(listContentItemFreq);
+
+                var listContentItemE = new ListContent("EListResultTable");
+                listContentItemE.Items = new List<ListItemContent>(listEItemContent);
+                tableRowContent.Lists.Add(listContentItemE);
+
+                resultETableContent.Rows.Add(tableRowContent);
+                k++;
+            }
+
+            string startFrequency = string.Empty;
+            string endFrequency = string.Empty;
+            if (room.MeasSettings is not null)
+            {
+                startFrequency = room.MeasSettings.StartFrequency.ToString();
+                endFrequency = room.MeasSettings.EndFrequency.ToString();
+            }
+
+            //Заполняем шаблон содержимым
+            var valuesToFill = new Content(
+                new FieldContent("Room", room.Name),
+                new FieldContent("Organization", room.Organization.Name),
+                new FieldContent("Address", room.Organization.Address),
+                new FieldContent("FrequencyStart", startFrequency),
+                new FieldContent("FrequencyEnd", endFrequency),
+                new TableContent("DevicesTable", devicesRows),
+                new TableContent("ElementsTable", elementsRows),
+                new FieldContent("TableCount", (i - 1).ToString()),
+                new FieldContent("TableNumber", i.ToString()),
+                new FieldContent("ResultMinE", minE)
+            );
+
+            valuesToFill.Lists.Add(listContent); //Добавляем список таблиц результатов по каждой частоте
+            valuesToFill.Tables.Add(resultETableContent); //Добавляем результирующую таблицу
+            resultETableContent = new TableContent("ResultTable");
+            resultETableContent.AddRow(new FieldContent("MinE", minE));
+            valuesToFill.Tables.Add(resultETableContent);
+
+            try
+            {
+                using (TemplateProcessor outputDocument = new TemplateProcessor(outputFileName).SetRemoveContentControls(true))
+                {
+                    //outputDocument.FillContent(new Content(
+                    //    new FieldContent("Room", room.Name),
+                    //    new FieldContent("Organization", room.Organization.Name),
+                    //    new FieldContent("Address", room.Organization.Address),
+                    //    new FieldContent("FrequencyStart", startFrequency),
+                    //    new FieldContent("FrequencyEnd", endFrequency),
+                    //    new TableContent("DevicesTable", devicesRows),
+                    //    new TableContent("ElementsTable", elementsRows),
+                    //    new FieldContent("TableCount", (i - 1).ToString()),
+                    //    new FieldContent("TableNumber", i.ToString()),
+                    //    new FieldContent("ResultMinE", minE)
+                    //    ));
+                    outputDocument.FillContent(valuesToFill);
+                    outputDocument.SaveChanges();
+                    
                 }
             }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+
+            Process.Start("explorer", outputFileName);
         }
 
         private bool CanCreateReportCommandExecute(object p)
         {
-            return SelectedValue is not null && SelectedValue is Room;
+            return SelectedValue is not null && SelectedValue is Room && ((Room)SelectedValue).Elements is not null;
         }
 
         #endregion
